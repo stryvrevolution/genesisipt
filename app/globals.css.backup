@@ -3,43 +3,44 @@
 @tailwind utilities;
 
 /* =====================================================
-   STRYV LAB — CLINICAL BIO-BRUTALISM
-   Brand Book v1.0
+   STRYV LAB — DESIGN SYSTEM GENESIS
+   Obsidian Black + Electric Emerald
+   Forensic • Clinical • Premium
    ===================================================== */
 
-:root {
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     COLORS — BRAND BOOK EXACT
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  
-  /* Base backgrounds */
-  --bg-obsidian: #08090A;           /* Obsidian Core */
-  --bg-carbon: #1C1E21;             /* Carbon Concrete */
-  --bg-surface: #1C1E21;
-  
-  /* Genesis Cyan accent (bio-luminescent signal) */
-  --genesis-cyan-500: #4DEEEA;
-  --genesis-cyan-400: #6FF2EE;
-  --genesis-cyan-600: #3DD9D5;
-  --genesis-cyan-glow: rgba(77, 238, 234, 0.15);
-  
-  /* Text hierarchy */
-  --text-primary: #F0F2F5;          /* Titanium White */
-  --text-secondary: #8A92A0;        /* Tech Grey */
-  --text-muted: rgba(138, 146, 160, 0.6);
-  --text-disabled: rgba(138, 146, 160, 0.3);
-  
-  /* Borders & strokes (technical grid - 1px) */
-  --stroke-subtle: rgba(240, 242, 245, 0.06);
-  --stroke-medium: rgba(240, 242, 245, 0.12);
-  --stroke-strong: rgba(240, 242, 245, 0.18);
-  --stroke-cyan: rgba(77, 238, 234, 0.3);
-  
-  /* Surfaces */
-  --surface-elevated: rgba(240, 242, 245, 0.03);
-  --surface-hover: rgba(240, 242, 245, 0.06);
-  --surface-glass: rgba(240, 242, 245, 0.04);
-  
+   :root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       COLORS — STRYV LAB BRAND BOOK
+       Clinical Bio-Brutalism
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    
+    /* Base backgrounds */
+    --bg-obsidian: #08090A;           /* Obsidian Core */
+    --bg-carbon: #1C1E21;             /* Carbon Concrete */
+    --bg-surface: #1C1E21;
+    
+    /* Genesis Cyan accent (bio-luminescent) */
+    --genesis-cyan-500: #4DEEEA;
+    --genesis-cyan-400: #6FF2EE;
+    --genesis-cyan-600: #3DD9D5;
+    --genesis-cyan-glow: rgba(77, 238, 234, 0.15);
+    
+    /* Text hierarchy */
+    --text-primary: #F0F2F5;          /* Titanium White */
+    --text-secondary: #8A92A0;        /* Tech Grey */
+    --text-muted: rgba(138, 146, 160, 0.6);
+    --text-disabled: rgba(138, 146, 160, 0.3);
+    
+    /* Borders & strokes (technical grid) */
+    --stroke-subtle: rgba(240, 242, 245, 0.06);
+    --stroke-medium: rgba(240, 242, 245, 0.12);
+    --stroke-strong: rgba(240, 242, 245, 0.18);
+    --stroke-cyan: rgba(77, 238, 234, 0.3);
+    
+    /* Surfaces */
+    --surface-elevated: rgba(240, 242, 245, 0.03);
+    --surface-hover: rgba(240, 242, 245, 0.06);
+    --surface-glass: rgba(240, 242, 245, 0.04);
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      SPACING & SIZING
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -59,9 +60,9 @@
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   
   /* Variables set by Next.js font loader:
-     --font-body: Inter
-     --font-display: Space Grotesk
-     --font-mono: JetBrains Mono */
+     --font-body (Inter)
+     --font-display (Sora)
+     --font-mono (JetBrains Mono) */
   
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      TRANSITIONS
@@ -71,31 +72,30 @@
   --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
   
-  /* Grain texture opacity */
+  /* Grain texture */
   --grain-opacity: 0.015;
 }
 
 /* =====================================================
-   GLOBAL BACKGROUND — OBSIDIAN CORE
-   Dark Mode Permanent (85% sombre)
+   GLOBAL BACKGROUND — OBSIDIAN DEPTH
    ===================================================== */
 
 html,
 body {
   min-height: 100vh;
   background:
-    /* Subtle vignette (15% lumière) */
+    /* Subtle vignette */
     radial-gradient(
       ellipse 1400px 1000px at 50% 50%,
-      rgba(8, 9, 10, 0) 40%,
-      rgba(0, 0, 0, 0.85) 100%
+      rgba(10, 10, 10, 0) 40%,
+      rgba(0, 0, 0, 0.6) 100%
     ),
     
-    /* Obsidian Core base */
+    /* Deep obsidian base */
     linear-gradient(
       180deg,
       #0f0f0f 0%,
-      #08090A 100%
+      #0a0a0a 100%
     );
 
   background-attachment: fixed;
@@ -104,8 +104,7 @@ body {
 }
 
 /* =====================================================
-   TECHNICAL GRID (1px lines - Brand Book)
-   La Grille (La Science)
+   ARCHITECTURAL GRID (SUBTLE)
    ===================================================== */
 
 body::before {
@@ -120,11 +119,11 @@ body::before {
     linear-gradient(90deg, var(--stroke-subtle) 1px, transparent 1px);
   
   background-size: 80px 80px;
-  opacity: 0.3;
+  opacity: 0.25;
 }
 
 /* =====================================================
-   FILM GRAIN TEXTURE
+   FILM GRAIN TEXTURE (PREMIUM TOUCH)
    ===================================================== */
 
 body::after {
@@ -141,7 +140,7 @@ body::after {
 }
 
 /* =====================================================
-   COMPONENT PRIMITIVES — CLINICAL BIO-BRUTALISM
+   COMPONENT PRIMITIVES
    ===================================================== */
 
 @layer components {
@@ -157,7 +156,7 @@ body::after {
     border-radius: var(--radius-lg);
     box-shadow: 
       0 8px 32px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(240, 242, 245, 0.05);
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
   
   .panel-elevated {
@@ -168,19 +167,19 @@ body::after {
   }
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     BUTTONS (Bio-luminescent accent)
+     BUTTONS
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   
   .btn-primary {
     padding: 12px 24px;
     background: var(--genesis-cyan-500);
-    color: #08090A;
+    color: white;
     font-weight: 600;
     border-radius: var(--radius-md);
     border: 1px solid var(--genesis-cyan-600);
     transition: all var(--transition-base);
     box-shadow: 
-      0 4px 12px rgba(77, 238, 234, 0.2),
+      0 4px 12px rgba(16, 185, 129, 0.2),
       0 0 20px var(--genesis-cyan-glow);
   }
   
@@ -188,7 +187,7 @@ body::after {
     background: var(--genesis-cyan-400);
     transform: translateY(-1px);
     box-shadow: 
-      0 6px 16px rgba(77, 238, 234, 0.3),
+      0 6px 16px rgba(16, 185, 129, 0.3),
       0 0 30px var(--genesis-cyan-glow);
   }
   
@@ -225,7 +224,7 @@ body::after {
   }
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     BADGES & CHIPS (HUD style - Blueprint)
+     BADGES & CHIPS
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   
   .chip {
@@ -237,21 +236,21 @@ body::after {
     border: 1px solid var(--stroke-subtle);
     border-radius: var(--radius-pill);
     font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-muted);
   }
   
-  .chip-cyan {
+  .chip-genesis-cyan {
     background: var(--genesis-cyan-glow);
-    border-color: var(--stroke-cyan);
+    border-color: var(--stroke-genesis-cyan);
     color: var(--genesis-cyan-400);
   }
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     DIVIDERS (Technical grid)
+     DIVIDERS
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   
   .divider-h {
@@ -275,7 +274,7 @@ body::after {
   }
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     TYPOGRAPHY (Space Grotesk + Inter)
+     TYPOGRAPHY
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   
   .heading-xl {
@@ -283,8 +282,7 @@ body::after {
     font-size: clamp(2rem, 4vw, 3.5rem);
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
   }
   
@@ -293,8 +291,7 @@ body::after {
     font-size: clamp(1.5rem, 3vw, 2.5rem);
     font-weight: 600;
     line-height: 1.3;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
+    letter-spacing: -0.01em;
     color: var(--text-primary);
   }
   
@@ -303,15 +300,6 @@ body::after {
     font-size: clamp(1.25rem, 2.5vw, 2rem);
     font-weight: 600;
     line-height: 1.4;
-    letter-spacing: 0.02em;
-    color: var(--text-primary);
-  }
-  
-  .text-body {
-    font-family: var(--font-body);
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1.6;
     color: var(--text-primary);
   }
   
@@ -342,7 +330,6 @@ body::after {
     border: 2px solid var(--stroke-medium);
     border-radius: var(--radius-md);
     color: var(--text-primary);
-    font-family: var(--font-body);
     font-size: 16px;
     transition: all var(--transition-base);
   }
@@ -361,11 +348,11 @@ body::after {
      UTILITIES
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   
-  .glow-cyan {
+  .glow-genesis-cyan {
     box-shadow: 0 0 20px var(--genesis-cyan-glow);
   }
   
-  .text-gradient-cyan {
+  .text-gradient-genesis-cyan {
     background: linear-gradient(135deg, var(--genesis-cyan-400), var(--genesis-cyan-600));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -374,7 +361,7 @@ body::after {
 }
 
 /* =====================================================
-   SCROLLBAR — Minimalist
+   SCROLLBAR STYLING (OPTIONAL)
    ===================================================== */
 
 ::-webkit-scrollbar {
@@ -392,11 +379,11 @@ body::after {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--stroke-cyan);
+  background: var(--stroke-strong);
 }
 
 /* =====================================================
-   SELECTION — Genesis Cyan accent
+   SELECTION STYLING
    ===================================================== */
 
 ::selection {
@@ -405,7 +392,7 @@ body::after {
 }
 
 /* =====================================================
-   RENDERING OPTIMIZATION
+   ANTI-ALIASING & RENDERING
    ===================================================== */
 
 * {
