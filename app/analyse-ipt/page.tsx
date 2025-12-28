@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { IPTQuestionnaire } from '@/components/genesis/IPTQuestionnaire';
+import { IPTQuestionnaire } from '@/app/components/genesis/IPTQuestionnaire';
 import genesisQuestions from '@/data/genesis_questions.json';
 import { GenesisQuestion, IPTResponses } from '@/types/genesis';
 

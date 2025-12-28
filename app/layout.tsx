@@ -1,6 +1,6 @@
 import '@/app/globals.css';
 import { Footer } from '@/app/components/Footer';
-import { Inter, Sora, JetBrains_Mono } from 'next/font/google';
+import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // FONTS CONFIGURATION
@@ -12,7 +12,7 @@ const inter = Inter({
   display: 'swap', // Performance optimization
 });
 
-const sora = Sora({
+const sora = Space_Grotesk({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'], // Ajout 700 pour headers
   variable: '--font-display',

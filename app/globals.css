@@ -19,10 +19,10 @@
   --bg-surface: #1f1f1f;
   
   /* Emerald accent */
-  --emerald-500: #10b981;
-  --emerald-400: #34d399;
-  --emerald-600: #059669;
-  --emerald-glow: rgba(16, 185, 129, 0.15);
+  --genesis-cyan-500: #4DEEEA;
+  --genesis-cyan-400: #4DEEEA;
+  --genesis-cyan-600: #059669;
+  --genesis-cyan-glow: rgba(16, 185, 129, 0.15);
   
   /* Text hierarchy */
   --text-primary: #ffffff;
@@ -34,7 +34,7 @@
   --stroke-subtle: rgba(255, 255, 255, 0.06);
   --stroke-medium: rgba(255, 255, 255, 0.12);
   --stroke-strong: rgba(255, 255, 255, 0.18);
-  --stroke-emerald: rgba(16, 185, 129, 0.3);
+  --stroke-genesis-cyan: rgba(16, 185, 129, 0.3);
   
   /* Surfaces */
   --surface-elevated: rgba(255, 255, 255, 0.03);
@@ -172,23 +172,23 @@ body::after {
   
   .btn-primary {
     padding: 12px 24px;
-    background: var(--emerald-500);
+    background: var(--genesis-cyan-500);
     color: white;
     font-weight: 600;
     border-radius: var(--radius-md);
-    border: 1px solid var(--emerald-600);
+    border: 1px solid var(--genesis-cyan-600);
     transition: all var(--transition-base);
     box-shadow: 
       0 4px 12px rgba(16, 185, 129, 0.2),
-      0 0 20px var(--emerald-glow);
+      0 0 20px var(--genesis-cyan-glow);
   }
   
   .btn-primary:hover {
-    background: var(--emerald-400);
+    background: var(--genesis-cyan-400);
     transform: translateY(-1px);
     box-shadow: 
       0 6px 16px rgba(16, 185, 129, 0.3),
-      0 0 30px var(--emerald-glow);
+      0 0 30px var(--genesis-cyan-glow);
   }
   
   .btn-secondary {
@@ -243,10 +243,10 @@ body::after {
     color: var(--text-muted);
   }
   
-  .chip-emerald {
-    background: var(--emerald-glow);
-    border-color: var(--stroke-emerald);
-    color: var(--emerald-400);
+  .chip-genesis-cyan {
+    background: var(--genesis-cyan-glow);
+    border-color: var(--stroke-genesis-cyan);
+    color: var(--genesis-cyan-400);
   }
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -336,8 +336,8 @@ body::after {
   
   .input-field:focus {
     outline: none;
-    border-color: var(--emerald-500);
-    box-shadow: 0 0 0 3px var(--emerald-glow);
+    border-color: var(--genesis-cyan-500);
+    box-shadow: 0 0 0 3px var(--genesis-cyan-glow);
   }
   
   .input-field::placeholder {
@@ -348,12 +348,12 @@ body::after {
      UTILITIES
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   
-  .glow-emerald {
-    box-shadow: 0 0 20px var(--emerald-glow);
+  .glow-genesis-cyan {
+    box-shadow: 0 0 20px var(--genesis-cyan-glow);
   }
   
-  .text-gradient-emerald {
-    background: linear-gradient(135deg, var(--emerald-400), var(--emerald-600));
+  .text-gradient-genesis-cyan {
+    background: linear-gradient(135deg, var(--genesis-cyan-400), var(--genesis-cyan-600));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -387,7 +387,7 @@ body::after {
    ===================================================== */
 
 ::selection {
-  background: var(--emerald-glow);
+  background: var(--genesis-cyan-glow);
   color: var(--text-primary);
 }
 
