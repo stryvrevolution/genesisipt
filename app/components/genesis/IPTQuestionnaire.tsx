@@ -7,7 +7,9 @@ interface IPTQuestionnaireProps {
   value: QuestionResponse;
   onChange: (value: QuestionResponse) => void;
   onConfirm: () => void;
+  onBack?: () => void;  // ✅ NOUVEAU
   canProceed: boolean;
+  canGoBack?: boolean;  // ✅ NOUVEAU
 }
 
 export function IPTQuestionnaire({
@@ -15,13 +17,15 @@ export function IPTQuestionnaire({
   value,
   onChange,
   onConfirm,
+  onBack,
   canProceed,
+  canGoBack = false,
 }: IPTQuestionnaireProps) {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 md:p-8">
       <div className="max-w-3xl w-full">
         
-        {/* Question Card - Clinical Bio-Brutalism */}
+        {/* Question Card */}
         <div className="panel-elevated p-8 md:p-10 mb-6">
           
           {/* Header */}
@@ -48,7 +52,7 @@ export function IPTQuestionnaire({
             />
           )}
 
-          {question.type === 'Choix unique' && (
+          {question.type === 'Choix unique' && question.options && question.options.length > 0 && (
             <div className="space-y-3">
               {question.options.map((option, idx) => (
                 <button
@@ -63,7 +67,6 @@ export function IPTQuestionnaire({
                   `}
                 >
                   <div className="flex items-center gap-4">
-                    {/* Radio indicator */}
                     <div className={`
                       w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all
                       ${value === option 
@@ -76,7 +79,6 @@ export function IPTQuestionnaire({
                       )}
                     </div>
                     
-                    {/* Text */}
                     <span className={`
                       font-medium text-base
                       ${value === option ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}
@@ -91,7 +93,6 @@ export function IPTQuestionnaire({
 
           {question.type === 'Échelle 1-10' && (
             <div className="space-y-6">
-              {/* Range input */}
               <div className="relative">
                 <input
                   type="range"
@@ -109,20 +110,12 @@ export function IPTQuestionnaire({
                     [&::-webkit-slider-thumb]:cursor-pointer
                     [&::-webkit-slider-thumb]:transition-all
                     [&::-webkit-slider-thumb]:hover:scale-110
-                    [&::-moz-range-thumb]:w-6
-                    [&::-moz-range-thumb]:h-6
-                    [&::-moz-range-thumb]:rounded-full
-                    [&::-moz-range-thumb]:bg-[#4DEEEA]
-                    [&::-moz-range-thumb]:border-0
-                    [&::-moz-range-thumb]:shadow-[0_0_12px_rgba(77,238,234,0.4)]
-                    [&::-moz-range-thumb]:cursor-pointer
                   "
                   style={{
                     background: `linear-gradient(to right, #4DEEEA 0%, #4DEEEA ${((value as number || 5) - 1) * 11.11}%, var(--surface-elevated) ${((value as number || 5) - 1) * 11.11}%, var(--surface-elevated) 100%)`
                   }}
                 />
                 
-                {/* Scale markers */}
                 <div className="flex justify-between mt-2 px-1">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                     <span 
@@ -139,7 +132,6 @@ export function IPTQuestionnaire({
                 </div>
               </div>
               
-              {/* Score display */}
               <div className="text-center py-4">
                 <div className="inline-flex items-baseline gap-2">
                   <span className="text-6xl font-bold text-[#4DEEEA] font-['var(--font-display)'] tracking-tight">
@@ -152,10 +144,43 @@ export function IPTQuestionnaire({
               </div>
             </div>
           )}
+
+          {/* ✅ VALIDATION ERROR DISPLAY */}
+          {question.type === 'Choix unique' && (!question.options || question.options.length === 0) && (
+            <div className="p-4 border-2 border-red-500/30 bg-red-500/10 rounded-lg">
+              <p className="text-sm text-red-400">
+                ⚠️ Configuration invalide: Aucune option disponible
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Navigation - HUD style */}
-        <div className="flex justify-end">
+        {/* ✅ NAVIGATION AVEC RETOUR */}
+        <div className="flex justify-between items-center">
+          {/* Bouton Retour */}
+          {canGoBack && onBack && (
+            <button
+              onClick={onBack}
+              className="btn-ghost px-8 py-4 text-sm font-semibold tracking-wider uppercase group"
+            >
+              <span className="flex items-center gap-3">
+                <svg 
+                  className="w-5 h-5 transition-transform group-hover:-translate-x-1" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                </svg>
+                RETOUR
+              </span>
+            </button>
+          )}
+
+          {/* Spacer si pas de bouton retour */}
+          {!canGoBack && <div />}
+
+          {/* Bouton Suivant */}
           <button
             onClick={onConfirm}
             disabled={!canProceed}
