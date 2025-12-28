@@ -8,7 +8,7 @@ import { Menu, X, ChevronDown, Dna, BarChart3, RefreshCw, HeartPulse, Droplet, D
 import { createPortal } from 'react-dom'
 import type { Language } from '@/lib/i18n/translations'
 import { getTranslation } from '@/lib/i18n/translations'
-import { navigationItems } from '@/app/lib/navigation-constants'
+import { navigationItems } from '@/lib/navigation-constants'
 
 // Motion components
 const MotionHeader = motion.header

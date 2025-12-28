@@ -20,45 +20,32 @@ export async function POST(request: NextRequest) {
     const headersList = headers();
     const signature = headersList.get('stripe-signature');
 
-    if (!signature) {
-      return NextResponse.json({ error: 'No signature' }, { status: 400 });
-    }
+    if (!signature) return NextResponse.json({ error: 'No signature' }, { status: 400 });
 
     const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        
-        await supabase
-          .from('payment_transactions')
-          .update({
-            stripe_payment_intent_id: session.payment_intent as string,
-            stripe_customer_id: session.customer as string,
-            status: 'succeeded',
-            paid_at: new Date().toISOString(),
-          })
-          .eq('stripe_session_id', session.id);
-        break;
-      }
-
-      case 'payment_intent.payment_failed': {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        
-        await supabase
-          .from('payment_transactions')
-          .update({ status: 'failed' })
-          .eq('stripe_payment_intent_id', paymentIntent.id);
-        break;
-      }
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
+      await supabase
+        .from('payment_transactions')
+        .update({
+          stripe_payment_intent_id: session.payment_intent as string,
+          stripe_customer_id: session.customer as string,
+          status: 'succeeded',
+          paid_at: new Date().toISOString(),
+        })
+        .eq('stripe_session_id', session.id);
+    } else if (event.type === 'payment_intent.payment_failed') {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      await supabase
+        .from('payment_transactions')
+        .update({ status: 'failed' })
+        .eq('stripe_payment_intent_id', paymentIntent.id);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('Webhook error:', error);
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }

@@ -12,30 +12,26 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { sessionId, responses, email } = body;
 
+    // 1. Mettre à jour submission comme complétée
     const { data: submission, error: submissionError } = await supabase
       .from('ipt_submissions')
-      .upsert({
-        session_id: sessionId,
+      .update({
         responses,
         email,
         is_completed: true,
         completed_at: new Date().toISOString(),
         last_updated_at: new Date().toISOString(),
-        current_step: 9,
-        total_steps: 9,
-      }, {
-        onConflict: 'session_id'
       })
+      .eq('session_id', sessionId)
       .select()
       .single();
 
-    if (submissionError) {
-      console.error('Submission error:', submissionError);
-      throw submissionError;
-    }
+    if (submissionError) throw submissionError;
 
+    // 2. Calculer score IPT
     const scoreData = calculateIPTScore(responses);
 
+    // 3. Sauvegarder score
     const { data: score, error: scoreError } = await supabase
       .from('ipt_scores')
       .insert({
@@ -56,10 +52,7 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (scoreError) {
-      console.error('Score error:', scoreError);
-      throw scoreError;
-    }
+    if (scoreError) throw scoreError;
 
     return NextResponse.json({
       success: true,
@@ -71,7 +64,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Submit error:', error);
     return NextResponse.json(
-      { error: 'Failed to submit questionnaire', details: error },
+      { error: 'Failed to submit questionnaire' },
       { status: 500 }
     );
   }

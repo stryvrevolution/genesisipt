@@ -14,18 +14,18 @@ const supabase = createClient(
 const TIERS = {
   RAPPORT: {
     name: 'Rapport IPT Complet',
-    price: 4900,
-    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_TIER1_RAPPORT!,
+    price: 4900, // 49€
+    stripePriceId: process.env.STRIPE_PRICE_RAPPORT!,
   },
   PROTOCOL: {
     name: 'Protocole Personnalisé',
-    price: 14900,
-    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_TIER2_PROTOCOL!,
+    price: 14900, // 149€
+    stripePriceId: process.env.STRIPE_PRICE_PROTOCOL!,
   },
   COACHING: {
     name: 'Coaching GENESIS 12 Semaines',
-    price: 99900,
-    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_TIER3_COACHING!,
+    price: 99900, // 999€
+    stripePriceId: process.env.STRIPE_PRICE_COACHING!,
   },
 };
 
@@ -42,13 +42,10 @@ export async function POST(request: NextRequest) {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [{
-        price: selectedTier.stripePriceId,
-        quantity: 1,
-      }],
+      line_items: [{ price: selectedTier.stripePriceId, quantity: 1 }],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/genesis/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/genesis/results/${submissionId}`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/genesis/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/genesis/results/${submissionId}`,
       customer_email: email,
       metadata: { submissionId, tier },
     });
@@ -62,15 +59,9 @@ export async function POST(request: NextRequest) {
       status: 'pending',
     });
 
-    return NextResponse.json({
-      sessionId: session.id,
-      url: session.url,
-    });
+    return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
     console.error('Stripe checkout error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

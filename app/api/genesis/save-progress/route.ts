@@ -9,8 +9,9 @@ const supabase = createClient(
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { sessionId, currentModule, currentQuestionIndex, responses, timeSpent } = body;
+    const { sessionId, currentModule, currentQuestionIndex, responses } = body;
 
+    // Upsert submission (create or update)
     const { data, error } = await supabase
       .from('ipt_submissions')
       .upsert({

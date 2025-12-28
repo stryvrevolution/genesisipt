@@ -1,4 +1,7 @@
-// Types GENESIS IPT - Version simplifiée pour démarrage rapide
+// =====================================================
+// GENESIS IPT - TYPESCRIPT TYPES
+// À placer dans: types/genesis.ts
+// =====================================================
 
 export interface GenesisQuestion {
   id: string;
@@ -33,6 +36,9 @@ export interface IPTSubmission {
   totalSteps: number;
   isCompleted: boolean;
   responses: IPTResponses;
+  userAgent?: string;
+  ipAddress?: string;
+  referrer?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,19 +47,85 @@ export interface IPTScore {
   id: string;
   submissionId: string;
   iptScore: number;
-  iptCory: 'CRITIQUE' | 'FAIBLE' | 'MOYEN' | 'ÉLEVÉ' | 'EXCELLENT';
+  iptCategory: 'CRITIQUE' | 'FAIBLE' | 'MOYEN' | 'ÉLEVÉ' | 'EXCELLENT';
   metabolicScore: number;
   infrastructureScore: number;
   psychologyScore: number;
   physiologyScore: number;
   adherenceScore: number;
-  detectedPatterns: any[];
-  redFlags: any[];
-  rootCauses: any[];
-  recommendations: any[];
-  detailedScores: any;
+  detectedPatterns: DetectedPattern[];
+  redFlags: RedFlag[];
+  rootCauses: RootCause[];
+  recommendations: Recommendation[];
+  detailedScores: DetailedScores;
   calculatedAt: Date;
   createdAt: Date;
+}
+
+export interface DetectedPattern {
+  patternId: string;
+  patternName: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  confidence: number;
+  description: string;
+  relatedQuestions: string[];
+  impact: string;
+}
+
+export interface RedFlag {
+  type: 'MEDICAL' | 'METABOLIC' | 'PSYCHOLOGICAL' | 'HORMONAL' | 'ENVIRONMENTAL';
+  severity: 'warning' | 'critical';
+  title: string;
+  description: string;
+  actionRequired: string;
+  relatedPatterns: string[];
+}
+
+export interface RootCause {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  confidence: number;
+  evidence: string[];
+  scientificBasis: string;
+}
+
+export interface Recommendation {
+  category: 'NUTRITION' | 'TRAINING' | 'RECOVERY' | 'MEDICAL' | 'LIFESTYLE';
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  actionSteps: string[];
+  expectedImpact: string;
+  timeline: string;
+}
+
+export interface DetailedScores {
+  [dimension: string]: {
+    score: number;
+    weight: number;
+    breakdown: {
+      [subdimension: string]: number;
+    };
+  };
+}
+
+export interface IPTCategory {
+  scoreMin: number;
+  scoreMax: number;
+  category: 'CRITIQUE' | 'FAIBLE' | 'MOYEN' | 'ÉLEVÉ' | 'EXCELLENT';
+  description: string;
+  color: string;
+}
+
+export interface SessionStats {
+  questionsAnswered: number;
+  questionsTotal: number;
+  completionPercentage: number;
+  timeElapsed: number;
+  timeEstimatedRemaining: number;
+  averageTimePerQuestion: number;
 }
 
 export type ScoringPillar = 

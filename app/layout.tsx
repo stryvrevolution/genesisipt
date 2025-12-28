@@ -1,52 +1,86 @@
-import { Inter, Poppins, Roboto_Mono } from 'next/font/google'
-import './globals.css'
-// On garde le Footer en import normal car il est statique
-import { FooterMedisync } from '@/app/components/sections/footer-medisync'
-// 1. On importe l'outil dynamic de Next.js
-import dynamic from 'next/dynamic'
+import '@/app/globals.css';
+import { Footer } from '@/app/components/Footer';
+import { Inter, Sora, JetBrains_Mono } from 'next/font/google';
 
-// 2. On importe le Header de manière dynamique avec ssr: false
-// Cela empêche le serveur d'essayer de lire "window" et de faire planter le build
-const HeaderMedisync = dynamic(
-  () => import('@/app/components/layout/header-medisync').then((mod) => mod.HeaderMedisync),
-  { ssr: false }
-)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FONTS CONFIGURATION
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-inter',
-})
+  variable: '--font-body',
+  display: 'swap', // Performance optimization
+});
 
-const poppins = Poppins({ 
+const sora = Sora({
   subsets: ['latin'],
-  weight: ['200', '300', '500', '600'],
-  variable: '--font-poppins',
-})
+  weight: ['300', '400', '500', '600', '700'], // Ajout 700 pour headers
+  variable: '--font-display',
+  display: 'swap',
+});
 
-const robotoMono = Roboto_Mono({ 
+const mono = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-roboto-mono',
-})
+  weight: ['400', '500', '600'], // Poids spécifiques pour code/data
+  variable: '--font-mono',
+  display: 'swap',
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// METADATA
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export const metadata = {
-  title: 'GENESIS by Stryv Lab — Forensic Metabolic Coaching',
-  description: 'L\'Indice de Potentiel de Transformation (IPT) évalue si votre transformation est biologiquement et comportementalement possible.',
-}
+  title: 'GENESIS by STRYV LAB — Forensic Metabolic Coaching',
+  description: 'Système d\'analyse métabolique forensique pour transformation physique basée sur la science. IPT scoring, root cause analysis, protocoles personnalisés.',
+  keywords: ['GENESIS', 'IPT', 'coaching métabolique', 'transformation', 'STRYV LAB'],
+  authors: [{ name: 'Coach Stryv', url: 'https://stryvlab.com' }],
+  openGraph: {
+    title: 'GENESIS — Forensic Metabolic Coaching',
+    description: 'Indice de Potentiel de Transformation scientifiquement validé',
+    url: 'https://stryvlab.com',
+    siteName: 'STRYV LAB',
+    locale: 'fr_BE',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ROOT LAYOUT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className="dark">
-      <body className={`${inter.variable} ${poppins.variable} ${robotoMono.variable} ${inter.className} antialiased bg-[#11202E]`}>
-        <HeaderMedisync />
-        {children}
-        <FooterMedisync />
+    <html 
+      lang="fr" 
+      className={`${inter.variable} ${sora.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="antialiased bg-black text-white">
+        {/* Main Content Wrapper */}
+        <main className="relative z-10 min-h-screen">
+          {children}
+        </main>
+
+        {/* Footer Global (auto-hidden sur /genesis via CSS ou logic) */}
+        <Footer />
+
+        {/* Optional: Grain Texture Overlay (désactivable) */}
+        <div 
+          className="pointer-events-none fixed inset-0 z-50 opacity-[0.015]"
+          style={{
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 400 400\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+          }}
+        />
       </body>
     </html>
-  )
+  );
 }

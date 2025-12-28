@@ -13,17 +13,24 @@ export async function GET(
   try {
     const { submissionId } = params;
 
-    const { data: submission, error } = await supabase
+    const { data: submission, error: submissionError } = await supabase
       .from('ipt_submissions')
       .select('*, ipt_scores(*)')
       .eq('id', submissionId)
       .single();
 
-    if (error) throw error;
+    if (submissionError) throw submissionError;
+
+    if (!submission.ipt_scores || submission.ipt_scores.length === 0) {
+      return NextResponse.json(
+        { error: 'Score not found' },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({
       submission,
-      score: submission.ipt_scores?.[0] || null,
+      score: submission.ipt_scores[0],
     });
   } catch (error) {
     console.error('Get score error:', error);
