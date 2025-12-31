@@ -1,59 +1,34 @@
-import '@/app/globals.css';
-import { Footer } from '@/app/components/Footer';
-import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import type { Metadata } from 'next';
+import localFont from 'next/font/local';
+import './globals.css';
+import './typography.css'; // On garde votre fichier css au cas où
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// FONTS — STRYV LAB BRAND BOOK
-// Clinical Bio-Brutalism Typography System
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-body',
+// 1. Configurer Azonix (Logo "STRYV")
+const azonix = localFont({
+  src: './fonts/Azonix.otf',
+  variable: '--font-azonix',
   display: 'swap',
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-display',
+// 2. Configurer Ramabhadra (Titres H1, H2)
+const ramabhadra = localFont({
+  src: './fonts/Ramabhadra-Regular.ttf',
+  variable: '--font-ramabhadra',
   display: 'swap',
 });
 
-const jetBrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-mono',
+// 3. Configurer Outfit (Logo "lab", Textes, autres titres)
+// On utilise la version Variable pour avoir toutes les graisses (Thin à Black)
+const outfit = localFont({
+  src: './fonts/Outfit-VariableFont_wght.ttf',
+  variable: '--font-outfit',
   display: 'swap',
 });
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// METADATA
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-export const metadata = {
-  title: 'GENESIS by STRYV LAB — Forensic Metabolic Coaching',
-  description: 'Système d\'analyse métabolique forensique pour transformation physique basée sur la science. IPT scoring, root cause analysis, protocoles personnalisés.',
-  keywords: ['GENESIS', 'IPT', 'coaching métabolique', 'transformation', 'STRYV LAB', 'forensic analysis'],
-  authors: [{ name: 'Coach Stryv', url: 'https://stryvlab.com' }],
-  openGraph: {
-    title: 'GENESIS — Forensic Metabolic Coaching',
-    description: 'Indice de Potentiel de Transformation scientifiquement validé',
-    url: 'https://stryvlab.com',
-    siteName: 'STRYV LAB',
-    locale: 'fr_BE',
-    type: 'website',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+export const metadata: Metadata = {
+  title: 'Genesis Lab',
+  description: 'Application Genesis Lab',
 };
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ROOT LAYOUT — CLINICAL BIO-BRUTALISM
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function RootLayout({
   children,
@@ -61,19 +36,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html 
-      lang="fr" 
-      className={`${inter.variable} ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
-      suppressHydrationWarning
-    >
-      <body className="antialiased">
-        {/* Main Content Wrapper */}
-        <main className="relative z-10 min-h-screen">
-          {children}
-        </main>
-
-        {/* Footer Global */}
-        <Footer />
+    <html lang="fr">
+      <body
+        // On injecte les 3 variables de police
+        // "font-outfit" est mis par défaut pour tout le texte du site
+        className={`${azonix.variable} ${ramabhadra.variable} ${outfit.variable} font-outfit antialiased bg-bg text-white`}
+      >
+        {children}
       </body>
     </html>
   );

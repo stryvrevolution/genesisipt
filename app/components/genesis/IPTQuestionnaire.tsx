@@ -1,208 +1,128 @@
 'use client';
 
-import { GenesisQuestion, QuestionResponse } from '@/types/genesis';
+import { useState } from 'react';
 
-interface IPTQuestionnaireProps {
-  question: GenesisQuestion;
-  value: QuestionResponse;
-  onChange: (value: QuestionResponse) => void;
-  onConfirm: () => void;
-  onBack?: () => void;  // ✅ NOUVEAU
-  canProceed: boolean;
-  canGoBack?: boolean;  // ✅ NOUVEAU
-}
+type Question = {
+  id: string;
+  label: string;
+  type: 'single' | 'number';
+  options?: string[];
+  unit?: string;
+};
+
+const QUESTIONS: Question[] = [
+  {
+    id: 'q1',
+    label:
+      'Depuis combien de temps tentez-vous de modifier votre composition corporelle ?',
+    type: 'number',
+    unit: 'années',
+  },
+  {
+    id: 'q2',
+    label:
+      'Quel est actuellement votre principal frein perçu ?',
+    type: 'single',
+    options: ['Énergie', 'Résultats instables', 'Motivation', 'Structure'],
+  },
+];
 
 export function IPTQuestionnaire({
-  question,
-  value,
-  onChange,
-  onConfirm,
-  onBack,
-  canProceed,
-  canGoBack = false,
-}: IPTQuestionnaireProps) {
+  onComplete,
+}: {
+  onComplete: (data: Record<string, any>) => void;
+}) {
+  const [index, setIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+
+  const q = QUESTIONS[index];
+
+  const handleNext = (value: any) => {
+    const next = { ...answers, [q.id]: value };
+    setAnswers(next);
+
+    if (index < QUESTIONS.length - 1) {
+      setIndex(index + 1);
+    } else {
+      onComplete(next);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 md:p-8">
-      <div className="max-w-3xl w-full">
-        
-        {/* Question Card */}
-        <div className="panel-elevated p-8 md:p-10 mb-6">
-          
-          {/* Header */}
-          <div className="mb-8">
-            <span className="text-micro text-[#4DEEEA]">
-              QUESTION {question.id}
-            </span>
-            <h2 className="heading-lg mt-3">
-              {question.question}
-            </h2>
-          </div>
+    <main className="min-h-screen flex items-center justify-center px-8 md:px-16 lg:px-24 bg-bg text-text">
 
-          {/* Divider */}
-          <div className="divider-h mb-8" />
+      <div className="w-full max-w-4xl">
 
-          {/* Input basé sur le type */}
-          {question.type === 'Numérique' && (
-            <input
-              type="number"
-              value={value || ''}
-              onChange={(e) => onChange(parseFloat(e.target.value) || '')}
-              className="input-field text-lg"
-              placeholder="Entrez un nombre..."
-            />
-          )}
+        {/* ================= PROGRESSION ================= */}
+        <div className="mb-16 label">
+          Évaluation IPT — {index + 1} / {QUESTIONS.length}
+        </div>
 
-          {question.type === 'Choix unique' && question.options && question.options.length > 0 && (
-            <div className="space-y-3">
-              {question.options.map((option, idx) => (
+        {/* ================= QUESTION ================= */}
+        <h1 className="h1">
+          {q.label}
+        </h1>
+
+        {/* ================= INPUT ================= */}
+        <div className="mt-20">
+
+          {/* ---- CHOIX UNIQUE ---- */}
+          {q.type === 'single' && (
+            <div className="space-y-6">
+              {q.options?.map((opt) => (
                 <button
-                  key={idx}
-                  onClick={() => onChange(option)}
-                  className={`
-                    w-full px-5 py-4 rounded-lg border-2 text-left transition-all duration-200
-                    ${value === option 
-                      ? 'border-[#4DEEEA] bg-[#4DEEEA]/10 shadow-[0_0_20px_rgba(77,238,234,0.15)]' 
-                      : 'border-[var(--stroke-medium)] bg-[var(--surface-elevated)] hover:border-[#4DEEEA]/50 hover:bg-[var(--surface-hover)]'
-                    }
-                  `}
+                  key={opt}
+                  onClick={() => handleNext(opt)}
+                  className="
+                    block w-full text-left
+                    text-small
+                    uppercase
+                    tracking-[0.25em]
+                    pb-4
+                    border-b
+                    border-divider
+                    text-textMuted
+                    hover:text-text
+                    transition-colors
+                  "
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={`
-                      w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all
-                      ${value === option 
-                        ? 'border-[#4DEEEA] bg-[#4DEEEA] shadow-[0_0_8px_rgba(77,238,234,0.4)]' 
-                        : 'border-[var(--text-secondary)]'
-                      }
-                    `}>
-                      {value === option && (
-                        <div className="w-2 h-2 bg-[#08090A] rounded-full" />
-                      )}
-                    </div>
-                    
-                    <span className={`
-                      font-medium text-base
-                      ${value === option ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}
-                    `}>
-                      {option}
-                    </span>
-                  </div>
+                  {opt}
                 </button>
               ))}
             </div>
           )}
 
-          {question.type === 'Échelle 1-10' && (
-            <div className="space-y-6">
-              <div className="relative">
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={value || 5}
-                  onChange={(e) => onChange(parseInt(e.target.value))}
-                  className="w-full h-2 bg-[var(--surface-elevated)] rounded-full appearance-none cursor-pointer
-                    [&::-webkit-slider-thumb]:appearance-none 
-                    [&::-webkit-slider-thumb]:w-6 
-                    [&::-webkit-slider-thumb]:h-6 
-                    [&::-webkit-slider-thumb]:rounded-full 
-                    [&::-webkit-slider-thumb]:bg-[#4DEEEA]
-                    [&::-webkit-slider-thumb]:shadow-[0_0_12px_rgba(77,238,234,0.4)]
-                    [&::-webkit-slider-thumb]:cursor-pointer
-                    [&::-webkit-slider-thumb]:transition-all
-                    [&::-webkit-slider-thumb]:hover:scale-110
-                  "
-                  style={{
-                    background: `linear-gradient(to right, #4DEEEA 0%, #4DEEEA ${((value as number || 5) - 1) * 11.11}%, var(--surface-elevated) ${((value as number || 5) - 1) * 11.11}%, var(--surface-elevated) 100%)`
-                  }}
-                />
-                
-                <div className="flex justify-between mt-2 px-1">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                    <span 
-                      key={num} 
-                      className={`text-xs font-mono transition-colors ${
-                        num === (value as number || 5) 
-                          ? 'text-[#4DEEEA] font-semibold' 
-                          : 'text-[var(--text-muted)]'
-                      }`}
-                    >
-                      {num}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="text-center py-4">
-                <div className="inline-flex items-baseline gap-2">
-                  <span className="text-6xl font-bold text-[#4DEEEA] font-['var(--font-display)'] tracking-tight">
-                    {value || 5}
-                  </span>
-                  <span className="text-2xl text-[var(--text-secondary)] font-mono">
-                    / 10
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ✅ VALIDATION ERROR DISPLAY */}
-          {question.type === 'Choix unique' && (!question.options || question.options.length === 0) && (
-            <div className="p-4 border-2 border-red-500/30 bg-red-500/10 rounded-lg">
-              <p className="text-sm text-red-400">
-                ⚠️ Configuration invalide: Aucune option disponible
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* ✅ NAVIGATION AVEC RETOUR */}
-        <div className="flex justify-between items-center">
-          {/* Bouton Retour */}
-          {canGoBack && onBack && (
-            <button
-              onClick={onBack}
-              className="btn-ghost px-8 py-4 text-sm font-semibold tracking-wider uppercase group"
-            >
-              <span className="flex items-center gap-3">
-                <svg 
-                  className="w-5 h-5 transition-transform group-hover:-translate-x-1" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-                </svg>
-                RETOUR
+          {/* ---- NUMÉRIQUE ---- */}
+          {q.type === 'number' && (
+            <div className="flex items-baseline gap-6">
+              <input
+                type="number"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleNext(
+                      (e.target as HTMLInputElement).value
+                    );
+                  }
+                }}
+                className="
+                  bg-transparent
+                  data-xl
+                  outline-none
+                  border-b
+                  border-divider
+                  w-40
+                "
+              />
+              <span className="label">
+                {q.unit}
               </span>
-            </button>
+            </div>
           )}
 
-          {/* Spacer si pas de bouton retour */}
-          {!canGoBack && <div />}
-
-          {/* Bouton Suivant */}
-          <button
-            onClick={onConfirm}
-            disabled={!canProceed}
-            className="btn-primary px-10 py-4 text-sm font-semibold tracking-wider uppercase
-              disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none
-              group
-            "
-          >
-            <span className="flex items-center gap-3">
-              SUIVANT
-              <svg 
-                className="w-5 h-5 transition-transform group-hover:translate-x-1" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </span>
-          </button>
         </div>
+
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,140 +1,126 @@
-// app/lib/genesis/scoring-engine.ts
+// =====================================================
+// GENESIS IPT — SCORING ENGINE
+// File: lib/genesis/scoring-engine.ts
+// =====================================================
+// Purpose:
+// - Calculer l’IPT Score global
+// - Fournir une catégorisation clinique lisible
+// - Exposer un breakdown par piliers
+// - MOCK contrôlé (frontend-safe) en attendant le moteur final
+// =====================================================
 
-// 1. DÉFINITION DES TYPES (Pour la sécurité TypeScript)
-export interface DetailedScores {
-  metabolicFlexibility: number;
-  circadianAlignment: number;
-  inflammatoryStatus: number;
-  nutrientSensing: number;
-  stressResilience: number;
+import { IPTResponses } from '@/types/genesis';
+
+/* =========================
+   PILLAR WEIGHTS (LOCKED)
+   ========================= */
+/**
+ * Pondérations scientifiques des piliers GENESIS
+ * La somme DOIT toujours = 1.00
+ */
+const PILLAR_WEIGHTS = {
+  METABOLIC: 0.30,
+  INFRASTRUCTURE: 0.25,
+  PSYCHOLOGY: 0.20,
+  PHYSIOLOGY: 0.15,
+  ADHERENCE: 0.10,
+} as const;
+
+/* =========================
+   TYPES
+   ========================= */
+
+export type IPTCategory =
+  | 'CRITIQUE'
+  | 'FAIBLE'
+  | 'MOYEN'
+  | 'ÉLEVÉ'
+  | 'EXCELLENT';
+
+export interface IPTBreakdown {
+  metabolic: number;
+  infrastructure: number;
+  psychology: number;
+  physiology: number;
+  adherence: number;
 }
 
-export interface GenesisResult {
-  globalScore: number;
-  detailedScores: DetailedScores;
-  detectedPatterns: string[];
-  redFlags: string[];
-  rootCauses: string[];
-  recommendations: string[];
+export interface IPTResult {
+  iptScore: number;
+  category: IPTCategory;
+  breakdown: IPTBreakdown;
 }
 
-// 2. MOTEUR DE SCORING
+/* =========================
+   SCORING ENGINE
+   ========================= */
+
 export class GenesisScoringEngine {
-  // DÉCLARATION OBLIGATOIRE DES PROPRIÉTÉS (C'est ce qui manquait)
-  private responses: Record<string, any>;
-  private detailedScores: DetailedScores;
-  private detectedPatterns: string[];
-  private redFlags: string[];
-  private rootCauses: string[];
+  private responses: IPTResponses;
 
-  // CONSTRUCTEUR
-  constructor(responses: Record<string, any>) {
+  constructor(responses: IPTResponses) {
     this.responses = responses;
-    
-    // Initialisation des valeurs par défaut
-    this.detailedScores = {
-      metabolicFlexibility: 0,
-      circadianAlignment: 0,
-      inflammatoryStatus: 0,
-      nutrientSensing: 0,
-      stressResilience: 0
-    };
-    
-    this.detectedPatterns = [];
-    this.redFlags = [];
-    this.rootCauses = [];
   }
 
-  // MÉTHODE PRINCIPALE
-  public calculate(): GenesisResult {
-    // 1. Calcul des scores détaillés
-    this.calculateDetailedScores();
-
-    // 2. Détection des patterns
-    this.detectPatterns();
-
-    // 3. Identification des Red Flags
-    this.identifyRedFlags();
-
-    // 4. Identification des causes racines
-    this.identifyRootCauses();
-
-    // 5. Calcul du score global (Moyenne pondérée si nécessaire)
-    const globalScore = this.computeGlobalScore();
+  /**
+   * Calcul principal IPT
+   * ⚠️ MOCK TEMPORAIRE — volontairement déterministe
+   * (aucun Math.random en production finale)
+   */
+  public calculate(): IPTResult {
+    // MOCK contrôlé pour éviter tout crash frontend
+    // et garder une cohérence visuelle pendant le design
+    const mockScore = 68;
 
     return {
-      globalScore,
-      detailedScores: this.detailedScores,
-      detectedPatterns: this.detectedPatterns,
-      redFlags: this.redFlags,
-      rootCauses: this.rootCauses,
-      recommendations: this.generateRecommendations()
+      iptScore: mockScore,
+      category: this.getIPTCategory(mockScore),
+      breakdown: {
+        metabolic: 72,
+        infrastructure: 64,
+        psychology: 78,
+        physiology: 58,
+        adherence: 85,
+      },
     };
   }
 
-  // --- LOGIQUE INTERNE (Méthodes privées) ---
-
-  private calculateDetailedScores(): void {
-    // Exemple de logique basique (à adapter selon tes règles métiers exactes)
-    
-    // Métabolisme
-    if (this.responses.energy_dip === 'yes') {
-      this.detailedScores.metabolicFlexibility -= 10;
-    } else {
-      this.detailedScores.metabolicFlexibility += 10;
-    }
-
-    // Circadien
-    if (this.responses.sleep_quality === 'poor') {
-      this.detailedScores.circadianAlignment -= 15;
-    }
-
-    // Normalisation des scores entre 0 et 100
-    this.normalizeScores();
-  }
-
-  private detectPatterns(): void {
-    // Exemple: Détection du pattern "Insulin Resistance"
-    if (
-      this.responses.waist_circumference === 'high' && 
-      this.responses.energy_dip === 'yes'
-    ) {
-      this.detectedPatterns.push('INSULIN_RESISTANCE_PROFILE');
-    }
-  }
-
-  private identifyRedFlags(): void {
-    // Exemple: Symptôme critique
-    if (this.responses.chronic_pain === 'severe') {
-      this.redFlags.push('HIGH_INFLAMMATION_MARKER');
-    }
-  }
-
-  private identifyRootCauses(): void {
-    if (this.detailedScores.circadianAlignment < 40) {
-      this.rootCauses.push('CIRCADIAN_DISRUPTION');
-    }
-  }
-
-  private computeGlobalScore(): number {
-    const scores = Object.values(this.detailedScores);
-    const sum = scores.reduce((a, b) => a + b, 0);
-    return Math.round(sum / scores.length);
-  }
-
-  private normalizeScores(): void {
-    // S'assurer que les scores ne dépassent pas 0-100
-    (Object.keys(this.detailedScores) as Array<keyof DetailedScores>).forEach(key => {
-      this.detailedScores[key] = Math.max(0, Math.min(100, 50 + this.detailedScores[key])); 
-      // Note: 50 est la base de départ arbitraire ici
-    });
-  }
-
-  private generateRecommendations(): string[] {
-    const recs: string[] = [];
-    if (this.detailedScores.metabolicFlexibility < 50) {
-      recs.push("Protocol: Metabolic Reset Level 1");
-    }
-    return recs;
+  /**
+   * Catégorisation clinique IPT
+   */
+  private getIPTCategory(score: number): IPTCategory {
+    if (score < 25) return 'CRITIQUE';
+    if (score < 45) return 'FAIBLE';
+    if (score < 65) return 'MOYEN';
+    if (score < 85) return 'ÉLEVÉ';
+    return 'EXCELLENT';
   }
 }
+
+/* =========================
+   HELPER
+   ========================= */
+
+export function calculateIPTScore(
+  responses: IPTResponses
+): IPTResult {
+  const engine = new GenesisScoringEngine(responses);
+  return engine.calculate();
+}
+
+/* =========================
+   NOTES IMPORTANTES
+   ========================= */
+/*
+  - Aucun hasard dans le mock :
+    → UI stable
+    → Design cohérent
+    → Debug simple
+
+  - La structure du retour (IPTResult) est FINALE.
+    Le moteur réel remplacera uniquement le contenu de calculate().
+
+  - Ce fichier parle le langage GENESIS :
+    SCORE / PILIERS / CATÉGORIE
+    Pas de gamification. Pas de marketing.
+*/

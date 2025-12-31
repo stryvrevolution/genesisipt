@@ -1,78 +1,83 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+
   theme: {
     extend: {
-      colors: {
-        stryv: {
-          bg0: "var(--bg-0)",
-          bg1: "var(--bg-1)",
-          bg2: "var(--bg-2)",
-
-          surface0: "var(--surface-0)",
-          surface1: "var(--surface-1)",
-          surface2: "var(--surface-2)",
-          surface3: "var(--surface-3)",
-
-          stroke0: "var(--stroke-0)",
-          stroke1: "var(--stroke-1)",
-          stroke2: "var(--stroke-2)",
-
-          text: {
-            primary: "var(--text-primary)",
-            secondary: "var(--text-secondary)",
-            muted: "var(--text-muted)",
-            disabled: "var(--text-disabled)"
-          },
-
-          accent: "var(--accent)",
-          accentSoft: "var(--accent-soft)",
-          accentStroke: "var(--accent-stroke)",
-
-          good: "var(--good)",
-          warn: "var(--warn)",
-          bad: "var(--bad)"
-        }
-      },
-      borderRadius: {
-        sm: "var(--r-sm)",
-        md: "var(--r-md)",
-        lg: "var(--r-lg)",
-        xl: "var(--r-xl)",
-        pill: "var(--r-pill)"
-      },
-      boxShadow: {
-        soft: "var(--sh-soft)",
-        lift: "var(--sh-lift)"
-      },
-      backdropBlur: {
-        glass: "var(--blur-glass)",
-        hud: "var(--blur-hud)"
-      },
-      transitionTimingFunction: {
-        standard: "var(--ease-standard)",
-        out: "var(--ease-out)"
-      },
-      transitionDuration: {
-        fast: "var(--t-fast)",
-        base: "var(--t-base)",
-        slow: "var(--t-slow)"
-      },
+      /* =========================
+         TYPOGRAPHY — GENESIS LAB SYSTEM
+         ========================= */
       fontFamily: {
-        display: "var(--font-display)",
-        body: "var(--font-body)",
-        mono: "var(--font-mono)"
+        // 1. OUTFIT (Par défaut)
+        // Remplace la police "sans" par défaut. Tout le site sera en Outfit.
+        sans: [
+          "var(--font-outfit)",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+        ],
+        
+        // 2. AZONIX (Pour le logo "STRYV")
+        // Utilisation: className="font-azonix"
+        azonix: ["var(--font-azonix)", "sans-serif"],
+
+        // 3. RAMABHADRA (Pour H1, H2)
+        // Utilisation: className="font-ramabhadra"
+        ramabhadra: ["var(--font-ramabhadra)", "sans-serif"],
+
+        // 4. MONO (Pour les données techniques)
+        mono: [
+          "var(--font-mono)",
+          "ui-monospace",
+          "SFMono-Regular",
+          "monospace",
+        ],
       },
-      letterSpacing: {
-        tight: "-0.02em",
-        normal: "0em",
-        wide: "0.06em",
-        wider: "0.12em"
+
+      /* =========================
+         COLOR TOKENS — MEDUSMO (LOCKED)
+         ========================= */
+      colors: {
+        /* Backgrounds */
+        bg: "var(--bg-main)",
+        bgSoft: "var(--bg-soft)",
+        bgSecondary: "var(--bg-secondary)",
+
+        /* Text */
+        text: "var(--text-main)",
+        textMuted: "var(--text-muted)",
+        textSoft: "var(--text-soft)",
+        textInvert: "var(--text-invert)",
+
+        /* Structure */
+        divider: "var(--divider)",
+
+        /* Accent (unique) */
+        accent: "var(--accent)",
       },
-      maxWidth: {
-        container: "1200px"
-      }
-    }
+
+      /* =========================
+         SHADOWS — NONE (INTENTIONAL)
+         ========================= */
+      boxShadow: {
+        none: "none",
+      },
+
+      /* =========================
+         MOTION — NEUTRAL
+         ========================= */
+      transitionTimingFunction: {
+        linear: "linear",
+      },
+    },
   },
-  plugins: []
+
+  plugins: [],
 };
+
+export default config;
