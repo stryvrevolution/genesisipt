@@ -2,7 +2,6 @@ export type Language = 'fr' | 'en'
 
 export const translations = {
   fr: {
-    // Structure attendue par la page Outils
     toolsPage: {
       labLabel: 'LABORATOIRE MÉTABOLIQUE',
       title: 'Outils de Précision',
@@ -23,7 +22,7 @@ export const translations = {
         },
         hrZones: {
           title: 'Zones Cardiaques',
-          deculez vos zones d\'entraînement optimales (Karvonen).'
+          description: 'Calculez vos zones d\'entraînemervonen).'
         },
         hydratation: {
           title: 'Hydratation',
@@ -35,7 +34,6 @@ export const translations = {
         }
       }
     },
-    // Clés de navigation (compatibilité)
     nav: {
       home: 'Accueil',
       analysis: 'Analyse IPT',
@@ -55,11 +53,11 @@ export const translations = {
       access: 'Access Tool',
       tools: {
         macros: {
-          title: 'Macro Calculator',
+       title: 'Macro Calculator',
           description: 'Define your precise energy needs based on your neuro-metabolic profile.'
         },
         bodyFat: {
-       le: 'Body Fat',
+          title: 'Body Fat',
           description: 'Estimate your body fat percentage using the US Navy method.'
         },
         carbCycling: {
@@ -93,7 +91,6 @@ export const translations = {
   }
 }
 
-// Nouvelle fonction qui renvoie l'objet entier (le dictionnaire)
 export function getTranslation(lang: Language = 'fr') {
   return translations[lang] || translations['fr']
 }
