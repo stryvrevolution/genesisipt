@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { GlassCard } from '../../../components/components1/ui/glass-card';
-import { Dropdown } from '../../../components/components1/ui/Dropdown';
-import type { Language } from '@/app/lib/i18n/translations';
-import { getTranslation } from '@/app/lib/i18n/translations';
+import { GlassCard } from '../ui/glass-card';
+import { Dropdown } from '../ui/Dropdown';
+import type { Language } from '@/lib/i18n/translations';
+import { getTranslation } from '@/lib/i18n/translations';
 import { Droplet } from 'lucide-react';
 
 // Water glass icon component - represents a glass of water

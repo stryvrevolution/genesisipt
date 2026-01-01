@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+// 👇 C'est propre maintenant : @/components/...
 import { IPTQuestionnaire } from '@/components/genesis/IPTQuestionnaire';
 import { CalendlyButton } from '@/components/CalendlyButton';
 

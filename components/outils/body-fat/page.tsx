@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { BodyFatCalculator } from '@/components/calculators/BodyFatCalculator'
+import { BodyFatCalculator } from '@/app/lib/calculators/BodyFatCalculator'
 import { BackButton } from '@/components/components1/ui/BackButton'
 import { LanguageSwitcher } from '@/components/components1/ui/LanguageSwitcher'
 import { ToolCTA } from '@/components/components1/ui/ToolCTA'
-import type { Language } from '@/lib/i18n/translations'
+import type { Language } from '@/app/lib/i18n/translations'
 
 export default function BodyFatPage() {
   const [language, setLanguage] = useState<Language>('fr')

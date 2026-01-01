@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { CarbCyclingCalculator } from '@/app/components/calculators/CarbCyclingCalculator'
-import { BackButton } from '@/app/components/ui/BackButton'
-import { LanguageSwitcher } from '@/app/components/ui/LanguageSwitcher'
-import { ToolCTA } from '@/app/components/ui/ToolCTA'
+import { CarbCyclingCalculator } from '@/components/calculators/CarbCyclingCalculator'
+import { BackButton } from '@/components/components1/ui/BackButton'
+import { LanguageSwitcher } from '@/components/components1/ui/LanguageSwitcher'
+import { ToolCTA } from '@/components/components1/ui/ToolCTA'
 import type { Language } from '@/lib/i18n/translations'
 
 export default function CarbCyclingPage() {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { IPTQuestionnaire } from '@/app/components/genesis/IPTQuestionnaire';
+import { IPTQuestionnaire } from '@/components/components1/genesis/IPTQuestionnaire';
 import { IPTResponses } from '@/types/genesis';
 
 export default function GenesisPage() {

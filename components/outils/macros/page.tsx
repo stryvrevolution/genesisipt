@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { BodyFatCalculator } from '@/components/calculators/BodyFatCalculator'
+import { MacroCalculator } from '@/app/lib/calculators/MacroCalculator'
 import { BackButton } from '@/components/components1/ui/BackButton'
 import { LanguageSwitcher } from '@/components/components1/ui/LanguageSwitcher'
 import { ToolCTA } from '@/components/components1/ui/ToolCTA'
-import type { Language } from '@/lib/i18n/translations'
+import type { Language } from '@/app/lib/i18n/translations'
 
-export default function BodyFatPage() {
+export default function MacrosPage() {
   const [language, setLanguage] = useState<Language>('fr')
   
   return (
@@ -18,7 +18,7 @@ export default function BodyFatPage() {
         <LanguageSwitcher currentLanguage={language} onLanguageChange={setLanguage} />
       </div>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <BodyFatCalculator language={language} />
+        <MacroCalculator language={language} />
         <ToolCTA language={language} />
       </div>
     </main>

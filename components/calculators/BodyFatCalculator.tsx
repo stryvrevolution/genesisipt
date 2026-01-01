@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { GlassCard } from '../../../components/components1/ui/glass-card';
-import type { Language } from '@/app/lib/i18n/translations';
-import { getTranslation } from '@/app/lib/i18n/translations';
+import { GlassCard } from '../ui/glass-card';
+import type { Language } from '@/lib/i18n/translations';
+import { getTranslation } from '@/lib/i18n/translations';
 
 interface BodyFatCalculatorProps {
   language?: Language
