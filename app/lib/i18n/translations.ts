@@ -2,6 +2,7 @@ export type Language = 'fr' | 'en'
 
 export const translations = {
   fr: {
+    // Structure attendue par la page Outils
     toolsPage: {
       labLabel: 'LABORATOIRE MÉTABOLIQUE',
       title: 'Outils de Précision',
@@ -22,7 +23,7 @@ export const translations = {
         },
         hrZones: {
           title: 'Zones Cardiaques',
-          description: 'Calculez vos zones d\'entraînemervonen).'
+          deculez vos zones d\'entraînement optimales (Karvonen).'
         },
         hydratation: {
           title: 'Hydratation',
@@ -34,11 +35,17 @@ export const translations = {
         }
       }
     },
-    // Clés génériques de secours
-    'nav.home': 'Accueil',
-    'nav.analysis': 'Analyse IPT',
-    'nav.tools': 'Outils',
-    'common.loading': 'Chargement...',
+    // Clés de navigation (compatibilité)
+    nav: {
+      home: 'Accueil',
+      analysis: 'Analyse IPT',
+      tools: 'Outils',
+      faq: 'FAQ'
+    },
+    common: {
+      loading: 'Chargement...',
+      free: 'Gratuit'
+    }
   },
   en: {
     toolsPage: {
@@ -52,8 +59,8 @@ export const translations = {
           description: 'Define your precise energy needs based on your neuro-metabolic profile.'
         },
         bodyFat: {
-          title: 'Body Fat',
-          description: 'Estimate your bodpercentage using the US Navy method.'
+       le: 'Body Fat',
+          description: 'Estimate your body fat percentage using the US Navy method.'
         },
         carbCycling: {
           title: 'Carb Cycling',
@@ -73,13 +80,20 @@ export const translations = {
         }
       }
     },
-    'nav.home': 'Home',
-    'nav.analysis': 'IPT Analysis',
-    'nav.tools': 'Tools',
-    'common.loading': 'Loading...',
+    nav: {
+      home: 'Home',
+      analysis: 'IPT Analysis',
+      tools: 'Tools',
+      faq: 'FAQ'
+    },
+    common: {
+      loading: 'Loading...',
+      free: 'Free'
+    }
   }
 }
 
+// Nouvelle fonction qui renvoie l'objet entier (le dictionnaire)
 export function getTranslation(lang: Language = 'fr') {
   return translations[lang] || translations['fr']
 }
