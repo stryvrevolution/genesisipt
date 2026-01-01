@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { GlassCard } from '../../../components/components1/ui/glass-card';
+import { GlassCard } from '../../../components/ui/glass-card';
 import type { Language } from '@/app/lib/i18n/translations';
 import { getTranslation } from '@/app/lib/i18n/translations';
 import { Check, Circle, Activity } from 'lucide-react';

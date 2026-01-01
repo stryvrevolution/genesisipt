@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import type { Language } from '@/lib/i18n/translations'
-import { GlassCard } from '@/components/components1/ui/glass-card'
+import { GlassCard } from '@/components/ui/glass-card'
 
 interface LanguageSwitcherProps {
   currentLanguage: Language

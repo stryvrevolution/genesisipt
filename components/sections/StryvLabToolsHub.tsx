@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { GlassCard } from '@/components/components1/ui/glass-card';
+import { GlassCard } from '@/components/ui/glass-card';
 import { Dna, BarChart3, RefreshCw, HeartPulse, Droplet, Dumbbell } from 'lucide-react';
 
 const tools = [

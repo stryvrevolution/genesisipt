@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import { GlassCard } from '@/components/components1/ui/glass-card';
+import { GlassCard } from '@/components/ui/glass-card';
 
 const data = [
   {

@@ -3,8 +3,8 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import Link from 'next/link'
-import { GlassCard } from '@/components/components1/ui/glass-card'
-import { Button } from '@/components/components1/ui/Button'
+import { GlassCard } from '@/components/ui/glass-card'
+import { Button } from '@/components/ui/Button'
 
 /**
  * HERO SECTION - Medical Grade Design

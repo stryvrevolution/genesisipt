@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { GlassCard } from '@/components/components1/ui/glass-card'
+import { GlassCard } from '@/components/ui/glass-card'
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 

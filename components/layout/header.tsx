@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Button } from '@/components/components1/ui/Button'
+import { Button } from '@/components/ui/Button'
 import { useState } from 'react'
 
 export function Header() {

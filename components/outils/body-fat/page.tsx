@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { BodyFatCalculator } from '@/app/lib/calculators/BodyFatCalculator'
-import { BackButton } from '@/components/components1/ui/BackButton'
-import { LanguageSwitcher } from '@/components/components1/ui/LanguageSwitcher'
-import { ToolCTA } from '@/components/components1/ui/ToolCTA'
+import { BackButton } from '@/components/ui/BackButton'
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
+import { ToolCTA } from '@/components/ui/ToolCTA'
 import type { Language } from '@/app/lib/i18n/translations'
 
 export default function BodyFatPage() {
