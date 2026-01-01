@@ -1,66 +1,85 @@
-// Module i18n minimal pour GENESIS
 export type Language = 'fr' | 'en'
 
-type Translations = {
-  [key: string]: string
-}
-
-const translations: Record<Language, Translations> = {
+export const translations = {
   fr: {
+    toolsPage: {
+      labLabel: 'LABORATOIRE MÉTABOLIQUE',
+      title: 'Outils de Précision',
+      subtitle: 'Des calculateurs basés sur les équations de référence (Mifflin-St Jeor, Katch-McArdle) pour optimiser votre métabolisme.',
+      access: 'Accéder à l\'outil',
+      tools: {
+        macros: {
+          title: 'Calculateur Macros',
+          description: 'Définissez vos besoins énergétiques précis selon votre profil neuro-métabolique.'
+        },
+        bodyFat: {
+          title: 'Masse Grasse',
+          description: 'Estimez votre taux de graisse corporelle avec la méthode US Navy.'
+        },
+        carbCycling: {
+          title: 'Carb Cycling',
+          description: 'Planifiez vos cycles de glucides pour maximiser la perte de gras.'
+        },
+        hrZones: {
+          title: 'Zones Cardiaques',
+          description: 'Calculez vos zones d\'entraînemervonen).'
+        },
+        hydratation: {
+          title: 'Hydratation',
+          description: 'Vos besoins hydriques précis selon l\'intensité de l\'effort.'
+        },
+        oneRM: {
+          title: 'Calculateur 1RM',
+          description: 'Estimez votre force maximale théorique sans risque de blessure.'
+        }
+      }
+    },
+    // Clés génériques de secours
     'nav.home': 'Accueil',
     'nav.analysis': 'Analyse IPT',
     'nav.tools': 'Outils',
-    'nav.faq': 'FAQ',
-    'header.menu': 'Menu',
-    'header.close': 'Fermer',
-    'tools.macros': 'Calculateur Macros',
-    'tools.bodyFat': 'Taux de Masse Grasse',
-    'tools.carbCycling': 'Carb Cycling',
-    'tools.hrZones': 'Zones Cardiaques',
-    'tools.hydration': 'Hydratation',
-    'tools.oneRM': '1RM Calculator',
-    'cta.miniScan': 'Mini-Scan Gratuit',
-    'cta.start': 'Commencer',
-    'cta.discover': 'Découvrir',
-    'common.free': 'Gratuit',
     'common.loading': 'Chargement...',
   },
   en: {
+    toolsPage: {
+      labLabel: 'METABOLIC LAB',
+      title: 'Precision Tools',
+      subtitle: 'Calculators based on reference equations (Mifflin-St Jeor, Katch-McArdle) to optimize your metabolism.',
+      access: 'Access Tool',
+      tools: {
+        macros: {
+          title: 'Macro Calculator',
+          description: 'Define your precise energy needs based on your neuro-metabolic profile.'
+        },
+        bodyFat: {
+          title: 'Body Fat',
+          description: 'Estimate your bodpercentage using the US Navy method.'
+        },
+        carbCycling: {
+          title: 'Carb Cycling',
+          description: 'Plan your carb cycles to maximize fat loss.'
+        },
+        hrZones: {
+          title: 'Heart Zones',
+          description: 'Calculate your optimal training zones (Karvonen).'
+        },
+        hydratation: {
+          title: 'Hydration',
+          description: 'Your precise hydration needs based on effort intensity.'
+        },
+        oneRM: {
+          title: '1RM Calculator',
+          description: 'Estimate your theoretical maximum strength without injury risk.'
+        }
+      }
+    },
     'nav.home': 'Home',
     'nav.analysis': 'IPT Analysis',
     'nav.tools': 'Tools',
-    'nav.faq': 'FAQ',
-    'header.menu': 'Menu',
-    'header.close': 'Close',
-    'tools.macros': 'Macro Caculator',
-    'tools.bodyFat': 'Body Fat %',
-    'tools.carbCycling': 'Carb Cycling',
-    'tools.hrZones': 'HR Zones',
-    'tools.hydration': 'Hydration',
-    'tools.oneRM': '1RM Calculator',
-    'cta.miniScan': 'Free Mini-Scan',
-    'cta.start': 'Start',
-    'cta.discover': 'Discover',
-    'common.free': 'Free',
     'common.loading': 'Loading...',
   }
 }
 
 export function getTranslation(lang: Language = 'fr') {
-  return (key: string): string => {
-    return translations[lang][key] || key
-  }
-}
-
-export function getCurrentLanguage(): Language {
-  if (typeof window === 'undefined') return 'fr'
-  const saved = localStorage.getItem('language') as Language
-  if (saved && (saved === 'fr' || saved === 'en')) return saved
-  return 'fr'
-}
-
-export function setLanguage(lang: Language): void {
-  if (typeof window === 'undefined') return
-  localStorage.setItem('language', lang)
-  window.dispatchEvent(new Event('languageChanged'))
+  return translations[lang] || translations['fr']
 }
