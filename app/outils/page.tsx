@@ -96,7 +96,7 @@ export default function ToolsPage() {
       <header className="absolute top-0 left-0 right-0 z-50">
         <div className="flex items-center justify-between px-6 sm:px-10 md:px-16 pt-6 sm:pt-7 md:pt-8">
           
-          <Link href="/accueil" className="block cursor-pointer">
+          <Link href="/" className="block cursor-pointer">
             <div className="leading-none tracking-wide flex items-baseline gap-[6px] text-white transition-transform duration-200 hover:scale-[1.04]">
               <span className="text-[26px] tracking-wider font-azonix uppercase">STRYV</span>
               <span className="text-[25px] opacity-80 font-light lowercase">lab</span>
