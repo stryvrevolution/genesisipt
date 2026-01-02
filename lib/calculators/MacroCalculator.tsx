@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { GlassCard } from '../ui/glass-card';
-import { Accordion } from '../ui/Accordion';
-import { Dropdown } from '../ui/Dropdown';
+import { GlassCard } from '../../components/ui/glass-card';
+import { Accordion } from '../../components/ui/Accordion';
+import { Dropdown } from '../../components/ui/Dropdown';
 import type { Language } from '@/lib/i18n/translations';
 import { getTranslation } from '@/lib/i18n/translations';
 import { Dumbbell, Wheat, Droplet } from 'lucide-react';

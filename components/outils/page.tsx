@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { GlassCard } from '@/components/ui/glass-card'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ArrowRight, Dna, BarChart3, RefreshCw, HeartPulse, Droplet, Dumbbell } from 'lucide-react'
-import type { Language } from '@/app/lib/i18n/translations'
-import { getTranslation } from '@/app/lib/i18n/translations'
+import type { Language } from '@/lib/i18n/translations'
+import { getTranslation } from '@/lib/i18n/translations'
 
 const toolIds = [
   { id: 'macros', href: '/outils/macros', icon: Dna },

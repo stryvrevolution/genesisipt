@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { WaterIntakeCalculator } from '@/app/lib/calculators/WaterIntakeCalculator'
+import { WaterIntakeCalculator } from '@/lib/calculators/WaterIntakeCalculator'
 import { BackButton } from '@/components/ui/BackButton'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { ToolCTA } from '@/components/ui/ToolCTA'
-import type { Language } from '@/app/lib/i18n/translations'
+import type { Language } from '@/lib/i18n/translations'
 
 export default function HydratationPage() {
   const [language, setLanguage] = useState<Language>('fr')

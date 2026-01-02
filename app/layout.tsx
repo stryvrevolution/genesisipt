@@ -1,24 +1,21 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import './typography.css'; // On garde votre fichier css au cas où
+import './typography.css';
 
-// 1. Configurer Azonix (Logo "STRYV")
+// Polices
 const azonix = localFont({
   src: './fonts/Azonix.otf',
   variable: '--font-azonix',
   display: 'swap',
 });
 
-// 2. Configurer Ramabhadra (Titres H1, H2)
 const ramabhadra = localFont({
   src: './fonts/Ramabhadra-Regular.ttf',
   variable: '--font-ramabhadra',
   display: 'swap',
 });
 
-// 3. Configurer Outfit (Logo "lab", Textes, autres titres)
-// On utilise la version Variable pour avoir toutes les graisses (Thin à Black)
 const outfit = localFont({
   src: './fonts/Outfit-VariableFont_wght.ttf',
   variable: '--font-outfit',
@@ -26,21 +23,21 @@ const outfit = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Genesis Lab',
-  description: 'Application Genesis Lab',
+  title: 'STRYV Lab',
+  description: 'Algorithmes de performance humaine et bio-données.',
 };
+
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: RootLayoutProps) {
   return (
     <html lang="fr">
       <body
-        // On injecte les 3 variables de police
-        // "font-outfit" est mis par défaut pour tout le texte du site
-        className={`${azonix.variable} ${ramabhadra.variable} ${outfit.variable} font-outfit antialiased bg-bg text-white`}
+        className={`${azonix.variable} ${ramabhadra.variable} ${outfit.variable} font-outfit antialiased bg-[#0E0E0E] text-white`}
       >
         {children}
       </body>
