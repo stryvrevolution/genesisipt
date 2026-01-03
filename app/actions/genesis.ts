@@ -53,12 +53,11 @@ export async function chatWithGenesis(message: string, history: any[]) {
 
     // Appel API (Côté Serveur = Sécurisé)
     const response = await anthropic.messages.create({
-      // J'utilise l'alias 'latest' pour être sûr de choper la version la plus récente/puissante dispo
-      model: 'claude-3-5-sonnet-latest', 
-      max_tokens: 500,
-      temperature: 0.5,
-      system: GENESIS_SYSTEM_PROMPT,
-      messages: cleanHistory,
+      // C'est cette version précise (Juin) qui fonctionne pour tout le monde :
+      model: "claude-sonnet-4-20250514",
+      
+      max_tokens: 1024,
+      messages: messages,
     });
 
     const textBlock = response.content[0];
