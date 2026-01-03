@@ -1,10 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* =====================================================
+   TYPOGRAPHY OVERRIDES
+   ===================================================== */
 @layer base {
   h1, h2 {
     font-family: var(--font-ramabhadra);
     text-transform: uppercase;
+  }
+
+  /* Force Azonix à rester normal */
+  .font-azonix,
+  [class*="font-[var(--font-azonix)]"] {
+    font-weight: 400 !important;
+    font-style: normal !important;
+    font-synthesis: none !important;
+  }
+
+  /* Force Outfit à rester light */
+  .font-outfit,
+  [class*="font-[var(--font-outfit)]"] {
+    font-weight: 300 !important;
+    font-style: normal !important;
+    font-synthesis: none !important;
   }
 }
 
@@ -13,14 +33,15 @@
    ===================================================== */
 
 :root {
-  --bg-main:   #E6E6E4;
-  --bg-soft:   #EFEFED;
-  --bg-dark:   #2F2F2E;
+  /* MODIFIÉ : Harmonisation avec le thème sombre STRYV */
+  --bg-main:   #303030; 
+  --bg-soft:   #3D3D3D;
+  --bg-dark:   #1A1A1A;
 
-  --text-main: #1E1E1E;
-  --text-soft: #8E8E8C;
+  --text-main: #FFFFFF;
+  --text-soft: rgba(255, 255, 255, 0.6);
 
-  --divider: rgba(0,0,0,0.08);
+  --divider: rgba(255, 255, 255, 0.1);
 }
 
 /* =====================================================
@@ -31,8 +52,14 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-main);
-  color: var(--text-main);
+  
+  /* CORRECTION MOBILE : Fond sombre pour éviter le blanc au scroll */
+  background-color: #303030; 
+  color: white;
+  
+  /* CORRECTION MOBILE : Bloque le rebond élastique sur iOS/Android */
+  overscroll-behavior-y: none;
+
   font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -49,10 +76,11 @@ body::before {
   pointer-events: none;
   z-index: 0;
 
-  /* Grain très fin, clair, homogène */
+  /* Grain très fin */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.22' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.06'/%3E%3C/svg%3E");
 
-  mix-blend-mode: normal;
+  mix-blend-mode: overlay; /* Passé en overlay pour mieux se fondre sur le sombre */
+  opacity: 0.04; /* Légèrement réduit pour le mode sombre */
 }
 
 /* =====================================================
@@ -81,6 +109,7 @@ body::before {
   background-color: var(--divider);
 }
 
+/* Animations de chargement */
 .typing-dots span {
   display: inline-block;
   animation: blink 1.4s infinite both;
@@ -99,24 +128,3 @@ body::before {
   20% { opacity: 1; }
   100% { opacity: 0.2; }
 }
-/* =====================================================
-   FONT FIXES — AZONIX & OUTFIT
-   ===================================================== */
-
-   @layer base {
-    /* Force Azonix à rester normal */
-    .font-azonix,
-    [class*="font-[var(--font-azonix)]"] {
-      font-weight: 400 !important;
-      font-style: normal !important;
-      font-synthesis: none !important;
-    }
-  
-    /* Force Outfit à rester light */
-    .font-outfit,
-    [class*="font-[var(--font-outfit)]"] {
-      font-weight: 300 !important;
-      font-style: normal !important;
-      font-synthesis: none !important;
-    }
-  }
