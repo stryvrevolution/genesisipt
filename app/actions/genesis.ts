@@ -1,11 +1,9 @@
 // app/actions/genesis.ts
 'use server'
 
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 const GENESIS_SYSTEM_PROMPT = `Tu es GENESIS ASSISTANT, l'interface conversationnelle officielle de STRYV LAB.
 
@@ -42,31 +40,38 @@ export async function chatWithGenesis(message: string, history: any[]) {
   try {
     if (!message) return { success: false, response: 'Message vide' };
 
-    // Préparation de l'historique pour l'API
-    const cleanHistory = history.map(msg => ({
-      role: msg.role === 'user' ? 'user' : 'assistant',
-      content: msg.content
-    })) as any[];
-
-    // Ajout du message actuel
-    cleanHistory.push({ role: 'user', content: message });
-
-    // Appel API (Côté Serveur = Sécurisé)
-    const response = await anthropic.messages.create({
-      // C'est cette version précise (Juin) qui fonctionne pour tout le monde :
-      model: "claude-sonnet-4-20250514",
-      
-      max_tokens: 1024,
-      messages: messages,
+    // Initialiser le modèle Gemini
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      systemInstruction: GENESIS_SYSTEM_PROMPT
     });
 
-    const textBlock = response.content[0];
-    const reply = textBlock.type === 'text' ? textBlock.text : '...';
+    // Convertir l'historique au format Gemini
+    const chatHistory = history.map(msg => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }]
+    }));
+
+    // Créer une session de chat avec historique
+    const chat = model.startChat({
+      history: chatHistory,
+      generationConfig: {
+        maxOutputTokens: 1024,
+        temperature: 0.7,
+      },
+    });
+
+    // Envoyer le message
+    const result = await chat.sendMessage(message);
+    const reply = result.response.text();
 
     return { success: true, response: reply };
 
   } catch (error) {
     console.error('❌ [GENESIS API Error]', error);
-    return { success: false, response: "Je mets à jour mes bases de données neuronales. Veuillez réessayer dans un instant." };
+    return { 
+      success: false, 
+      response: "Je mets à jour mes bases de données neuronales. Veuillez réessayer dans un instant." 
+    };
   }
 }
