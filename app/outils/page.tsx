@@ -21,7 +21,7 @@ const toolIds = [
     href: 'macros', 
     icon: Utensils,
     type: 'Nutrition',
-    title: 'Macros Forensic',
+    title: 'Kcal & Macros',
     description: 'Besoins caloriques & macronutriments (BMR + NEAT + EAT + TEF).',
     color: 'from-blue-400 to-blue-600',
     shadow: 'rgba(59, 130, 246, 0.4)'
@@ -40,7 +40,7 @@ const toolIds = [
     id: 'cycleSync', 
     href: 'cycle-sync', 
     icon: Moon, 
-    type: 'Protocole Hormonal',
+    type: 'Protocole Hormonal Féminin',
     title: 'Cycle Sync',
     description: 'Nutrition et training adaptés aux fluctuations hormonales.',
     color: 'from-purple-400 to-purple-600',
@@ -50,8 +50,8 @@ const toolIds = [
     id: 'carbCycling', 
     href: 'carb-cycling', 
     icon: RefreshCw, 
-    type: 'Planification',
-    title: 'Glycogène',
+    type: 'Glycogène',
+    title: 'Carb Cycling',
     description: 'Stratégie glucidique cyclique pour la performance et la recomposition.',
     color: 'from-orange-400 to-orange-600',
     shadow: 'rgba(249, 115, 22, 0.4)'

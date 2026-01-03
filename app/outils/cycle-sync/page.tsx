@@ -8,7 +8,7 @@ export default function CycleSyncPage() {
   return (
     <main className="flex flex-col md:flex-row min-h-screen bg-white font-outfit text-[#303030]">
       
-      {/* SECTION GAUCHE : DESIGN CARTE HUB "ÉTENDUE" */}
+      {/* SECTION GAUCHE : DESIGN CARTE HUB "ÉTENDUE" (SIDEBAR DARK) */}
       <section className="w-full md:w-5/12 lg:w-1/3 bg-[#1A1A1A] p-8 md:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden min-h-[40vh] md:min-h-screen border-r border-white/5 shadow-[20px_0_40px_-10px_rgba(0,0,0,0.2)] z-20">
         
         {/* Filigrane d'arrière-plan */}
@@ -36,7 +36,7 @@ export default function CycleSyncPage() {
                 
                 {/* BADGE TYPE */}
                 <span className="text-[10px] uppercase tracking-wider text-white/40 border border-white/10 px-3 py-1 rounded-full bg-white/5">
-                   Protocole Hormonal féminin
+                   Protocole Hormonal Féminin
                 </span>
             </div>
             
@@ -103,11 +103,11 @@ export default function CycleSyncPage() {
         </div>
       </section>
 
-      {/* SECTION DROITE (CONTENU) */}
+      {/* SECTION DROITE : CONTENU CALCULATEUR (WHITE) */}
       <section className="flex-1 bg-white relative overflow-y-auto">
-        <div className="max-w-4xl mx-auto h-full flex flex-col items-center justify-center p-8 md:p-16 lg:p-24">
+        <div className="max-w-4xl mx-auto min-h-full flex flex-col justify-center p-8 md:p-16 lg:p-24">
           <div className="w-full">
-            {/* Le composant importé conserve sa logique interne */}
+            {/* Intégration de votre composant qui contient la logique et le design intérieur */}
             <CycleSyncCalculator />
           </div>
         </div>

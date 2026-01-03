@@ -5,8 +5,7 @@ import { IPTQuestionnaire } from '@/components/genesis/IPTQuestionnaire';
 import { CalendlyButton } from '@/components/CalendlyButton';
 import GenesisAssistant from '@/components/GenesisAssistant';
 import { ArrowUpRight } from 'lucide-react';
-import { Dumbbell, ArrowLeft } from 'lucide-react';
-import { Moon,  } from 'lucide-react';
+import { Utensils, BarChart3, Moon, RefreshCw, Droplet, HeartPulse, Dumbbell } from 'lucide-react';
 
 export default function AnalyseIPTPage() {
   // Seul état nécessaire conservé : l'ouverture du modal IPT
@@ -360,16 +359,43 @@ export default function AnalyseIPTPage() {
       </div>
     </a>
 
-    {/* CARTE 3 : BIBLIOTHÈQUE PLUS */}
+    {/* CARTE 3 : BIBLIOTHÈQUE PLUS (Mosaïque d'outils) */}
     <a href="/outils" className="group relative bg-[#1A1A1A] rounded-[24px] p-8 border border-dashed border-white/10 hover:border-[#DAFA72] hover:bg-[#1f1f1f] transition-all duration-500 flex flex-col items-center justify-center text-center h-full min-h-[300px]">
-      <div className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center mb-6 group-hover:bg-[#DAFA72] group-hover:border-[#DAFA72] group-hover:text-[#1A1A1A] text-white/20 transition-all duration-500">
-        <span className="text-3xl font-light">+</span>
+      
+      {/* MOSAÏQUE DES ICÔNES - STYLE OFFICIEL (Solid Gradients) */}
+      <div className="mb-8 flex flex-wrap justify-center gap-3 max-w-[180px] opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+        
+        {/* Macros (Bleu) */}
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-[0_0_15px_-5px_rgba(59,130,246,0.5)] flex items-center justify-center text-white transform group-hover:-translate-y-1 transition-transform duration-300 delay-0">
+           <Utensils size={18} strokeWidth={2} />
+        </div>
+
+        {/* Body Fat (Emerald) */}
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-[0_0_15px_-5px_rgba(16,185,129,0.5)] flex items-center justify-center text-white transform group-hover:-translate-y-1 transition-transform duration-300 delay-75">
+           <BarChart3 size={18} strokeWidth={2} />
+        </div>
+
+        {/* Glycogène (Orange) */}
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 shadow-[0_0_15px_-5px_rgba(249,115,22,0.5)] flex items-center justify-center text-white transform group-hover:-translate-y-1 transition-transform duration-300 delay-150">
+           <RefreshCw size={18} strokeWidth={2} />
+        </div>
+
+        {/* Hydratation (Cyan) */}
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-[0_0_15px_-5px_rgba(34,211,238,0.5)] flex items-center justify-center text-white transform group-hover:-translate-y-1 transition-transform duration-300 delay-200">
+           <Droplet size={18} strokeWidth={2} />
+        </div>
+
+        {/* HR Zones (Red) */}
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-400 to-red-600 shadow-[0_0_15px_-5px_rgba(225,29,72,0.5)] flex items-center justify-center text-white transform group-hover:-translate-y-1 transition-transform duration-300 delay-300">
+           <HeartPulse size={18} strokeWidth={2} />
+        </div>
       </div>
+
       <h3 className="text-sm text-white mb-2 font-azonix uppercase tracking-widest group-hover:text-[#DAFA72] transition-colors">
         BIBLIOTHÈQUE
       </h3>
       <p className="text-white/40 text-xs font-light font-outfit max-w-[200px]">
-        Voir tous les outils et calculateurs disponibles
+        Accéder à tous les calculateurs
       </p>
     </a>
 

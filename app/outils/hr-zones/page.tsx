@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { HeartPulse } from 'lucide-react';
+import { HeartPulse, ArrowLeft } from 'lucide-react';
 
 type Gender = 'male' | 'female';
 
@@ -47,9 +47,9 @@ export default function HRZonesPage() {
 
     // Validation FC repos
     if (rhr < 40) {
-      warnings.push('⚠️ FC repos très basse (&lt;40 bpm): Athlète élite ou erreur de mesure?');
+      warnings.push('⚠️ FC repos très basse (<40 bpm): Athlète élite ou erreur de mesure?');
     } else if (rhr > 90) {
-      warnings.push('⚠️ FC repos élevée (&gt;90 bpm): Condition physique faible ou problème cardiaque potentiel. Consulter médecin');
+      warnings.push('⚠️ FC repos élevée (>90 bpm): Condition physique faible ou problème cardiaque potentiel. Consulter médecin');
     }
 
     // ========================================
@@ -154,7 +154,7 @@ export default function HRZonesPage() {
     
     // Warning âge >60 ans
     if (a > 60) {
-      warnings.push('ℹ️ Âge &gt;60 ans: Consulter médecin avant training haute intensité (zones 5-6)');
+      warnings.push('ℹ️ Âge >60 ans: Consulter médecin avant training haute intensité (zones 5-6)');
     }
 
     // Warning FC max calculée vs test terrain
@@ -170,230 +170,233 @@ export default function HRZonesPage() {
   };
 
   return (
-    <main className="flex flex-col md:flex-row min-h-screen bg-white font-sans" style={{ fontFamily: 'var(--font-outfit)' }}>
+    <main className="flex flex-col md:flex-row min-h-screen bg-white font-outfit text-[#303030]">
       
-      {/* SECTION GAUCHE */}
-      <section className="w-full md:w-1/3 bg-[#0E0E0E] p-8 md:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden min-h-[40vh] md:min-h-screen">
+      {/* SECTION GAUCHE : DESIGN CARTE HUB "ÉTENDUE" */}
+      <section className="w-full md:w-5/12 lg:w-1/3 bg-[#1A1A1A] p-8 md:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden min-h-[40vh] md:min-h-screen border-r border-white/5 shadow-[20px_0_40px_-10px_rgba(0,0,0,0.2)] z-20">
         
+        {/* Filigrane d'arrière-plan */}
+        <div className="absolute -bottom-6 -right-6 text-white/5 pointer-events-none select-none">
+           <HeartPulse className="w-80 h-80 stroke-[0.5]" />
+        </div>
+
         <div className="relative z-10">
-          <Link href="/outils" className="inline-flex items-center text-white/40 hover:text-white text-xs mb-12 transition-colors uppercase tracking-widest font-bold">
-            ← Retour aux outils
+          {/* Back Link */}
+          <Link 
+            href="/outils" 
+            className="group inline-flex items-center text-white/40 hover:text-white text-[10px] uppercase tracking-[0.2em] font-bold mb-12 transition-colors"
+          >
+            <ArrowLeft className="w-3 h-3 mr-2 group-hover:-translate-x-1 transition-transform" />
+            Retour au Hub
           </Link>
           
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 shadow-lg flex items-center justify-center text-white transform hover:scale-105 transition-all duration-300">
-               <HeartPulse className="w-7 h-7 stroke-[1.5]" />
+          {/* Header identique à la carte Hub */}
+          <div className="flex flex-col items-start gap-6 mb-10">
+            <div className="flex items-center gap-4">
+                {/* ICONE CARRÉE GRADIENT (Rose pour Cardio) */}
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-400 to-rose-600 shadow-[0_0_20px_-5px_rgba(225,29,72,0.4)] flex items-center justify-center text-white">
+                   <HeartPulse className="w-7 h-7 stroke-[1.5]" />
+                </div>
+                
+                {/* BADGE TYPE */}
+                <span className="text-[10px] uppercase tracking-wider text-white/40 border border-white/10 px-3 py-1 rounded-full bg-white/5">
+                   Cardiovasculaire
+                </span>
             </div>
-            <div className="text-[#DAFA72] text-[11px] font-bold tracking-[0.3em] uppercase opacity-80">
-            Cardiovasculaire
+            
+            <div className="font-mono text-[10px] text-white/10 font-bold">
+              ID: 04
             </div>
           </div>
           
-          <h1 className="text-white text-5xl md:text-6xl leading-[0.9] mb-8" style={{ fontFamily: 'var(--font-azonix)' }}>
-            HR<br />ZONES
+          {/* Titre */}
+          <h1 className="text-white text-4xl md:text-5xl font-azonix italic uppercase tracking-tighter mb-8 leading-[0.9]">
+            HR Zones
           </h1>
-
           
-          <div className="space-y-6">
-            <p className="text-white/80 text-sm font-medium leading-relaxed max-w-sm">
+          <div className="space-y-8">
+            <p className="text-white/50 text-[13px] leading-relaxed font-light border-t border-white/5 pt-6">
               Définissez vos zones d'entraînement cardiaque personnalisées via la méthode Karvonen (FC réserve).
             </p>
 
-            {/* Méthodologie */}
-            <div className="space-y-3">
-              <h3 className="text-white text-[10px] uppercase tracking-widest font-bold opacity-40">Méthode Karvonen</h3>
-              
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                <div className="text-[#DAFA72] text-[9px] uppercase tracking-widest font-bold mb-2">Formules</div>
-                <p className="text-white/70 text-[11px] leading-relaxed">
-                  <strong>FC Max:</strong> Tanaka (H) 208-(0.7×âge) · Gulati (F) 206-(0.88×âge)
-                  <br />
-                  <strong>Zone:</strong> (FC_Réserve × %intensité) + FC_Repos
-                </p>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                <div className="text-[#DAFA72] text-[9px] uppercase tracking-widest font-bold mb-2">Mesure FC Repos</div>
-                <p className="text-white/70 text-[11px] leading-relaxed">
-                  Au réveil, avant de se lever. Moyenne sur 3-5 jours. 30s au poignet × 2 OU cardiofréquencemètre.
-                </p>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                <div className="text-[#DAFA72] text-[9px] uppercase tracking-widest font-bold mb-2">Progression</div>
-                <p className="text-white/70 text-[11px] leading-relaxed">
-                  Débutants: 80% temps zone 2, 20% zone 3. Avancés: pyramide 70% Z2, 20% Z3, 10% Z4-5.
-                </p>
-              </div>
-            </div>
-
-            {/* Références */}
-            <div className="pt-4 border-t border-white/10">
-              <p className="text-white/40 text-[10px] leading-relaxed">
-                <span className="font-bold uppercase tracking-wider">Références:</span>
-                <br />Tanaka et al. (2001) · Gulati et al. (2010)
-                <br />Karvonen Method (1957)
-                <br />ACSM Guidelines (2022)
-              </p>
+            {/* Info Box */}
+            <div className="bg-[#0E0E0E] border border-white/5 rounded-xl p-5">
+                 <div className="flex justify-between items-center mb-2">
+                    <span className="text-[#DAFA72] text-[10px] uppercase tracking-widest font-bold">Méthode Karvonen</span>
+                    <span className="text-white/60 font-mono text-[10px]">Précision</span>
+                 </div>
+                 <div className="w-full h-px bg-white/5 mb-3"></div>
+                 <p className="text-white/40 text-[11px] leading-relaxed">
+                   Prend en compte votre fréquence cardiaque au repos pour des zones plus adaptées à votre niveau réel.
+                 </p>
             </div>
           </div>
         </div>
 
-        <div className="relative z-10 mt-12 md:mt-0">
-          <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">
-            GENESIS LAB — HR ZONES V2.0
+        {/* Footer Sidebar */}
+        <div className="relative z-10 mt-12 md:mt-0 flex justify-between items-end text-white/20">
+          <p className="text-[10px] uppercase tracking-[0.2em] font-bold hover:text-white transition-colors cursor-default">
+            Initialiser
           </p>
+          <span className="font-azonix text-xs opacity-30">V2.0</span>
         </div>
-
-        <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-[#DAFA72] rounded-full blur-[120px] opacity-10 pointer-events-none" />
       </section>
 
-      {/* SECTION DROITE */}
-      <section className="flex-1 p-8 md:p-16 lg:p-24 flex items-center justify-center bg-white relative">
-        <div className="w-full max-w-xl">
+      {/* SECTION DROITE (CONTENU) */}
+      <section className="flex-1 bg-white relative overflow-y-auto">
+        <div className="max-w-3xl mx-auto min-h-full flex flex-col justify-center p-8 md:p-16 lg:p-24">
           
-          <div className="space-y-12">
+          <div className="w-full space-y-16">
             
-            {/* GENRE */}
-            <div>
-              <label className="block text-[#303030] text-[10px] uppercase tracking-widest mb-4 font-bold opacity-40">
-                Genre (Formule FC Max)
-              </label>
-              <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => { setGender('male'); setResult(null); }}
-                  className={`py-3 px-4 rounded-xl text-sm font-medium uppercase tracking-wide transition-all border ${
-                    gender === 'male'
-                    ? 'border-[#303030] bg-[#303030] text-white' 
-                    : 'border-black/10 text-black/40 hover:border-black/30'
-                  }`}
-                >
-                  Homme
-                </button>
-                <button 
-                  onClick={() => { setGender('female'); setResult(null); }}
-                  className={`py-3 px-4 rounded-xl text-sm font-medium uppercase tracking-wide transition-all border ${
-                    gender === 'female'
-                    ? 'border-[#303030] bg-[#303030] text-white' 
-                    : 'border-black/10 text-black/40 hover:border-black/30'
-                  }`}
-                >
-                  Femme
-                </button>
-              </div>
-            </div>
-
             {/* INPUTS */}
-            <div className="grid grid-cols-2 gap-8">
-              <div className="relative group">
-                <label className="block text-[#303030] text-[10px] uppercase tracking-widest mb-2 font-bold opacity-40">
-                  Âge
-                </label>
-                <input
-                  type="number"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="30"
-                  className="w-full bg-transparent border-b border-black/10 py-3 text-3xl text-[#303030] outline-none focus:border-[#DAFA72] transition-colors font-light placeholder:text-black/5"
-                />
-              </div>
+            <div className="space-y-10">
               
-              <div className="relative group">
-                <label className="block text-[#303030] text-[10px] uppercase tracking-widest mb-2 font-bold opacity-40">
-                  FC Repos (bpm)
-                  <span className="block text-[9px] text-black/30 font-normal mt-1">Optionnel (matin au réveil)</span>
+              {/* GENRE */}
+              <div>
+                <label className="block text-[#303030] text-[10px] uppercase tracking-widest mb-4 font-bold opacity-40">
+                  Genre (Formule FC Max)
                 </label>
-                <input
-                  type="number"
-                  value={restingHR}
-                  onChange={(e) => setRestingHR(e.target.value)}
-                  placeholder="60"
-                  className="w-full bg-transparent border-b border-black/10 py-3 text-3xl text-[#303030] outline-none focus:border-[#DAFA72] transition-colors font-light placeholder:text-black/5"
-                />
+                <div className="grid grid-cols-2 gap-4 border-b border-black/5 pb-8">
+                  <button 
+                    onClick={() => { setGender('male'); setResult(null); }}
+                    className={`flex items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
+                      gender === 'male' 
+                      ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] shadow-lg' 
+                      : 'bg-white text-black/40 border-black/10 hover:border-black/30 hover:text-black/60'
+                    }`}
+                  >
+                    <span className="text-[12px] uppercase tracking-[0.2em] font-bold">Homme</span>
+                  </button>
+                  <button 
+                    onClick={() => { setGender('female'); setResult(null); }}
+                    className={`flex items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
+                      gender === 'female' 
+                      ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] shadow-lg' 
+                      : 'bg-white text-black/40 border-black/10 hover:border-black/30 hover:text-black/60'
+                    }`}
+                  >
+                    <span className="text-[12px] uppercase tracking-[0.2em] font-bold">Femme</span>
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* BUTTON */}
-            <button
-              onClick={calculateZones}
-              disabled={!age}
-              className="group w-full relative inline-flex items-center justify-center gap-3 px-8 py-5 rounded-full bg-[#1A1A1A] text-white text-[13px] font-medium tracking-wide transition-all duration-300 hover:bg-[#DAFA72] hover:text-[#1A1A1A] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="relative z-10">Calculer mes zones</span>
-            </button>
+              {/* Age & Resting HR */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                <div className="relative group">
+                   <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Âge</label>
+                   <input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="30" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all placeholder:text-black/5" />
+                </div>
+                
+                <div className="relative group">
+                   <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">
+                     FC Repos (bpm)
+                     <span className="ml-2 text-[8px] opacity-50 normal-case tracking-normal">Optionnel</span>
+                   </label>
+                   <input type="number" value={restingHR} onChange={(e) => setRestingHR(e.target.value)} placeholder="ex: 60" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all placeholder:text-black/5" />
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button 
+                onClick={calculateZones} 
+                disabled={!age} 
+                className="w-full group relative overflow-hidden rounded-full bg-[#1A1A1A] p-5 transition-all duration-300 hover:bg-[#DAFA72] disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-[0_0_30px_-5px_rgba(218,250,114,0.4)]"
+              >
+                <span className="relative z-10 text-white text-[13px] font-bold uppercase tracking-[0.15em] group-hover:text-[#1A1A1A] transition-colors">
+                  Calculer
+                </span>
+              </button>
+            </div>
 
             {/* RÉSULTATS */}
             {result && (
-              <div className="mt-16 pt-12 border-t border-black/5 animate-in fade-in duration-700">
-                
-                {/* Métriques Globales */}
-                <div className="grid grid-cols-3 gap-4 mb-8">
-                  <div className="p-4 rounded-xl bg-[#FAFAFA] border border-black/5 text-center">
-                    <div className="text-[9px] text-black/30 uppercase tracking-widest mb-1">FC Max</div>
-                    <div className="text-2xl font-bold text-[#303030]">{result.maxHR}</div>
-                    <div className="text-[9px] text-black/40">bpm</div>
-                  </div>
+              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="w-full h-px bg-black/5 mb-12" />
+
+                {/* Main Card (Premium Black) */}
+                <div className="relative overflow-hidden rounded-[32px] bg-[#1A1A1A] p-10 text-center shadow-2xl mb-12 group">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/5 to-transparent opacity-50" />
                   
-                  <div className="p-4 rounded-xl bg-[#FAFAFA] border border-black/5 text-center">
-                    <div className="text-[9px] text-black/30 uppercase tracking-widest mb-1">FC Repos</div>
-                    <div className="text-2xl font-bold text-[#303030]">{result.restingHR}</div>
-                    <div className="text-[9px] text-black/40">bpm</div>
-                  </div>
+                  <h3 className="relative text-[10px] font-bold uppercase tracking-[0.3em] text-[#DAFA72] mb-6">
+                    Fréquence Cardiaque Max
+                  </h3>
                   
-                  <div className="p-4 rounded-xl bg-[#FAFAFA] border border-black/5 text-center">
-                    <div className="text-[9px] text-black/30 uppercase tracking-widest mb-1">Réserve FC</div>
-                    <div className="text-2xl font-bold text-[#303030]">{result.hrReserve}</div>
-                    <div className="text-[9px] text-black/40">bpm</div>
+                  <div className="relative flex items-baseline justify-center gap-2 mb-8">
+                    <span className="text-8xl md:text-9xl font-light tracking-tighter text-white">
+                      {result.maxHR}
+                    </span>
+                    <span className="text-2xl font-medium text-white/30 uppercase tracking-widest">
+                      bpm
+                    </span>
+                  </div>
+
+                  {/* Sub Stats */}
+                  <div className="relative grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                    <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                        <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1">FC Repos</div>
+                        <div className="text-xl text-white font-light">{result.restingHR} <span className="text-xs text-white/30">bpm</span></div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                        <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1">FC Réserve</div>
+                        <div className="text-xl text-white font-light">{result.hrReserve} <span className="text-xs text-white/30">bpm</span></div>
+                    </div>
                   </div>
                 </div>
 
-                <h3 className="text-[#303030] text-sm font-bold uppercase tracking-widest mb-6">Zones d'Entraînement</h3>
-
-                {/* Zones */}
-                <div className="space-y-3 mb-8">
-                  {result.zones.map((zone) => (
-                    <div key={zone.zone} className={`p-4 rounded-xl border transition-all hover:shadow-md ${zone.color}`}>
-                      
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-white/50 flex items-center justify-center text-sm font-bold">
+                {/* Zones List */}
+                <div className="space-y-6">
+                  <h3 className="text-[#303030] text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 pl-2">
+                    Zones d'entraînement
+                  </h3>
+                  
+                  <div className="grid gap-3">
+                    {result.zones.map((zone) => (
+                      <div 
+                        key={zone.zone} 
+                        className={`group relative flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${zone.color}`}
+                      >
+                        <div className="flex items-start md:items-center gap-5 mb-4 md:mb-0">
+                          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-sm font-bold shadow-sm shrink-0">
                             {zone.zone}
                           </div>
                           <div>
-                            <div className="font-bold text-sm uppercase tracking-wide">{zone.name}</div>
-                            <div className="text-[10px] opacity-70">{zone.desc}</div>
+                            <div className="font-bold text-[13px] uppercase tracking-wide leading-tight mb-1">
+                              {zone.name}
+                            </div>
+                            <div className="text-[11px] opacity-70 font-medium leading-tight max-w-xs">
+                              {zone.desc}
+                            </div>
                           </div>
                         </div>
                         
-                        <div className="text-right">
-                          <div className="font-bold text-lg">{zone.bpm}</div>
-                          <div className="text-[9px] opacity-60">bpm</div>
+                        <div className="flex items-center justify-between md:flex-col md:items-end w-full md:w-auto pl-14 md:pl-0">
+                          <div className="text-[10px] opacity-60 font-mono hidden md:block mb-1">
+                             {zone.range}
+                          </div>
+                          <div className="text-xl font-bold tracking-tight">
+                            {zone.bpm} <span className="text-[10px] opacity-50 uppercase">bpm</span>
+                          </div>
+                          <div className="text-[10px] opacity-60 font-medium md:hidden bg-white/40 px-2 py-0.5 rounded">
+                             {zone.range}
+                          </div>
                         </div>
                       </div>
-                      
-                      <div className="flex items-center justify-between pt-2 border-t border-current/10">
-                        <div className="text-[10px] opacity-70">{zone.usage}</div>
-                        <div className="text-[10px] font-medium bg-white/40 px-2 py-0.5 rounded">{zone.range}</div>
-                      </div>
-                      
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
 
                 {/* Warnings */}
                 {result.warnings.length > 0 && (
-                  <div className="space-y-2">
-                    {result.warnings.map((warning, i) => (
-                      <div key={i} className="p-4 rounded-xl bg-blue-50 border border-blue-200">
-                        <p className="text-[11px] text-blue-800 font-medium" dangerouslySetInnerHTML={{ __html: warning }} />
-                      </div>
+                  <div className="mt-8 bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                    {result.warnings.map((w, i) => (
+                      <p key={i} className="text-[11px] text-blue-800 font-medium flex items-center gap-2 mb-1 last:mb-0">
+                         <span dangerouslySetInnerHTML={{ __html: w }} />
+                      </p>
                     ))}
                   </div>
                 )}
-
               </div>
             )}
-
           </div>
         </div>
       </section>

@@ -308,16 +308,16 @@ export default function BodyFatPage() {
               {/* INPUTS DE BASE */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                  <div className="relative group">
-                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Âge</label>
-                    <input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="30" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all placeholder:text-black/5" />
+                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Âge</label>
+                    <input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="30" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all placeholder:text-black/5" />
                  </div>
                  <div className="relative group">
-                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Poids (kg)</label>
-                    <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="75" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all placeholder:text-black/5" />
+                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Poids (kg)</label>
+                    <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="75" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all placeholder:text-black/5" />
                  </div>
                  <div className="relative group">
-                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Taille (cm)</label>
-                    <input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="180" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all placeholder:text-black/5" />
+                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Taille (cm)</label>
+                    <input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="180" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all placeholder:text-black/5" />
                  </div>
               </div>
 
@@ -325,17 +325,17 @@ export default function BodyFatPage() {
               {method === 'navy' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-top-4">
                   <div className="relative group">
-                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Cou (cm)</label>
-                    <input type="number" value={neck} onChange={(e) => setNeck(e.target.value)} placeholder="38" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all placeholder:text-black/5" />
+                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Cou (cm)</label>
+                    <input type="number" value={neck} onChange={(e) => setNeck(e.target.value)} placeholder="38" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all placeholder:text-black/5" />
                   </div>
                   <div className="relative group">
-                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Taille (cm)</label>
-                    <input type="number" value={waist} onChange={(e) => setWaist(e.target.value)} placeholder="80" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all placeholder:text-black/5" />
+                    <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Tour de taille (cm)</label>
+                    <input type="number" value={waist} onChange={(e) => setWaist(e.target.value)} placeholder="80" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all placeholder:text-black/5" />
                   </div>
                   {gender === 'female' && (
                     <div className="relative group">
-                      <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Hanches (cm)</label>
-                      <input type="number" value={hips} onChange={(e) => setHips(e.target.value)} placeholder="95" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all placeholder:text-black/5" />
+                      <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Hanches (cm)</label>
+                      <input type="number" value={hips} onChange={(e) => setHips(e.target.value)} placeholder="95" className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all placeholder:text-black/5" />
                     </div>
                   )}
                 </div>
@@ -347,31 +347,31 @@ export default function BodyFatPage() {
                    {gender === 'male' ? (
                      <>
                        <div className="relative group">
-                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Pectoral (mm)</label>
-                         <input type="number" value={chest} onChange={(e) => setChest(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all" />
+                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Pectoral (mm)</label>
+                         <input type="number" value={chest} onChange={(e) => setChest(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all" />
                        </div>
                        <div className="relative group">
-                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Abdo (mm)</label>
-                         <input type="number" value={abdominal} onChange={(e) => setAbdominal(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all" />
+                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Abdo (mm)</label>
+                         <input type="number" value={abdominal} onChange={(e) => setAbdominal(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all" />
                        </div>
                        <div className="relative group">
-                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Cuisse (mm)</label>
-                         <input type="number" value={thigh} onChange={(e) => setThigh(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all" />
+                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Cuisse (mm)</label>
+                         <input type="number" value={thigh} onChange={(e) => setThigh(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all" />
                        </div>
                      </>
                    ) : (
                      <>
                         <div className="relative group">
-                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Triceps (mm)</label>
-                         <input type="number" value={triceps} onChange={(e) => setTriceps(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all" />
+                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Triceps (mm)</label>
+                         <input type="number" value={triceps} onChange={(e) => setTriceps(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all" />
                        </div>
                        <div className="relative group">
-                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Supra (mm)</label>
-                         <input type="number" value={suprailiac} onChange={(e) => setSuprailiac(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all" />
+                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Supra (mm)</label>
+                         <input type="number" value={suprailiac} onChange={(e) => setSuprailiac(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all" />
                        </div>
                        <div className="relative group">
-                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">Cuisse (mm)</label>
-                         <input type="number" value={thigh} onChange={(e) => setThigh(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all" />
+                         <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">Cuisse (mm)</label>
+                         <input type="number" value={thigh} onChange={(e) => setThigh(e.target.value)} className="w-full bg-transparent border-b border-black/10 py-2 text-2xl text-[#303030] font-light outline-none focus:border-[#303030] transition-all" />
                        </div>
                      </>
                    )}

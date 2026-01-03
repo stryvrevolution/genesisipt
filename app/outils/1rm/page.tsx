@@ -62,14 +62,14 @@ export default function RMCalculatorPage() {
 
   // Zones calculées à la volée
   const trainingZones = result ? [
-    { intensity: 100, weight: result.oneRM, reps: "1", objective: "Test 1RM / Compétition", color: "border-red-500/50 text-red-600 bg-red-50" },
-    { intensity: 95, weight: result.oneRM * 0.95, reps: "1-2", objective: "Force Maximale", color: "border-orange-500/50 text-orange-600 bg-orange-50" },
-    { intensity: 90, weight: result.oneRM * 0.90, reps: "2-4", objective: "Force", color: "border-orange-400/30 text-orange-600 bg-orange-50/50" },
-    { intensity: 85, weight: result.oneRM * 0.85, reps: "4-6", objective: "Force / Hypertrophie", color: "border-yellow-500/50 text-yellow-700 bg-yellow-50" },
-    { intensity: 80, weight: result.oneRM * 0.80, reps: "6-8", objective: "Hypertrophie", color: "border-green-500/50 text-green-700 bg-green-50" },
-    { intensity: 75, weight: result.oneRM * 0.75, reps: "8-10", objective: "Hypertrophie", color: "border-green-400/30 text-green-600 bg-green-50/50" },
-    { intensity: 70, weight: result.oneRM * 0.70, reps: "10-12", objective: "Hypertrophie / Endurance", color: "border-blue-500/50 text-blue-700 bg-blue-50" },
-    { intensity: 65, weight: result.oneRM * 0.65, reps: "12-15", objective: "Endurance Musculaire", color: "border-blue-400/30 text-blue-600 bg-blue-50/50" },
+    { intensity: 100, weight: result.oneRM, reps: "1", objective: "Test 1RM / Compétition", color: "border-red-500/20 text-red-700 bg-red-50" },
+    { intensity: 95, weight: result.oneRM * 0.95, reps: "1-2", objective: "Force Maximale", color: "border-orange-500/20 text-orange-700 bg-orange-50" },
+    { intensity: 90, weight: result.oneRM * 0.90, reps: "2-4", objective: "Force", color: "border-orange-400/20 text-orange-600 bg-orange-50/50" },
+    { intensity: 85, weight: result.oneRM * 0.85, reps: "4-6", objective: "Force / Hypertrophie", color: "border-yellow-500/20 text-yellow-800 bg-yellow-50" },
+    { intensity: 80, weight: result.oneRM * 0.80, reps: "6-8", objective: "Hypertrophie", color: "border-emerald-500/20 text-emerald-700 bg-emerald-50" },
+    { intensity: 75, weight: result.oneRM * 0.75, reps: "8-10", objective: "Hypertrophie", color: "border-emerald-400/20 text-emerald-600 bg-emerald-50/50" },
+    { intensity: 70, weight: result.oneRM * 0.70, reps: "10-12", objective: "Hypertrophie / Endurance", color: "border-blue-500/20 text-blue-700 bg-blue-50" },
+    { intensity: 65, weight: result.oneRM * 0.65, reps: "12-15", objective: "Endurance Musculaire", color: "border-blue-400/20 text-blue-600 bg-blue-50/50" },
     { intensity: 50, weight: result.oneRM * 0.50, reps: "20+", objective: "Échauffement / Technique", color: "border-slate-300 text-slate-600 bg-slate-50" },
   ] : [];
 
@@ -77,7 +77,6 @@ export default function RMCalculatorPage() {
     <main className="flex flex-col md:flex-row min-h-screen bg-white font-outfit text-[#303030]">
       
       {/* SECTION GAUCHE : DESIGN CARTE HUB "ÉTENDUE" */}
-      {/* Fond #1A1A1A (Anthracite profond) */}
       <section className="w-full md:w-5/12 lg:w-1/3 bg-[#1A1A1A] p-8 md:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden min-h-[40vh] md:min-h-screen border-r border-white/5 shadow-[20px_0_40px_-10px_rgba(0,0,0,0.2)] z-20">
         
         {/* Filigrane d'arrière-plan */}
@@ -95,7 +94,7 @@ export default function RMCalculatorPage() {
             Retour au Hub
           </Link>
           
-          {/* Header identique à la carte Hub : Icone + Badge Type */}
+          {/* Header identique à la carte Hub */}
           <div className="flex flex-col items-start gap-6 mb-10">
             <div className="flex items-center gap-4">
                 {/* ICONE CARRÉE GRADIENT (Jaune pour Charges) */}
@@ -155,11 +154,12 @@ export default function RMCalculatorPage() {
             
             {/* INPUTS */}
             <div className="space-y-10">
+              {/* Note: Flex-col pour mobile (une ligne par question), md:flex-row pour desktop */}
               <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-end">
                 
                 {/* Poids */}
                 <div className="relative flex-1 group w-full">
-                  <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">
+                  <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">
                     Charge ({unit})
                   </label>
                   <input 
@@ -167,13 +167,13 @@ export default function RMCalculatorPage() {
                     value={weight} 
                     onChange={(e) => setWeight(e.target.value)} 
                     placeholder="ex: 80" 
-                    className="w-full bg-transparent border-b border-black/10 py-4 text-4xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all placeholder:text-black/5" 
+                    className="w-full bg-transparent border-b border-black/10 py-4 text-4xl text-[#303030] font-light outline-none focus:border-[#1A1A1A] transition-all placeholder:text-black/5" 
                   />
                 </div>
 
                 {/* Reps */}
                 <div className="relative flex-1 group w-full">
-                  <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#DAFA72] transition-all">
+                  <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-3 font-bold opacity-40 group-focus-within:opacity-100 group-focus-within:text-[#303030] transition-all">
                     Répétitions
                   </label>
                   <input 
@@ -181,7 +181,7 @@ export default function RMCalculatorPage() {
                     value={reps} 
                     onChange={(e) => setReps(e.target.value)} 
                     placeholder="ex: 6" 
-                    className="w-full bg-transparent border-b border-black/10 py-4 text-4xl text-[#303030] font-light outline-none focus:border-[#DAFA72] transition-all placeholder:text-black/5" 
+                    className="w-full bg-transparent border-b border-black/10 py-4 text-4xl text-[#303030] font-light outline-none focus:border-[#1A1A1A] transition-all placeholder:text-black/5" 
                   />
                 </div>
 
@@ -203,7 +203,7 @@ export default function RMCalculatorPage() {
                 </div>
               </div>
 
-              {/* Formula Selection (Boutons mis à jour #1A1A1A) */}
+              {/* Formula Selection */}
               <div>
                  <label className="block text-[#303030] text-[10px] uppercase tracking-[0.2em] mb-4 font-bold opacity-40">
                    Algorithme
@@ -220,7 +220,7 @@ export default function RMCalculatorPage() {
                       onClick={() => setFormula(f.id as Formula)} 
                       className={`px-4 py-3 rounded-xl text-[11px] font-medium border transition-all ${
                         formula === f.id 
-                        ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] shadow-lg' // COULEUR #1A1A1A
+                        ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] shadow-lg' 
                         : 'border-black/5 text-black/40 hover:border-black/20 hover:text-black/60 bg-transparent'
                       }`}
                     >
@@ -230,7 +230,7 @@ export default function RMCalculatorPage() {
                 </div>
               </div>
             
-              {/* Action Button (Bouton mis à jour #1A1A1A) */}
+              {/* Action Button */}
               <button 
                 onClick={calculateRM} 
                 disabled={!weight || !reps} 
@@ -247,7 +247,7 @@ export default function RMCalculatorPage() {
               <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
                 <div className="w-full h-px bg-black/5 mb-12" />
 
-                {/* Main Card (Fond #1A1A1A pour match sidebar) */}
+                {/* Main Card (Premium Black) */}
                 <div className="relative overflow-hidden rounded-[32px] bg-[#1A1A1A] p-10 text-center shadow-2xl mb-12 group">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/5 to-transparent opacity-50" />
                   
@@ -285,27 +285,27 @@ export default function RMCalculatorPage() {
                     {trainingZones.map((zone, i) => (
                       <div 
                         key={i} 
-                        className={`group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 hover:scale-[1.01] hover:shadow-lg ${zone.color} bg-opacity-30 hover:bg-opacity-50 border-opacity-50`}
+                        className={`group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 hover:scale-[1.01] hover:shadow-lg ${zone.color}`}
                       >
                         <div className="flex items-center gap-5">
                           <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-sm font-bold shadow-sm">
                             {zone.intensity}%
                           </div>
                           <div>
-                            <div className="font-bold text-[13px] uppercase tracking-wide leading-tight mb-1">
+                            <div className="font-bold text-[13px] uppercase tracking-wide leading-tight mb-1 text-[#303030]">
                               {zone.objective}
                             </div>
-                            <div className="text-[11px] opacity-70 font-medium">
+                            <div className="text-[11px] opacity-60 font-medium text-[#303030]">
                               ~{zone.reps} reps
                             </div>
                           </div>
                         </div>
                         
                         <div className="text-right">
-                          <span className="text-2xl font-bold tracking-tight">
+                          <span className="text-2xl font-bold tracking-tight text-[#303030]">
                             {displayWeight(zone.weight)}
                           </span>
-                          <span className="text-[9px] uppercase font-bold opacity-40 ml-1">
+                          <span className="text-[9px] uppercase font-bold opacity-40 ml-1 text-[#303030]">
                             {unit}
                           </span>
                         </div>
