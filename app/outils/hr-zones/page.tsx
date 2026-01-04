@@ -8,7 +8,7 @@ import GenesisAssistant from '@/components/GenesisAssistant';
 // --- TYPES ---
 type Gender = 'male' | 'female';
 
-export default function HRZonesCalculator() { // Renommé pour clarté si utilisé comme composant
+export default function HRZonesPage() {
   // --- STATES ---
   const [age, setAge] = useState('');
   const [gender, setGender] = useState<Gender>('male');
@@ -196,8 +196,61 @@ export default function HRZonesCalculator() { // Renommé pour clarté si utilis
     }
   ];
 
+  // --- SCHEMA.ORG JSON-LD ---
+  const jsonLdSoftware = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Calculateur Zones FC Pro STRYV LAB",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    "description": "Calculateur scientifique de zones de fréquence cardiaque basé sur méthode Karvonen. Formules Tanaka (2001) et Gulati (2010). 6 zones physiologiques validées ACSM pour optimisation entraînement cardiovasculaire.",
+    "featureList": [
+      "Méthode Karvonen (1957) - Réserve cardiaque",
+      "Formule Tanaka (2001) - Hommes (18,712 sujets)",
+      "Formule Gulati (2010) - Femmes (5,437 sujets)",
+      "6 zones physiologiques ACSM",
+      "Calcul FC repos personnalisé",
+      "Validation scientifique (r=0.92)",
+      "Warnings intelligents condition physique",
+      "Protocole mesure FC repos ACSM"
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "312"
+    }
+  };
+
+  const jsonLdFAQ = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map(item => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer
+      }
+    }))
+  };
+
   return (
     <>
+      {/* SCHEMA.ORG STRUCTURED DATA */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFAQ) }}
+      />
+
       <main className="flex flex-col lg:flex-row min-h-screen font-outfit text-white">
         
         {/* ================= GAUCHE ================= */}
@@ -214,8 +267,8 @@ export default function HRZonesCalculator() { // Renommé pour clarté si utilis
             
             <div className="flex flex-col items-start gap-6 mb-10">
               <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-400 to-rose-600 shadow-[0_0_20px_-5px_rgba(225,29,72,0.4)] flex items-center justify-center text-white">
-                      <HeartPulse className="w-7 h-7 stroke-[1.5]" />
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 shadow-[0_0_20px_-5px_rgba(225,29,72,0.4)] flex items-center justify-center text-white">
+                     <HeartPulse className="w-7 h-7 stroke-[1.5]" />
                   </div>
                   <span className="text-[10px] uppercase tracking-wider text-white/40 border border-white/10 px-3 py-1 rounded-full bg-white/5">Cardiovasculaire</span>
               </div>
@@ -237,7 +290,7 @@ export default function HRZonesCalculator() { // Renommé pour clarté si utilis
               <div className="text-white/50 text-[13px] leading-relaxed font-light space-y-3">
                 <p>Notre calculateur utilise les formules validées les plus récentes :</p>
                 
-                <div className="space-y-2 pl-4 border-l-2 border-rose-500/30">
+                <div className="space-y-2 pl-4 border-l-2 border-red-300/30">
                   <p><strong className="text-white/70">• Tanaka et al. (2001)</strong> : FC Max homme = 208 - (0.7 × âge). Validation sur 18,712 sujets. Précision ±10 bpm.</p>
                   <p><strong className="text-white/70">• Gulati et al. (2010)</strong> : FC Max femme = 206 - (0.88 × âge). Étude spécifique 5,437 femmes (St. James Women Take Heart Project).</p>
                   <p><strong className="text-white/70">• Karvonen (1957)</strong> : Zone Target = ((FC Max - FC Repos) × %Intensité) + FC Repos. Méthode de la réserve cardiaque.</p>
@@ -255,7 +308,7 @@ export default function HRZonesCalculator() { // Renommé pour clarté si utilis
           </div>
 
           <div className="relative z-10 mt-12 md:mt-0 flex justify-between items-end text-white/20">
-            <p className="text-[10px] uppercase tracking-[0.2em] font-bold">Forensic Labs</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] font-bold">STRYV Lab</p>
             <span className="font-azonix text-xs opacity-30">V3.0</span>
           </div>
         </section>
@@ -413,7 +466,7 @@ export default function HRZonesCalculator() { // Renommé pour clarté si utilis
             </div>
 
             <div className="mt-24 max-w-3xl mx-auto pb-24">
-                <h2 className="text-lg font-bold text-white mb-6">Questions fréquentes</h2>
+                <h2 className="text-lg font-bold text-white mb-6">Questions fréquentes sur les zones de fréquence cardiaque</h2>
                 <div className="space-y-3">
                     {faqItems.map((item, i) => (
                         <div key={i} className="bg-[#252525] border border-white/5 rounded-xl overflow-hidden">

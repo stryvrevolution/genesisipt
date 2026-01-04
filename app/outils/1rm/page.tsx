@@ -160,7 +160,7 @@ export default function RMCalculatorPage() {
           </div>
 
           <div className="relative z-10 mt-12 md:mt-0 flex justify-between items-end text-white/20">
-            <p className="text-[10px] uppercase tracking-[0.2em] font-bold">Forensic Labs</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] font-bold">STRYV Lab</p>
             <span className="font-azonix text-xs opacity-30">V3.0</span>
           </div>
         </section>
