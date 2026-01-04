@@ -8,7 +8,7 @@ import GenesisAssistant from '@/components/GenesisAssistant';
 // --- TYPES ---
 type Gender = 'male' | 'female';
 
-export default function HRZonesPage() {
+export default function HRZonesCalculator() { // Renommé pour clarté si utilisé comme composant
   // --- STATES ---
   const [age, setAge] = useState('');
   const [gender, setGender] = useState<Gender>('male');
@@ -215,7 +215,7 @@ export default function HRZonesPage() {
             <div className="flex flex-col items-start gap-6 mb-10">
               <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-400 to-rose-600 shadow-[0_0_20px_-5px_rgba(225,29,72,0.4)] flex items-center justify-center text-white">
-                     <HeartPulse className="w-7 h-7 stroke-[1.5]" />
+                      <HeartPulse className="w-7 h-7 stroke-[1.5]" />
                   </div>
                   <span className="text-[10px] uppercase tracking-wider text-white/40 border border-white/10 px-3 py-1 rounded-full bg-white/5">Cardiovasculaire</span>
               </div>
@@ -255,7 +255,7 @@ export default function HRZonesPage() {
           </div>
 
           <div className="relative z-10 mt-12 md:mt-0 flex justify-between items-end text-white/20">
-            <p className="text-[10px] uppercase tracking-[0.2em] font-bold">Stryv Lab</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] font-bold">Forensic Labs</p>
             <span className="font-azonix text-xs opacity-30">V3.0</span>
           </div>
         </section>
