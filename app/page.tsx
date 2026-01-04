@@ -248,39 +248,40 @@ export default function AnalyseIPTPage() {
         </div>
         
         <div
-          ref={ctaRef}
-          className={`
-            max-w-8xl mx-auto
-            bg-[#DAFA72]
-            rounded-2xl
-            px-8
-            py-6
-            flex
-            items-center
-            justify-between
-            transition-all
-            duration-700
-            ease-out
-            mt-24
-            ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}
-          `}
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-3 h-3 rounded-full bg-[#303030] mt-1" />
-            <p className="text-[#303030] text-sm max-w-md font-medium">
-              Prêt à analyser votre potentiel de transformation ?
-              <br />
-              Initiez une évaluation structurée dès maintenant.
-            </p>
-          </div>
+  ref={ctaRef}
+  className={`
+    max-w-8xl mx-auto
+    bg-[#DAFA72]
+    rounded-2xl
+    p-6 md:px-8 md:py-6
+    flex
+    flex-col md:flex-row
+    items-start md:items-center
+    justify-between
+    gap-6 md:gap-0
+    transition-all
+    duration-700
+    ease-out
+    mt-12 md:mt-24
+    ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}
+  `}
+>
+  <div className="flex items-start gap-4 w-full md:w-auto">
+    <div className="w-3 h-3 rounded-full bg-[#303030] mt-1.5 shrink-0" />
+    <p className="text-[#303030] text-sm max-w-md font-medium leading-relaxed">
+      Prêt à analyser votre potentiel de transformation ?
+      <br className="hidden md:block" />
+      <span className="md:block mt-1 md:mt-0">Initiez une évaluation structurée dès maintenant.</span>
+    </p>
+  </div>
 
-          <button
-            onClick={() => setStartIPT(true)}
-            className="bg-[#303030] text-white text-sm px-6 py-3 rounded-full transition-transform duration-200 hover:scale-[1.05] active:scale-[0.97] cursor-pointer"
-          >
-            Démarrer l'analyse
-          </button>
-        </div>
+  <button
+    onClick={() => setStartIPT(true)}
+    className="bg-[#303030] text-white text-sm px-6 py-3 rounded-full transition-transform duration-200 hover:scale-[1.05] active:scale-[0.97] cursor-pointer w-full md:w-auto text-center"
+  >
+    Démarrer l'analyse
+  </button>
+</div>
       </section>
 
       {/* SECTION OUTILS - DESIGN "LAB DARK PREMIUM" HARMONISÉ */}
@@ -349,7 +350,7 @@ export default function AnalyseIPTPage() {
           CYCLE SYNC
         </h3>
         <p className="text-white/50 text-[13px] leading-relaxed font-light border-t border-white/5 pt-4 font-outfit">
-          Synchronisez nutrition et entraînement avec vos variations hormonales pour maximiser vos résultats.
+          Life style féminin : Synchronisez nutrition et entraînement avec vos variations hormonales pour maximiser vos résultats.
         </p>
       </div>
 

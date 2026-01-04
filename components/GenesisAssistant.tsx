@@ -39,7 +39,7 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
     if (typeof window !== 'undefined') {
       localStorage.setItem('genesis-chat-history', JSON.stringify(messages));
     }
-  }, [messages, isOpen])
+  }, [messages, isOpen, isLoading]) // ← Ajout isLoading pour scroll pendant typing
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return
@@ -51,7 +51,10 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
     const newHistory = [...messages, { role: 'user', content: userMsg } as Message]
     setMessages(newHistory)
 
-    const result = await chatWithGenesis(userMsg, messages)
+    // Détecter la page actuelle pour contexte
+    const currentPage = typeof window !== 'undefined' ? window.location.pathname : undefined;
+
+    const result = await chatWithGenesis(userMsg, messages, currentPage)
 
     if (result.success) {
       setMessages(prev => [...prev, { role: 'assistant', content: result.response }])
@@ -164,7 +167,7 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
                 <div className="h-full flex flex-col items-center justify-center text-center opacity-60">
                    <Sparkles className="w-8 h-8 text-[#DAFA72] mb-4" />
                    <p className="text-white/60 font-outfit">
-                    GENESIS est prêt.<br/>Pose une question sur ta physiologie ou nutrition.
+                    GENESIS est prêt pour répondre à vos questions.
                    </p>
                 </div>
               )}
@@ -181,13 +184,28 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
                 </div>
               ))}
 
+              {/* ✨ ANIMATION TYPING DOTS AMÉLIORÉE */}
               {isLoading && (
                 <div className="text-left">
-                  <div className="inline-block bg-white/5 text-white/60 px-4 py-2 rounded-lg text-xs">
-                    Analyse en cours...
+                  <div className="inline-block bg-white/5 text-white/80 px-4 py-3 rounded-lg border border-white/5">
+                    <div className="flex items-center gap-1">
+                      <div 
+                        className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce"
+                        style={{ animationDelay: '0ms', animationDuration: '1s' }}
+                      />
+                      <div 
+                        className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce"
+                        style={{ animationDelay: '200ms', animationDuration: '1s' }}
+                      />
+                      <div 
+                        className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce"
+                        style={{ animationDelay: '400ms', animationDuration: '1s' }}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
+              
               <div ref={messagesEndRef} />
             </div>
 
@@ -197,13 +215,14 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Écris ici…"
-                className="flex-1 bg-[#1A1A1A] text-white/90 px-4 py-3 rounded-lg outline-none border border-white/5 focus:border-[#DAFA72]/30 transition-colors font-outfit placeholder:text-white/20"
+                disabled={isLoading}
+                className="flex-1 bg-[#1A1A1A] text-white/90 px-4 py-3 rounded-lg outline-none border border-white/5 focus:border-[#DAFA72]/30 transition-colors font-outfit placeholder:text-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
               />
 
               <button
                 onClick={handleSendMessage}
                 disabled={isLoading || !inputValue.trim()}
-                className="bg-[#DAFA72] text-[#303030] px-4 py-3 rounded-lg hover:scale-[1.03] transition-transform disabled:opacity-50 cursor-pointer flex items-center justify-center"
+                className="bg-[#DAFA72] text-[#303030] px-4 py-3 rounded-lg hover:scale-[1.03] transition-transform disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
               >
                 <Send className="w-4 h-4" />
               </button>
