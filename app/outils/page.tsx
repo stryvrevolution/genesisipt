@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Accédez aux calculateurs de précision pour l\'optimisation métabolique, hormonale et de la performance (Macros, Body Fat, Cycle Sync...).',
   openGraph: {
     title: 'Tools Hub | STRYV LAB',
-    description: 'La suite d\'outils métaboliques pour transformer votre physique.',
+    description: 'La suite d\'outils pour transformer votre physique.',
     url: 'https://www.stryvlab.com/outils',
     siteName: 'STRYV LAB',
     images: [
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Tools Hub | STRYV LAB',
     description: 'La suite d\'outils métaboliques pour transformer votre physique.',
-    images: ['/og-toolshub.jpg'],
+    images: ['/og-toolshub.png'],
   },
 };
 
