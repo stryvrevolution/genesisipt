@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/PhaseTimeline.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/PhaseTimeline.tsx", ".next/types/app/outils/1rm/OneRMCalculator.tsx", ".next/types/app/outils/body-fat/BodyFatCalculator.tsx"],
   "exclude": ["node_modules"]
 }

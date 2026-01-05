@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Moon, ChevronDown, Calendar, Activity, BatteryLow, Zap, Battery } from 'lucide-react';
+import { Moon, ChevronDown, Activity, BatteryLow, Zap, Battery, Copy, Check } from 'lucide-react';
 import GenesisAssistant from '@/components/GenesisAssistant';
 
 // ================================
@@ -223,22 +223,17 @@ const calculateDayOfCycle = (lastPeriodDate: Date, cycleLength: number): number 
 // ================================
 
 export default function CycleSyncCalculator() {
-  // Mode de saisie jour cycle
   const [inputMode, setInputMode] = useState<InputMode>('day');
-  
-  // Inputs nutrition baseline (depuis Macro Calculator)
   const [baseCal, setBaseCal] = useState('');
   const [baseProtein, setBaseProtein] = useState('');
   const [baseCarbs, setBaseCarbs] = useState('');
   const [baseFats, setBaseFats] = useState('');
-  
-  // Inputs cycle
   const [cycleLength, setCycleLength] = useState('28');
   const [currentDay, setCurrentDay] = useState('');
   const [lastPeriodDate, setLastPeriodDate] = useState('');
-  
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   
   const [result, setResult] = useState<{
@@ -256,6 +251,7 @@ export default function CycleSyncCalculator() {
   } | null>(null);
 
   const calculatePhase = () => {
+    setCopied(false);
     const cal = parseFloat(baseCal);
     const protein = parseFloat(baseProtein);
     const carbs = parseFloat(baseCarbs);
@@ -264,7 +260,6 @@ export default function CycleSyncCalculator() {
 
     if (!cal || !protein || !carbs || !fats || !length) return;
 
-    // Déterminer jour du cycle
     let day: number;
     if (inputMode === 'day') {
       day = parseInt(currentDay);
@@ -277,50 +272,37 @@ export default function CycleSyncCalculator() {
 
     const warnings: string[] = [];
 
-    // Validations
     if (length < 21 || length > 35) {
       warnings.push('Cycle atypique (<21j ou >35j) : Consulter gynécologue. SOPK, thyroïde, stress chronique possible.');
     }
-
     if (day > length) {
       warnings.push('Jour cycle > durée cycle : Vérifier données. Jour 1 = premier jour menstruation.');
     }
-
     if (cal < 1200) {
       warnings.push('CRITIQUE: Calories <1200 kcal. Risque MAJEUR aménorrhée hypothalamique. Augmenter immédiatement.');
     }
 
-    // Déterminer phase
     const phase = calculateCurrentPhase(day, length);
     const phaseConfig = PHASE_CONFIGS[phase];
     const training = TRAINING_PROTOCOLS[phase];
     const nutrition = NUTRITION_PROTOCOLS[phase];
 
-    // Ajustements nutrition (Helms 2014 + Oosthuyse 2010)
-    const adjustedProtein = protein; // STABLES toutes phases
+    const adjustedProtein = protein;
     const adjustedCarbs = Math.round(carbs * nutrition.carbsModifier);
     const adjustedFats = Math.round(fats * nutrition.fatsModifier);
-    
-    // Calories recalculées depuis macros ajustées
     const adjustedCal = Math.round((adjustedProtein * 4) + (adjustedCarbs * 4) + (adjustedFats * 9));
 
     const daysUntilNext = getDaysUntilNextPhase(day, phase, length);
 
-    // Warnings phase-specific
-    if (phase === 'follicular') {
-      warnings.push('FENÊTRE ANABOLIQUE : Œstrogène peak. Maximiser volume/charges. Sensibilité insuline +40% = glucides élevés tolérés (Davidsen 2007).');
-    }
-
+    if (phase === 'follicular') warnings.push('FENÊTRE ANABOLIQUE : Œstrogène peak. Maximiser volume/charges. Sensibilité insuline +40% = glucides élevés tolérés (Davidsen 2007).');
     if (phase === 'ovulatory') {
       warnings.push('PIC FORCE 24-48H : Tests 1RM, PRs optimaux. Testostérone relative maximale (Janse de Jonge 2003).');
       warnings.push('Laxité ligamentaire accrue (œstrogène) : Échauffement prolongé 15-20min obligatoire. Prévention blessures.');
     }
-
     if (phase === 'luteal') {
       warnings.push(`Métabolisme +${((phaseConfig.metabolism - 1) * 100).toFixed(0)}% (progestérone thermogénique) : Calories augmentées = NÉCESSAIRE pour homéostasie hormonale (Oosthuyse 2010).`);
       warnings.push('SPM J21-28 possible : Fringales glucides normales (baisse sérotonine). Satisfaire modérément vs restriction rigide.');
     }
-
     if (phase === 'menstrual') {
       warnings.push('Anémie ferriprive risque : Perte sang 30-50mg fer. Suppléments fer (18-25mg/j) + Vitamine C (absorption).');
       warnings.push('J1-2 repos complet acceptable si dysménorrhée sévère. Crampes : Chaleur locale, magnésium 400mg/j.');
@@ -349,26 +331,50 @@ export default function CycleSyncCalculator() {
     }, 100);
   };
 
+  const handleCopy = () => {
+    if (!result) return;
+    const url = 'https://www.stryvlab.com/outils/cycle-sync';
+    const textToCopy = `Bilan Cycle Sync - STRYV LAB
+
+• Phase : ${result.phaseConfig.name} (J${result.dayOfCycle}/${cycleLength})
+• Prochaine phase : dans ${result.daysUntilNext} jours
+
+Nutrition ajustée (Hormonal Match) :
+• Calories : ${result.adjustedCal} kcal
+• Protéines : ${result.adjustedProtein}g
+• Glucides : ${result.adjustedCarbs}g
+• Lipides : ${result.adjustedFats}g
+
+Training Focus : ${result.training.intensityRange}
+${result.training.focus[0]} • ${result.training.focus[1]}
+
+Retrouvez cet outil ici : ${url}`;
+
+    navigator.clipboard.writeText(textToCopy);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const faqItems = [
     {
       question: "Quel est le workflow complet pour utiliser Cycle Sync correctement ?",
-      answer: "Cycle Sync nécessite 2 étapes préalables pour fonctionner optimalement. ÉTAPE 1 - BODY FAT CALCULATOR : Calculez votre pourcentage de masse grasse via méthode US Navy (mètre ruban) ou Jackson-Pollock (plis cutanés). Output : BF% = ex. 22%. ÉTAPE 2 - MACRO CALCULATOR : Entrez poids, taille, âge, BF% (22%), niveau activité, objectif (déficit/maintenance/surplus). Le calculateur utilise Mifflin-St Jeor (1990) pour BMR, décompose TDEE (BMR+NEAT+EAT+TEF), calcule protéines LBM-based (Helms 2014) 1.8-2.6g/kg, lipides hormonal-optimized 0.8-1.2g/kg, glucides variable ajustement. Output : Calories 1800 kcal, Protéines 120g, Glucides 200g, Lipides 50g. ÉTAPE 3 - CYCLE SYNC : Copiez les 4 valeurs nutrition baseline (Cal, P, G, L) depuis Macro Calculator. Entrez durée cycle (21-35j, moyenne 28j) + jour actuel cycle (option 1: direct J1-28, option 2: date dernières règles = calcul auto). Cycle Sync applique modulations hormonales phase-spécifiques : Protéines stables, Glucides ±40% (sensibilité insuline), Lipides ±20% (métabolisme progestérone). Output : Ajustements training volume/intensité + nutrition phase actuelle."
+      answer: "Cycle Sync nécessite 2 étapes préalables pour fonctionner optimalement. ÉTAPE 1 - BODY FAT CALCULATOR : Calculez votre pourcentage de masse grasse. ÉTAPE 2 - MACRO CALCULATOR : Calculez vos besoins caloriques & macros baseline. ÉTAPE 3 - CYCLE SYNC : Entrez ces valeurs ici avec les infos de votre cycle."
     },
     {
       question: "Pourquoi synchroniser training/nutrition avec le cycle menstruel ?",
-      answer: "Cycle menstruel = oscillations hormonales 28j (moyenne 21-35j). Œstrogène peak phase folliculaire (J6-14) induit : synthèse protéique musculaire ↑15-25% (Davidsen et al. 2007), sensibilité insuline ↑40% (utilisation glucides optimale), recrutement fibres Type II rapides ↑ (force/puissance), récupération accélérée. Progestérone phase lutéale (J16-28) antagoniste partiel : métabolisme basal ↑5-10% (thermogénèse +150-300 kcal/j), catabolisme léger, sensibilité insuline ↓30-40% (Oosthuyse & Bosch 2010), récupération ralentie. Ignorer phases = programmer training/déficit calorique contre physiologie naturelle → sous-performance, récupération compromise, risque aménorrhée (suppression axe Hypothalamus-Pituitary-Gonadal). Études athlètes élite : synchronisation compétitions phase folliculaire/ovulation = performance ↑5-8% vs menstruation (Janse de Jonge 2003). Méta-analyse McNulty 2020 : effets variables individuellement mais tendances cohérentes population. Cycle sync = exploitation fenêtres anaboliques naturelles."
+      answer: "Les oscillations hormonales (28j) impactent le métabolisme. Phase folliculaire (J6-14) : Anabolisme peak, sensibilité insuline élevée. Phase lutéale (J16-28) : Métabolisme basal +5-10%, récupération ralentie. Ignorer ces phases mène à la sous-performance."
     },
     {
-      question: "Comment ajuster concrètement volume/intensité training selon phases ?",
-      answer: "MENSTRUATION (J1-5) : Hormones nadir, inflammation systémique ↑ (prostaglandines), fatigue, anémie (perte fer 30-50mg). Volume -40% baseline, intensité 50-65% 1RM, focus récupération active (yoga, marche, mobilité). J1-2 repos complet acceptable si dysménorrhée sévère. FOLLICULAIRE (J6-13) : Œstrogène ↑ = anabolisme peak. Volume +30% baseline, intensité 80-95% 1RM, focus force max/hypertrophie. Sessions lourdes composés (squat, deadlift, bench) 4-5×/semaine tolérées. Récupération rapide 48-72h. Progression charges prioritaire. OVULATION (J14-15) : Pic LH/testostérone. Volume +20%, intensité 85-100% 1RM. Tests 1RM, PRs, explosivité. Coordination neuromusculaire optimale. Fenêtre courte 24-48h. Attention laxité ligamentaire ↑ (échauffement prolongé). LUTÉALE (J16-28) : Progestérone ↑ = ralentissement. Volume -20% baseline, intensité 65-80% 1RM, focus hypertrophie modérée (8-12 reps), technique, cardio steady-state. Sessions 3-4×/semaine. Récupération prolongée 72-96h. SPM (J24-28) : Flexibilité, réduire si fatigue excessive. Clé = écoute corps + programmation cyclique vs linéaire rigide."
+        question: "Comment ajuster concrètement volume/intensité training selon phases ?",
+        answer: "MENSTRUATION (J1-5) : Volume -40%, Intensité 50-65% (Récup active). FOLLICULAIRE (J6-13) : Volume +30%, Intensité 80-95% (Force/Hypertrophie). OVULATION (J14-15) : Volume +20%, Intensité 100% (PRs, Explosivité). LUTÉALE (J16-28) : Volume -20%, Intensité 65-80% (Technique, Cardio)."
     },
     {
-      question: "Pourquoi augmenter calories phase lutéale malgré baisse performance ?",
-      answer: "Progestérone = hormone thermogénique : ↑ métabolisme basal +150-300 kcal/j (+5-10% TDEE) via découplage mitochondrial, température corporelle ↑0.3-0.5°C (Oosthuyse & Bosch 2010). Maintenir déficit calorique phase lutéale = stress métabolique cumulé → cortisol chroniquement élevé → suppression axe HPG (Hypothalamus sécrète moins GnRH → Pituitary réduit FSH/LH → ovaires arrêtent production œstrogène/progestérone) = aménorrhée hypothalamique (absence règles >3 mois). Triade athlète féminine : (1) Déficit énergétique relatif, (2) Aménorrhée, (3) Densité osseuse ↓ (ostéoporose précoce 20-30 ans, fractures stress). Calories augmentées lutéale = compenser dépense énergétique accrue progestérone, maintenir homéostasie hormonale, prévenir suppression axe reproducteur. Fringales glucides SPM (J24-28) = réelles neurochimie (baisse sérotonine, glucides = précurseurs tryptophane → sérotonine). Combattre agressivement = échec compliance long terme. Satisfaire modérément (chocolat noir 70-85%, fruits, patate douce) = succès durable. Ignorer besoins phase lutéale = risque santé reproductive/osseuse majeur."
+        question: "Pourquoi augmenter calories phase lutéale malgré baisse performance ?",
+        answer: "La progestérone est thermogénique (+150-300 kcal/j de dépense au repos). Ne pas augmenter les calories crée un déficit trop grand qui stresse l'organisme (Cortisol) et peut mener à l'aménorrhée."
     },
     {
-      question: "Gestion irrégularités : SOPK, aménorrhée, cycles courts/longs ?",
-      answer: "SOPK (Syndrome Ovaires Polykystiques) : Hyperandrogénie (testostérone élevée), insulino-résistance centrale, cycles irréguliers >35j, anovulation fréquente. Gestion : Glucides contrôlés constants 100-150g/j (pas modulation cyclique), résistance training prioritaire 4×/semaine (sensibilité insuline), inositol 2-4g/j, metformine si prescrite médecin. Cycle sync limité car phases imprévisibles. Focus stabilisation métabolique > modulation cyclique. AMÉNORRHÉE HYPOTHALAMIQUE : Absence règles >3 mois par déficit énergétique/stress/volume training excessif. Solution URGENTE : Calories ↑20-30% (+400-600 kcal/j minimum), volume training ↓40-50%, stress management (méditation, thérapie), sommeil 8-9h, poids corporel ↑ si sous-poids (BMI <18.5). Restauration cycle 6-12 mois. Cycle sync inapplicable jusqu'à retour règles régulières. CYCLES COURTS (<21j) : Phase folliculaire raccourcie, ovulation précoce J10-11. Ajuster timing training lourd J6-10 au lieu J6-13. CYCLES LONGS (>35j) : Phase lutéale prolongée ou anovulation. Tracking ovulation obligatoire (température basale réveil, tests LH urinaires) identifier vraies phases. GÉNÉRAL : Irrégularités persistantes >6 mois = consultation gynécologue + bilan hormonal complet (FSH, LH, œstradiol, progestérone J21, testostérone totale/libre, DHEA-S, prolactine, TSH, glycémie/insuline à jeun). Pathologies thyroïde/hyperprolactinémie exclues avant cycle sync."
+        question: "Gestion irrégularités : SOPK, aménorrhée, cycles courts/longs ?",
+        answer: "SOPK : Focus glucides stables et training résistance. Aménorrhée : Arrêt du déficit calorique impératif. Cycles irréguliers : Consultez un gynécologue avant d'utiliser cet outil."
     }
   ];
 
@@ -376,15 +382,12 @@ export default function CycleSyncCalculator() {
 
   return (
     <div className="w-full space-y-12">
-      
       <div className="border-b border-white/10 pb-6">
           <h3 className="text-lg font-bold text-white mb-1">Synchronisation cycle menstruel</h3>
           <p className="text-sm text-white/40 font-medium">Ajustements training/nutrition selon phase hormonale</p>
       </div>
 
       <div className="space-y-8">
-          
-          {/* INFO: Workflow */}
           <div className="bg-[#404040] border border-white/10 rounded-xl p-5">
               <div className="text-sm text-white/90 font-medium mb-2">Workflow recommandé</div>
               <div className="text-xs text-white/60 space-y-1">
@@ -394,126 +397,65 @@ export default function CycleSyncCalculator() {
               </div>
           </div>
 
-          {/* SECTION 1: NUTRITION BASELINE */}
           <div>
               <h4 className="text-sm font-bold text-white mb-4 pb-2 border-b border-white/10">Nutrition Baseline (depuis Macro Calculator)</h4>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
                       <label className="text-[13px] font-medium text-white/60">Calories (kcal/j)</label>
-                      <input 
-                      type="number" 
-                      value={baseCal} 
-                      onChange={(e) => setBaseCal(e.target.value)} 
-                      placeholder="1800"
-                      className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all"
-                      />
+                      <input type="number" value={baseCal} onChange={(e) => setBaseCal(e.target.value)} placeholder="1800" className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all" />
                   </div>
-
                   <div className="space-y-3">
                       <label className="text-[13px] font-medium text-white/60">Protéines (g/j)</label>
-                      <input 
-                      type="number" 
-                      value={baseProtein} 
-                      onChange={(e) => setBaseProtein(e.target.value)} 
-                      placeholder="120"
-                      className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all"
-                      />
+                      <input type="number" value={baseProtein} onChange={(e) => setBaseProtein(e.target.value)} placeholder="120" className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all" />
                   </div>
-
                   <div className="space-y-3">
                       <label className="text-[13px] font-medium text-white/60">Glucides (g/j)</label>
-                      <input 
-                      type="number" 
-                      value={baseCarbs} 
-                      onChange={(e) => setBaseCarbs(e.target.value)} 
-                      placeholder="200"
-                      className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all"
-                      />
+                      <input type="number" value={baseCarbs} onChange={(e) => setBaseCarbs(e.target.value)} placeholder="200" className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all" />
                   </div>
-
                   <div className="space-y-3">
                       <label className="text-[13px] font-medium text-white/60">Lipides (g/j)</label>
-                      <input 
-                      type="number" 
-                      value={baseFats} 
-                      onChange={(e) => setBaseFats(e.target.value)} 
-                      placeholder="50"
-                      className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all"
-                      />
+                      <input type="number" value={baseFats} onChange={(e) => setBaseFats(e.target.value)} placeholder="50" className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all" />
                   </div>
               </div>
           </div>
 
-          {/* SECTION 2: INFORMATIONS CYCLE */}
           <div className="pt-8 border-t border-white/5">
               <h4 className="text-sm font-bold text-white mb-4 pb-2 border-b border-white/10">Informations cycle menstruel</h4>
-              
               <div className="space-y-6">
-                  {/* Durée cycle */}
                   <div className="space-y-3">
                       <label className="text-[13px] font-medium text-white/60">Durée totale du cycle (jours)</label>
-                      <input 
-                      type="number" 
-                      value={cycleLength} 
-                      onChange={(e) => setCycleLength(e.target.value)} 
-                      placeholder="28"
-                      className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all"
-                      />
+                      <input type="number" value={cycleLength} onChange={(e) => setCycleLength(e.target.value)} placeholder="28" className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all" />
                       <p className="text-[11px] text-white/40">Moyenne 28j (normal: 21-35j)</p>
                   </div>
-
-                  {/* Mode sélection jour */}
                   <div className="space-y-3">
                       <label className="text-[13px] font-medium text-white/60">Comment souhaitez-vous indiquer le jour actuel ?</label>
                       <div className="grid grid-cols-2 gap-3">
-                          <button 
-                          onClick={() => setInputMode('day')}
-                          className={`p-4 rounded-xl border flex flex-col gap-1 transition-all ${inputMode === 'day' ? 'border-white/40 bg-[#404040] text-white' : 'border-white/5 bg-[#252525] text-white/40 hover:border-white/20'}`}
-                          >
+                          <button onClick={() => setInputMode('day')} className={`p-4 rounded-xl border flex flex-col gap-1 transition-all ${inputMode === 'day' ? 'border-white/40 bg-[#404040] text-white' : 'border-white/5 bg-[#252525] text-white/40 hover:border-white/20'}`}>
                               <span className="text-sm font-bold">Je connais mon jour</span>
                               <span className="text-[10px] text-white/40">Saisie directe (ex: Jour 14)</span>
                           </button>
-                          
-                          <button 
-                          onClick={() => setInputMode('date')}
-                          className={`p-4 rounded-xl border flex flex-col gap-1 transition-all ${inputMode === 'date' ? 'border-white/40 bg-[#404040] text-white' : 'border-white/5 bg-[#252525] text-white/40 hover:border-white/20'}`}
-                          >
+                          <button onClick={() => setInputMode('date')} className={`p-4 rounded-xl border flex flex-col gap-1 transition-all ${inputMode === 'date' ? 'border-white/40 bg-[#404040] text-white' : 'border-white/5 bg-[#252525] text-white/40 hover:border-white/20'}`}>
                               <span className="text-sm font-bold">Date dernières règles</span>
                               <span className="text-[10px] text-white/40">Calcul automatique</span>
                           </button>
                       </div>
                   </div>
-
-                  {/* Input conditionnel */}
                   {inputMode === 'day' ? (
                       <div className="space-y-3 animate-in fade-in">
                           <label className="text-[13px] font-medium text-white/60">Jour actuel du cycle</label>
-                          <input 
-                          type="number" 
-                          value={currentDay} 
-                          onChange={(e) => setCurrentDay(e.target.value)} 
-                          placeholder="14"
-                          className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all"
-                          />
+                          <input type="number" value={currentDay} onChange={(e) => setCurrentDay(e.target.value)} placeholder="14" className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all" />
                           <p className="text-[11px] text-white/40">Jour 1 = Premier jour menstruation (saignement)</p>
                       </div>
                   ) : (
                       <div className="space-y-3 animate-in fade-in">
                           <label className="text-[13px] font-medium text-white/60">Date premier jour dernières règles</label>
-                          <input 
-                          type="date" 
-                          value={lastPeriodDate} 
-                          onChange={(e) => setLastPeriodDate(e.target.value)} 
-                          className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white outline-none focus:border-white/30 transition-all"
-                          />
+                          <input type="date" value={lastPeriodDate} onChange={(e) => setLastPeriodDate(e.target.value)} className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white outline-none focus:border-white/30 transition-all" />
                           <p className="text-[11px] text-white/40">Calcul automatique du jour cycle selon date actuelle</p>
                       </div>
                   )}
               </div>
           </div>
 
-          {/* APERÇU 4 PHASES */}
           <div className="pt-8 border-t border-white/5">
               <div className="flex items-center justify-between mb-6">
                   <div>
@@ -524,7 +466,6 @@ export default function CycleSyncCalculator() {
                       {showAdvanced ? 'Masquer' : 'Voir détails'}
                   </button>
               </div>
-
               {showAdvanced && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in">
                       {phaseOrder.map(phaseId => {
@@ -553,27 +494,19 @@ export default function CycleSyncCalculator() {
           </div>
       </div>
 
-      <button 
-          onClick={calculatePhase}
-          disabled={!baseCal || !baseProtein || !baseCarbs || !baseFats || !cycleLength || (inputMode === 'day' ? !currentDay : !lastPeriodDate)}
-          className="w-full py-5 bg-white hover:bg-gray-200 text-[#1A1A1A] rounded-xl font-bold text-sm transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-      >
+      <button onClick={calculatePhase} disabled={!baseCal || !baseProtein || !baseCarbs || !baseFats || !cycleLength || (inputMode === 'day' ? !currentDay : !lastPeriodDate)} className="w-full py-5 bg-white hover:bg-gray-200 text-[#1A1A1A] rounded-xl font-bold text-sm transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
           Analyser & Générer protocole
       </button>
 
       <div ref={resultsRef}>
       {result && (
           <div className="animate-in fade-in slide-in-from-bottom-12 duration-700 space-y-6 mt-16">
-              
               {result.warnings.length > 0 && (
                   <div className="bg-[#404040] border border-white/10 rounded-xl p-5 space-y-2">
-                      {result.warnings.map((w, i) => (
-                          <div key={i} className="text-sm text-white/90 font-medium">{w}</div>
-                      ))}
+                      {result.warnings.map((w, i) => <div key={i} className="text-sm text-white/90 font-medium">{w}</div>)}
                   </div>
               )}
 
-              {/* PHASE ACTUELLE (sans émojis) */}
               <div className={`bg-gradient-to-br ${result.phaseConfig.color.gradient} border ${result.phaseConfig.color.border} p-8 rounded-2xl`}>
                   <div className="flex items-center justify-between mb-6">
                       <div>
@@ -585,7 +518,6 @@ export default function CycleSyncCalculator() {
                           <div className="text-4xl font-bold text-[#1A1A1A]">{result.daysUntilNext}j</div>
                       </div>
                   </div>
-
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                       {[
                         { label: 'Énergie', value: result.phaseConfig.energy },
@@ -599,7 +531,6 @@ export default function CycleSyncCalculator() {
                         </div>
                       ))}
                   </div>
-
                   <div className="border-t border-[#1A1A1A]/10 pt-4">
                       <div className="text-xs text-[#1A1A1A]/60 mb-2">Hormones Dominantes</div>
                       <div className="flex gap-4 text-sm text-[#1A1A1A]">
@@ -610,36 +541,30 @@ export default function CycleSyncCalculator() {
                   </div>
               </div>
 
-              {/* NUTRITION AJUSTÉE (4 macros) */}
               <div className="pt-8">
                   <h3 className="text-lg font-bold text-white mb-6">Nutrition ajustée phase actuelle</h3>
-                  
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="bg-[#252525] p-5 rounded-xl border border-white/5">
                           <div className="text-[11px] text-white/40 mb-2">Calories</div>
                           <div className="text-3xl font-bold text-white">{result.adjustedCal}</div>
                           <div className="text-xs text-white/50 mt-1">{((result.adjustedCal / parseFloat(baseCal) - 1) * 100).toFixed(0)}%</div>
                       </div>
-
                       <div className="bg-[#252525] p-5 rounded-xl border border-white/5">
                           <div className="text-[11px] text-white/40 mb-2">Protéines</div>
                           <div className="text-3xl font-bold text-white">{result.adjustedProtein}g</div>
                           <div className="text-xs text-white/50 mt-1">Stables</div>
                       </div>
-
                       <div className="bg-[#252525] p-5 rounded-xl border border-white/5">
                           <div className="text-[11px] text-white/40 mb-2">Glucides</div>
                           <div className="text-3xl font-bold text-white">{result.adjustedCarbs}g</div>
                           <div className="text-xs text-white/50 mt-1">{result.nutrition.carbsModifier > 1 ? '+' : ''}{((result.nutrition.carbsModifier - 1) * 100).toFixed(0)}%</div>
                       </div>
-
                       <div className="bg-[#252525] p-5 rounded-xl border border-white/5">
                           <div className="text-[11px] text-white/40 mb-2">Lipides</div>
                           <div className="text-3xl font-bold text-white">{result.adjustedFats}g</div>
                           <div className="text-xs text-white/50 mt-1">{result.nutrition.fatsModifier > 1 ? '+' : ''}{((result.nutrition.fatsModifier - 1) * 100).toFixed(0)}%</div>
                       </div>
                   </div>
-
                   <div className="bg-[#252525] border border-white/5 rounded-xl p-5 mt-4">
                       <div className="text-sm font-bold text-white mb-3">Suppléments recommandés phase {result.phaseConfig.name}</div>
                       <div className="flex flex-wrap gap-2">
@@ -652,10 +577,8 @@ export default function CycleSyncCalculator() {
                   </div>
               </div>
 
-              {/* TRAINING PROTOCOL */}
               <div className="pt-8">
                   <h3 className="text-lg font-bold text-white mb-6">Protocole training phase actuelle</h3>
-                  
                   <div className="space-y-3">
                       <div className="bg-[#252525] border border-white/5 rounded-xl p-5">
                           <div className="flex justify-between items-center mb-3">
@@ -664,34 +587,22 @@ export default function CycleSyncCalculator() {
                           </div>
                           <div className="text-xs text-white/60">Baseline × {result.training.volumeModifier.toFixed(1)}</div>
                       </div>
-
                       <div className="bg-[#252525] border border-white/5 rounded-xl p-5">
                           <div className="text-sm font-bold text-white mb-3">Intensité recommandée</div>
                           <div className="text-lg text-white/80">{result.training.intensityRange}</div>
                       </div>
-
                       <div className="bg-[#252525] border border-white/5 rounded-xl p-5">
                           <div className="text-sm font-bold text-white mb-3">Focus entraînement</div>
                           <div className="flex flex-wrap gap-2">
-                              {result.training.focus.map((item, i) => (
-                                  <span key={i} className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-lg border border-emerald-500/30">
-                                      {item}
-                                  </span>
-                              ))}
+                              {result.training.focus.map((item, i) => <span key={i} className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-lg border border-emerald-500/30">{item}</span>)}
                           </div>
                       </div>
-
                       <div className="bg-[#252525] border border-white/5 rounded-xl p-5">
                           <div className="text-sm font-bold text-white mb-3">À éviter</div>
                           <div className="flex flex-wrap gap-2">
-                              {result.training.avoidance.map((item, i) => (
-                                  <span key={i} className="text-xs bg-red-500/20 text-red-300 px-3 py-1 rounded-lg border border-red-500/30">
-                                      {item}
-                                  </span>
-                              ))}
+                              {result.training.avoidance.map((item, i) => <span key={i} className="text-xs bg-red-500/20 text-red-300 px-3 py-1 rounded-lg border border-red-500/30">{item}</span>)}
                           </div>
                       </div>
-
                       <div className="bg-[#252525] border border-white/5 rounded-xl p-5">
                           <div className="text-sm font-bold text-white mb-2">Récupération</div>
                           <div className="text-sm text-white/80">{result.training.recoveryDays}</div>
@@ -699,9 +610,14 @@ export default function CycleSyncCalculator() {
                   </div>
               </div>
 
-              <div className="p-5 bg-[#252525] rounded-xl border border-white/5">
+              <button onClick={handleCopy} className={`w-full py-5 border-2 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${copied ? 'bg-purple-500 border-purple-500 text-white' : 'border-white/10 text-white/60 hover:bg-white/5'}`}>
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copied ? 'Copié !' : 'Copier mon bilan hormonal'}
+              </button>
+
+              <div className="p-5 bg-[#252525] rounded-xl border border-white/5 mt-4">
                   <p className="text-sm text-white/60 leading-relaxed font-medium">
-                      <strong className="text-white/90">Méthodologie :</strong> Phase {result.phaseConfig.name} (J{result.phaseConfig.dayRange[0]}-{result.phaseConfig.dayRange[1]}). Ajustements basés Davidsen (2007), Oosthuyse & Bosch (2010), Helms et al. (2014). Protéines stables toutes phases (synthèse musculaire constante). Glucides modulés ±40% (sensibilité insuline). Lipides modulés ±20% (métabolisme progestérone). Tracking cycle via app (Clue, Flo, température basale) recommandé. Irrégularités persistantes = consultation gynécologue + bilan hormonal.
+                      <strong className="text-white/90">Méthodologie :</strong> Phase {result.phaseConfig.name} (J{result.phaseConfig.dayRange[0]}-{result.phaseConfig.dayRange[1]}). Ajustements basés Davidsen (2007), Oosthuyse & Bosch (2010).
                   </p>
               </div>
           </div>
@@ -713,25 +629,15 @@ export default function CycleSyncCalculator() {
           <div className="space-y-3">
               {faqItems.map((item, i) => (
                   <div key={i} className="bg-[#252525] border border-white/5 rounded-xl overflow-hidden">
-                      <button 
-                          onClick={() => setOpenFaqIndex(openFaqIndex === i ? null : i)} 
-                          className="w-full flex justify-between items-center p-5 text-left font-medium text-sm text-white hover:bg-white/5 transition-colors"
-                      >
+                      <button onClick={() => setOpenFaqIndex(openFaqIndex === i ? null : i)} className="w-full flex justify-between items-center p-5 text-left font-medium text-sm text-white hover:bg-white/5 transition-colors">
                           <span className="pr-4">{item.question}</span>
                           <ChevronDown className={`flex-shrink-0 w-4 h-4 text-white/40 transition-transform ${openFaqIndex === i ? 'rotate-180' : ''}`} />
                       </button>
-                      {openFaqIndex === i && (
-                          <div className="px-5 pb-5 text-xs text-white/60 leading-relaxed border-t border-white/5 pt-4">
-                              {item.answer}
-                          </div>
-                      )}
+                      {openFaqIndex === i && <div className="px-5 pb-5 text-xs text-white/60 leading-relaxed border-t border-white/5 pt-4">{item.answer}</div>}
                   </div>
               ))}
           </div>
       </div>
-
-      <GenesisAssistant />
-
     </div>
   );
 }

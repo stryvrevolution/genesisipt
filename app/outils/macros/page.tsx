@@ -1,8 +1,36 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import MacroCalculator from '@/components/MacroCalculator';
+import MacroCalculator from './MacroCalculator';
 import { Utensils, ArrowLeft } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Calculateur Macros & Calories (KCAL) | STRYV LAB',
+  description: 'Le calculateur nutritionnel ultime. BMR Mifflin-St Jeor, TDEE précis et répartition macronutriments (Protéines, Lipides, Glucides) optimisée pour la performance.',
+  
+  openGraph: {
+    title: 'Calculateur Macros Pro | STRYV LAB',
+    description: 'Calculez vos calories et macros avec précision scientifique.',
+    url: 'https://www.stryvlab.com/outils/macros',
+    siteName: 'STRYV LAB',
+    images: [
+      {
+        url: '/og-macros.png', // Assure-toi d'avoir cette image
+        width: 1200,
+        height: 630,
+        alt: 'Calculateur Macros Stryv Lab',
+      },
+    ],
+    locale: 'fr_FR',
+    type: 'website',
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Calculateur Macros Pro | STRYV LAB',
+    description: 'Nutrition de précision pour athlètes.',
+    images: ['/og-macros.png'],
+  },
+};
 
 export default function MacrosPage() {
   return (
