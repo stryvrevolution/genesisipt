@@ -45,6 +45,39 @@ export default function AnalyseIPTPage() {
       setIsStripeLoading(false);
     }
   };
+  const handleStripePaymentGPlus = async () => {
+    setIsStripeLoading(true);
+    try {
+      const res = await fetch('/api/stripe/gplus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Erreur paiement G+', error);
+      setIsStripeLoading(false);
+    }
+  };
+  
+  const handleStripePaymentIPT = async () => {
+    try {
+      const res = await fetch('/api/stripe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Erreur paiement analyse IPT', error);
+    }
+  };
+  
+  
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -152,17 +185,23 @@ export default function AnalyseIPTPage() {
             {/* BADGE SUPPRIMÉ ICI */}
 
             {/* H1 CORRIGÉ : Utilisation explicite de font-outfit pour autoriser les minuscules */}
-            <h1 className="font-outfit text-white font-medium leading-[0.95] tracking-[-0.02em] text-5xl sm:text-6xl md:text-[clamp(3.5rem,7vw,9rem)] break-words hyphens-auto mb-8">
-              Transformation
-              <br />
-              <span className="text-white/30">basée sur la donnée</span>
-            </h1>
+            <h1 className="font-outfit text-white font-medium leading-[0.95] tracking-[-0.02em] text-3xl sm:text-5xl md:text-[clamp(3.5rem,7vw,5rem)] break-words hyphens-auto mb-7">
+  La transformation physique
+  <br />
+  <span className="text-white/30">n’est pas une question d’effort</span>
+</h1>
 
-            <p className="mt-6 md:mt-8 text-white/60 text-sm md:text-base max-w-xl leading-relaxed border-l border-[#DAFA72]/30 pl-4">
-              Au-delà du coaching : le premier système d'analyse forensique 
-              qui diagnostique vos freins métaboliques, hormonaux et environnementaux
-              avant toute conception de programme personnalisé.
-            </p>
+<p className="mt-6 md:mt-8 text-white/60 text-sm md:text-base max-w-xl leading-relaxed border-l border-[#DAFA72]/30 pl-4">
+  <span className="inline-flex items-start gap-[2px]">
+    STRYV lab
+    <sup className="text-[9px] leading-none relative -top-[2px] opacity-70">™</sup>
+  </span>
+  mesure votre potentiel réel de transformation (ipt),
+  adapte la stratégie à votre système biologique,
+  puis optimise ce potentiel avant toute tentative de transformation.
+</p>
+
+
 
             <div className="mt-10 md:mt-12 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 w-full sm:w-auto">
               <button
@@ -515,72 +554,223 @@ export default function AnalyseIPTPage() {
           <div className="mb-20">
             <div className="text-[#DAFA72] text-xs font-bold tracking-widest uppercase mb-6">Écosystème GENESIS</div>
             <h2 className="font-outfit text-white font-medium leading-[0.95] tracking-[-0.02em] text-4xl sm:text-5xl md:text-[5.5rem] mb-8 md:mb-16">
-              Nos Solutions <br/> d'accompagnement
+              Nos solutions <br/> d'accompagnement
             </h2>
             <div className="text-white/60 text-lg leading-relaxed max-w-3xl">
               De l'audit métabolique ponctuel à l'optimisation continue de la performance.
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-6 items-stretch auto-rows-fr">
+
             
             {/* 1. RAPPORT IPT (Card #252525) */}
-            <div className="flex flex-col p-8 rounded-[24px] bg-[#252525] border border-white/5 hover:border-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
-              <div className="mb-8">
-                <h3 className="text-2xl text-white mb-2" style={{ fontFamily: 'var(--font-azonix)' }}>RAPPORT IPT</h3>
-                <span className="text-white/40 text-[11px] uppercase tracking-wider font-light">Bilan métabolique complet</span>
-              </div>
-              <div className="flex items-baseline gap-1 mb-8"><span className="text-4xl text-white font-light" style={{ fontFamily: 'var(--font-outfit)' }}>35€</span></div>
-              <div className="w-full h-[1px] bg-white/5 mb-8" />
-              <ul className="flex-1 space-y-4 text-[14px] text-white/60 font-light mb-10" style={{ fontFamily: 'var(--font-outfit)' }}>
-                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-white/20" />Diagnostic 273 points</li>
-                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-white/20" />Analyse des freins</li>
-                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-white/20" />Score potentiel (0-100)</li>
-              </ul>
-              <button onClick={() => setStartIPT(true)} className="w-full py-4 rounded-xl border border-white/10 text-white/60 text-[13px] hover:bg-white hover:text-black transition-all duration-300">
-                Commander l'audit
-              </button>
-            </div>
+<div className="flex flex-col h-full p-8 rounded-[24px] bg-[#252525] border border-white/5 hover:border-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
+  
+  {/* HEADER */}
+  <div className="mb-8">
+    <h3
+      className="text-2xl text-white mb-2"
+      style={{ fontFamily: 'var(--font-azonix)' }}
+    >
+      RAPPORT IPT
+    </h3>
+    <span className="text-white/40 text-[11px] uppercase tracking-wider font-light">
+      Bilan métabolique complet
+    </span>
+  </div>
+
+  {/* PRIX */}
+  <div className="flex items-baseline gap-1 mb-8">
+    <span
+      className="text-4xl text-white font-light"
+      style={{ fontFamily: 'var(--font-outfit)' }}
+    >
+      35€
+    </span>
+  </div>
+
+  <div className="w-full h-[1px] bg-white/5 mb-8" />
+
+  {/* CONTENU — PREND LA PLACE */}
+  <ul className="flex-1 space-y-4 text-[14px] text-white/60 font-light mb-8">
+    <li className="flex items-center gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      Analyse IPT (collecte & modélisation)
+    </li>
+    <li className="flex items-center gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      Calcul de l’indice de potentiel de transformation (IPT™)
+    </li>
+    <li className="flex items-center gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      Rapport de potentiel de transformation
+    </li>
+  </ul>
+
+  {/* FOOTER — COLLÉ EN BAS */}
+  <div className="mt-8 h-[160px] flex flex-col justify-between">
+    <p className="mb-3 text-[11px] text-white/40 leading-relaxed min-h-[34px]">
+      Vous payez pour une analyse et un rapport d’interprétation.
+      Aucun programme ni transformation n’est inclus à ce stade.
+    </p>
+
+    <button
+      onClick={handleStripePaymentIPT}
+      className="w-full py-4 rounded-xl border border-white/10 text-white/60 text-[13px] hover:bg-white hover:text-black transition-all duration-300"
+    >
+      Accéder à l’analyse IPT
+    </button>
+
+    <p className="mt-3 text-[11px] text-white/30 leading-relaxed min-h-[32px]">
+      Après paiement, vous accédez au questionnaire d’analyse IPT.
+      Le rapport est généré à partir de vos données et livré selon les délais indiqués.
+    </p>
+  </div>
+</div>
+
+            
 
             {/* 2. G+ (Card #404040 - Active) */}
-            <div className="flex flex-col p-8 rounded-[24px] bg-[#404040] border border-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-[#DAFA72]"></div>
-              <div className="mb-8">
-                <h3 className="text-2xl text-white mb-2" style={{ fontFamily: 'var(--font-azonix)' }}>PROTOCOL G+</h3>
-                <span className="text-white/60 text-[11px] uppercase tracking-wider font-light">Programme personnalisé</span>
-              </div>
-              <div className="flex items-baseline gap-1 mb-8"><span className="text-4xl text-white font-light" style={{ fontFamily: 'var(--font-outfit)' }}>175€</span><span className="text-white/40 text-xs font-light">/ 6 semaines</span></div>
-              <div className="w-full h-[1px] bg-white/10 mb-8" />
-              <ul className="flex-1 space-y-4 text-[14px] text-white/80 font-light mb-10" style={{ fontFamily: 'var(--font-outfit)' }}>
-                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />Programmation data</li>
-                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />Ajustements hebdo</li>
-                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />App privée</li>
-              </ul>
-              <button onClick={handleStripePayment} disabled={isStripeLoading} className={`w-full py-4 rounded-xl bg-white text-[#1A1A1A] font-bold text-[13px] transition-all duration-300 hover:bg-[#DAFA72] ${isStripeLoading ? 'opacity-70' : ''}`}>
-                {isStripeLoading ? "..." : "Activer mon Protocole"}
-              </button>
-            </div>
+<div className="flex flex-col h-full p-8 rounded-[24px] bg-[#404040] border border-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl relative overflow-hidden">
+  
+  <div className="absolute top-0 left-0 w-full h-1 bg-[#DAFA72]"></div>
+
+  {/* HEADER */}
+  <div className="mb-8">
+    <h3
+      className="text-2xl text-white mb-2"
+      style={{ fontFamily: 'var(--font-azonix)' }}
+    >
+      PROTOCOL G+
+    </h3>
+    <span className="text-white/60 text-[11px] uppercase tracking-wider font-light">
+      Programme ultra personnalisé
+    </span>
+  </div>
+
+  {/* PRIX */}
+  <div className="flex items-baseline gap-1 mb-8">
+    <span
+      className="text-4xl text-white font-light"
+      style={{ fontFamily: 'var(--font-outfit)' }}
+    >
+      175€
+    </span>
+    <span className="text-white/40 text-xs font-light">
+      / 6 semaines
+    </span>
+  </div>
+
+  <div className="w-full h-[1px] bg-white/10 mb-8" />
+
+  {/* CONTENU — PREND LA PLACE */}
+  <ul className="flex-1 space-y-4 text-[14px] text-white/80 font-light mb-8">
+    <li className="flex items-center gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
+      Adaptation stratégique basée sur votre IPT
+    </li>
+    <li className="flex items-center gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
+      Priorisation des leviers à potentiel élevé
+    </li>
+    <li className="flex items-center gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
+      Ajustements continus selon l’évolution de l’IPT
+    </li>
+  </ul>
+
+  {/* FOOTER — COLLÉ EN BAS */}
+  <div className="mt-8 h-[160px] flex flex-col justify-between">
+    <p className="mb-3 text-[11px] text-white/40 leading-relaxed min-h-[34px]">
+      Ce paiement active le protocole G+ et inclut une analyse IPT complète.
+      le protocole est adapté uniquement après évaluation de votre potentiel
+      de transformation.
+    </p>
+
+    <button
+      onClick={handleStripePaymentGPlus}
+      disabled={isStripeLoading}
+      className={`w-full py-4 rounded-xl bg-white text-[#1A1A1A] font-bold text-[13px] transition-all duration-300 hover:bg-[#DAFA72] ${
+        isStripeLoading ? 'opacity-70' : ''
+      }`}
+    >
+      {isStripeLoading ? 'Redirection…' : 'Activer le protocole G+'}
+    </button>
+
+    <p className="mt-3 text-[10px] text-white/30 leading-relaxed min-h-[32px]">
+      Après paiement, vous serez redirigé vers le questionnaire
+      d’analyse IPT, indispensable pour adapter le protocole
+      à votre système.
+    </p>
+  </div>
+</div>
+
 
             {/* 3. OMNI (Card #303030 - Elite) */}
-            <div className="relative flex flex-col p-8 rounded-[24px] bg-[#303030] border border-[#DAFA72]/30 shadow-lg transition-all duration-300 hover:-translate-y-2">
-              <div className="absolute top-8 right-8"><span className="text-[#DAFA72] text-[10px] font-bold tracking-widest uppercase border border-[#DAFA72]/30 px-2 py-1 rounded">Elite</span></div>
-              <div className="mb-8">
-                <h3 className="text-2xl text-white mb-2" style={{ fontFamily: 'var(--font-azonix)' }}>OMNI</h3>
-                <span className="text-white/40 text-[11px] uppercase tracking-wider font-light">Coaching & Bio-Hacking</span>
-              </div>
-              <div className="flex items-baseline gap-1 mb-8"><span className="text-4xl text-white font-light" style={{ fontFamily: 'var(--font-outfit)' }}>650€</span><span className="text-white/40 text-xs font-light">/ 12 semaines</span></div>
-              <div className="w-full h-[1px] bg-white/10 mb-8" />
-              <ul className="flex-1 space-y-4 text-[14px] text-white/60 font-light mb-10" style={{ fontFamily: 'var(--font-outfit)' }}>
-                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-white/20" />Suivi 7j/7</li>
-                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-white/20" />Ingénierie sommeil</li>
-                <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-white/20" />Optimisation hormonale</li>
-              </ul>
-              <CalendlyButton text="Entretien d'Admission" className="w-full py-4 rounded-xl bg-[#DAFA72] text-black text-[13px] font-medium hover:bg-white transition-colors duration-200" />
-            </div>
+<div className="relative flex flex-col h-full p-8 rounded-[24px] bg-[#303030] border border-[#DAFA72]/30 shadow-lg transition-all duration-300 hover:-translate-y-2">
+  
+  <div className="absolute top-8 right-8">
+    <span className="text-[#DAFA72] text-[10px] font-bold tracking-widest uppercase border border-[#DAFA72]/30 px-2 py-1 rounded">
+      Elite
+    </span>
+  </div>
 
-          </div>
-        </div>
-      </section>
+  <div className="mb-8">
+    <h3 className="text-2xl text-white mb-2" style={{ fontFamily: 'var(--font-azonix)' }}>
+      OMNI
+    </h3>
+    <span className="text-white/40 text-[11px] uppercase tracking-wider font-light">
+      Optimisation continue & ingénierie du potentiel
+    </span>
+  </div>
+
+  <div className="flex items-baseline gap-1 mb-8">
+    <span className="text-4xl text-white font-light" style={{ fontFamily: 'var(--font-outfit)' }}>
+      650€
+    </span>
+    <span className="text-white/40 text-xs font-light">
+      / 12 semaines
+    </span>
+  </div>
+
+  <div className="w-full h-[1px] bg-white/10 mb-8" />
+
+  <ul className="flex-1 space-y-4 text-[14px] text-white/60 font-light mb-8">
+    <li className="flex items-center gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      Optimisation continue du potentiel de transformation
+    </li>
+    <li className="flex items-center gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      Élévation progressive de l’indice IPT dans le temps
+    </li>
+    <li className="flex items-center gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      Recalibrage stratégique selon l’évolution du système
+    </li>
+  </ul>
+
+  <div className="mt-8 h-[160px] flex flex-col justify-between">
+    <p className="text-[11px] text-white/40 leading-relaxed">
+      OMNI s’adresse aux profils nécessitant une optimisation
+      continue et une supervision stratégique avancée.
+      l’accès se fait uniquement après entretien.
+    </p>
+
+    <CalendlyButton
+      text="entretien d’admission"
+      className="w-full py-4 rounded-xl bg-[#DAFA72] text-black text-[13px] font-medium hover:bg-white transition-colors duration-200"
+    />
+
+    <p className="text-[10px] text-white/30 leading-relaxed">
+      Aucun paiement n’est possible sans validation préalable.
+    </p>
+  </div>
+  </div>
+  </div> {/* fin grid */}
+</div> {/* fin max-w-7xl */}
+</section>
 
       {/* ================= FAQ SECTION (JUSTE APRÈS LES OFFRES) ================= */}
       <MetabolicFAQ />
