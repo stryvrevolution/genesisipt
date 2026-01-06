@@ -17,6 +17,9 @@ export async function POST() {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
 
+      // 👇 C'est cette ligne qui active le champ dans la fenêtre
+      allow_promotion_codes: true,
+
       line_items: [
         {
           price_data: {
@@ -45,8 +48,10 @@ export async function POST() {
         formula: 'ipt',
         includes_ipt: 'true',
         ipt_required: 'true',
+        access_type: 'automatic',
         version: 'v1',
       },
+      
 
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/analyse-ipt`,

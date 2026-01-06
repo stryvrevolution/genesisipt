@@ -232,9 +232,11 @@ Retrouvez cet outil ici : ${url}`;
                   <span className="text-[10px] uppercase tracking-wider text-white/40 border border-white/10 px-3 py-1 rounded-full bg-white/5">Glycogène</span>
               </div>
             </div>
-            <h1 className="text-white text-4xl md:text-5xl font-azonix italic uppercase tracking-tighter mb-8 leading-[0.9]">
-              Carb Cycling
-            </h1>
+            <h1 className="text-white text-4xl md:text-5xl font-azonix uppercase tracking-tighter mb-8 leading-[0.9]">
+  Carb
+  <br />
+  <span className="text-white/40">Cycling</span>
+</h1>
 
             <div className="space-y-6 border-t border-white/5 pt-6">
               <div>

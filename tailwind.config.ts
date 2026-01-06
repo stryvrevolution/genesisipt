@@ -14,7 +14,6 @@ const config: Config = {
          ========================= */
       fontFamily: {
         // 1. OUTFIT (Par défaut)
-        // Remplace la police "sans" par défaut. Tout le site sera en Outfit.
         sans: [
           "var(--font-outfit)",
           "ui-sans-serif",
@@ -23,11 +22,9 @@ const config: Config = {
         ],
         
         // 2. AZONIX (Pour le logo "STRYV")
-        // Utilisation: className="font-azonix"
         azonix: ["var(--font-azonix)", "sans-serif"],
 
         // 3. RAMABHADRA (Pour H1, H2)
-        // Utilisation: className="font-ramabhadra"
         ramabhadra: ["var(--font-ramabhadra)", "sans-serif"],
 
         // 4. MONO (Pour les données techniques)
@@ -73,6 +70,19 @@ const config: Config = {
          ========================= */
       transitionTimingFunction: {
         linear: "linear",
+      },
+
+      /* =========================
+         CUSTOM ANIMATIONS
+         ========================= */
+      keyframes: {
+        "fade-in-up": {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        "fade-in-up": "fade-in-up 0.3s ease-out forwards",
       },
     },
   },

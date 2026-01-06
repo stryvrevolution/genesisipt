@@ -229,9 +229,9 @@ Retrouvez cet outil ici : ${url}`;
               </div>
             </div>
             
-            <h1 className="text-white text-4xl md:text-5xl font-azonix italic uppercase tracking-tighter mb-8 leading-[0.9]">
-              Hydratation
-            </h1>
+            <h1 className="text-white text-4xl md:text-5xl font-azonix uppercase tracking-tighter mb-8 leading-[0.9]">
+  Hydratation
+</h1>
             
             {/* DESCRIPTION SCIENTIFIQUE */}
             <div className="space-y-6 border-t border-white/5 pt-6">

@@ -122,9 +122,9 @@ export default function ToolsGrid() {
       <section className="relative h-[60vh] min-h-[500px] bg-[#303030] flex flex-col justify-center">
         <div className="relative z-20 px-6 sm:px-10 md:px-16 lg:px-24 w-full">
           <div className="max-w-5xl">
-            <h1 className="text-[#DAFA72] font-medium leading-[0.95] tracking-[-0.02em] text-[clamp(3.8rem,7vw,9.5rem)]">
-              TOOLS<br /><span className="text-[#6D6D6D]">HUB</span>
-            </h1>
+          <h1 className="text-[#DAFA72] font-azonix uppercase leading-[0.95] tracking-tighter text-[clamp(3.8rem,7vw,9.5rem)]">
+  TOOLS <span className="text-[#6D6D6D]">HUB</span>
+</h1>
 
             <p className="mt-8 text-white/70 text-sm max-w-xl border-l-2 border-[#DAFA72] pl-6 leading-relaxed">
               Calculateurs de précision pour l'optimisation métabolique, hormonale et performance.<br />Calculez. Optimisez. Progressez.

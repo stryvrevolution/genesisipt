@@ -16,6 +16,9 @@ export async function POST() {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
 
+      // 👇 AJOUTE CETTE LIGNE POUR ACTIVER LE CHAMP CODE PROMO
+      allow_promotion_codes: true,
+
       line_items: [
         {
           price_data: {

@@ -147,25 +147,71 @@ export default function AnalyseIPTPage() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="fixed inset-0 bg-[#303030] z-40 flex flex-col items-center justify-center gap-8 md:hidden animate-in fade-in duration-200">
-             <button 
+        {/* 👇 MENU MOBILE : COMPACT & TECH STYLE 👇 */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#303030] animate-fade-in-up">
+          
+          {/* 1. HEADER (Plus compact) */}
+          <div className="flex justify-between items-center p-5 border-b border-white/5 bg-[#303030]">
+            <div>
+              <h3 className="text-base font-bold text-white leading-none tracking-wide">MENU</h3>
+              <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1.5">Navigation rapide</p>
+            </div>
+            
+            <button 
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 bg-[#252525] border border-white/5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all active:scale-90"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          {/* 2. CONTENU (Sans footer, sans labels superflus) */}
+          <div className="p-5 space-y-3">
+            
+            {/* CARTE 1 : NOS SOLUTIONS */}
+            <button 
               onClick={() => {
                 setMobileMenuOpen(false);
                 document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="text-2xl font-medium text-white/80"
+              className="w-full group bg-[#252525] border border-white/5 hover:border-white/20 rounded-xl p-4 text-left transition-all active:scale-[0.98] flex items-center justify-between"
             >
-              Expertise
+              <div className="pr-4">
+                <h4 className="text-lg font-bold text-white mb-1 group-hover:text-[#DAFA72] transition-colors">Nos solutions</h4>
+                <p className="text-xs text-white/40 font-medium leading-relaxed">
+                  De l'analyse forensic de pointe au coaching 3.0
+                </p>
+              </div>
+              
+              {/* Flèche parfaitement alignée et corrigée */}
+              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/30 group-hover:text-white group-hover:bg-white/10 transition-all">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5l7 7-7 7"></path>
+                </svg>
+              </div>
             </button>
-            <CalendlyButton
-              text="Prendre RDV"
-              className="px-8 py-4 rounded-xl bg-[#DAFA72] text-black font-bold text-lg"
-            />
+
+            {/* CARTE 2 : BOUTON RDV */}
+            <div className="bg-[#252525] border border-white/5 rounded-xl p-1">
+              <CalendlyButton
+                text="Prendre RDV"
+                className="w-full py-3.5 bg-[#DAFA72] hover:bg-[#ccec60] text-[#1A1A1A] rounded-lg font-bold text-sm uppercase tracking-wide transition-all active:scale-[0.99] shadow-lg flex items-center justify-center gap-2"
+              />
+            </div>
+
           </div>
-        )}
-      </header>
+          
+          {/* Zone vide en bas pour éviter le chevauchement avec le chat si besoin */}
+          <div className="flex-1 min-h-[50px]"></div>
+
+        </div>
+      )}
+    </header>
 
       {/* HERO SECTION (ÉPURÉE & H1 CORRIGÉ) */}
       <section className="relative min-h-screen flex items-center pt-20 md:pt-0">
@@ -185,10 +231,22 @@ export default function AnalyseIPTPage() {
             {/* BADGE SUPPRIMÉ ICI */}
 
             {/* H1 CORRIGÉ : Utilisation explicite de font-outfit pour autoriser les minuscules */}
-            <h1 className="font-outfit text-white font-medium leading-[0.95] tracking-[-0.02em] text-3xl sm:text-5xl md:text-[clamp(3.5rem,7vw,5rem)] break-words hyphens-auto mb-7">
-  La transformation physique
-  <br />
-  <span className="text-white/30">n’est pas une question d’effort</span>
+            <h1 className="font-outfit text-white/50 font-medium leading-[0.95] tracking-[-0.02em] 
+  text-3xl sm:text-5xl md:text-[clamp(2.5rem,4.5vw,4.5rem)] 
+  mb-7">
+  
+  {/* Première phrase */}
+  <span className="block whitespace-normal md:whitespace-nowrap">
+    Ne pliez pas votre vie à un régime.
+  </span>
+  
+  {/* Espaceur optionnel */}
+  <span className="block h-2 md:h-0"></span>
+
+  {/* Deuxième phrase */}
+  <span className="text-white/100 block whitespace-normal md:whitespace-nowrap">
+    Optimisez votre biologie pour vos ambitions.
+  </span>
 </h1>
 
 <p className="mt-6 md:mt-8 text-white/60 text-sm md:text-base max-w-xl leading-relaxed border-l border-[#DAFA72]/30 pl-4">
@@ -196,7 +254,7 @@ export default function AnalyseIPTPage() {
     STRYV lab
     <sup className="text-[9px] leading-none relative -top-[2px] opacity-70">™</sup>
   </span>
-  mesure votre potentiel réel de transformation (ipt),
+  Mesure votre potentiel réel de transformation (ipt),
   adapte la stratégie à votre système biologique,
   puis optimise ce potentiel avant toute tentative de transformation.
 </p>
@@ -695,7 +753,7 @@ export default function AnalyseIPTPage() {
         isStripeLoading ? 'opacity-70' : ''
       }`}
     >
-      {isStripeLoading ? 'Redirection…' : 'Activer le protocole G+'}
+      {'Activer le protocole G+'}
     </button>
 
     <p className="mt-3 text-[10px] text-white/30 leading-relaxed min-h-[32px]">
@@ -759,7 +817,7 @@ export default function AnalyseIPTPage() {
     </p>
 
     <CalendlyButton
-      text="entretien d’admission"
+      text="Entretien d’admission"
       className="w-full py-4 rounded-xl bg-[#DAFA72] text-black text-[13px] font-medium hover:bg-white transition-colors duration-200"
     />
 

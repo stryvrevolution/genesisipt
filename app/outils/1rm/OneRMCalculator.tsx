@@ -156,9 +156,11 @@ export default function RMCalculatorPage() {
               </div>
             </div>
             
-            <h1 className="text-white text-4xl md:text-5xl font-azonix italic uppercase tracking-tighter mb-8 leading-[0.9]">
-              1RM Calculator
-            </h1>
+            <h1 className="text-white text-4xl md:text-5xl font-azonix uppercase tracking-tighter mb-8 leading-[0.9]">
+  1RM
+  <br />
+  <span className="text-white/40">Calculator</span>
+</h1>
             
             {/* DESCRIPTION SCIENTIFIQUE ENRICHIE */}
             <div className="space-y-6 border-t border-white/5 pt-6">

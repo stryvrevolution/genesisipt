@@ -34,9 +34,11 @@ export default function CycleSyncPage() {
               </div>
               <div className="font-mono text-[10px] text-white/10 font-bold">ID: 03</div>
             </div>
-            <h1 className="text-white text-4xl md:text-5xl font-azonix italic uppercase tracking-tighter mb-8 leading-[0.9]">
-              Cycle Sync
-            </h1>
+            <h1 className="text-white text-4xl md:text-5xl font-azonix uppercase tracking-tighter mb-8 leading-[0.9]">
+  Cycle
+  <br />
+  <span className="text-white/40">Sync</span>
+</h1>
             <div className="space-y-6 border-t border-white/5 pt-6">
               <div>
                 <h2 className="text-white/90 text-base font-bold mb-3 tracking-tight">Optimisation Hormonale Cyclique</h2>
