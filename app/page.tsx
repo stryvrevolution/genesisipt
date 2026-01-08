@@ -6,7 +6,7 @@ import { ArrowUpRight, Lock, Activity, ChevronDown, Check, Play, Menu, X } from 
 import { Utensils, BarChart3, Moon, RefreshCw, Droplet, HeartPulse, Dumbbell } from 'lucide-react';
 
 // Composants locaux
-import { IPTQuestionnaire } from '@/components/genesis/IPTQuestionnaire';
+import IPTQuestionnaire from '@/components/genesis/IPTQuestionnaire';
 import { CalendlyButton } from '@/components/CalendlyButton';
 import GenesisAssistant from '@/components/GenesisAssistant';
 import FaqMetabolicSchema from '@/components/seo/FaqMetabolicSchema';
@@ -19,6 +19,23 @@ export default function AnalyseIPTPage() {
   const [startIPT, setStartIPT] = useState(false);
   const [isStripeLoading, setIsStripeLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const handleStripePaymentOmni = async () => {
+    try {
+      const res = await fetch('/api/stripe/omni', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      const data = await res.json();
+  
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Erreur paiement OMNI', error);
+    }
+  };
+  
   
   // États d'animation
   const [ctaVisible, setCtaVisible] = useState(false);
@@ -130,7 +147,7 @@ export default function AnalyseIPTPage() {
               onClick={() => document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' })}
               className="flex items-center justify-center h-[38px] text-white/60 text-[13px] px-6 rounded-xl bg-[#252525] border border-white/5 transition-all duration-200 hover:border-white/20 hover:text-white cursor-pointer"
             >
-              Expertise
+              Nos solutions
             </button>
             <CalendlyButton
               text="Consultation"
@@ -231,32 +248,34 @@ export default function AnalyseIPTPage() {
             {/* BADGE SUPPRIMÉ ICI */}
 
             {/* H1 CORRIGÉ : Utilisation explicite de font-outfit pour autoriser les minuscules */}
-            <h1 className="font-outfit text-white/50 font-medium leading-[0.95] tracking-[-0.02em] 
+            <h1 className="font-outfit text-white/40 font-light leading-[0.95] tracking-[-0.02em] 
   text-3xl sm:text-5xl md:text-[clamp(2.5rem,4.5vw,4.5rem)] 
-  mb-7">
+  mb-8">
   
-  {/* Première phrase */}
+  {/* Première phrase : Très fine, presque un murmure */}
   <span className="block whitespace-normal md:whitespace-nowrap">
     Ne pliez pas votre vie à un régime.
   </span>
   
-  {/* Espaceur optionnel */}
+  {/* Espaceur */}
   <span className="block h-2 md:h-0"></span>
 
-  {/* Deuxième phrase */}
-  <span className="text-white/100 block whitespace-normal md:whitespace-nowrap">
-    Optimisez votre biologie pour vos ambitions.
+  {/* Deuxième phrase : Plus présente, avec l'accent couleur */}
+  <span className="text-white font-normal block whitespace-normal md:whitespace-nowrap">
+    Alignez votre biologie sur <span className="text-[#DAFA72]">vos ambitions.</span>
   </span>
 </h1>
 
-<p className="mt-6 md:mt-8 text-white/60 text-sm md:text-base max-w-xl leading-relaxed border-l border-[#DAFA72]/30 pl-4">
-  <span className="inline-flex items-start gap-[2px]">
+<p className="mt-8 text-white/50 text-sm md:text-base max-w-lg leading-relaxed border-l border-[#DAFA72]/40 pl-5">
+  <span className="inline-flex items-start gap-1 text-white/90 font-medium">
     STRYV lab
-    <sup className="text-[9px] leading-none relative -top-[2px] opacity-70">™</sup>
+    <sup className="text-[9px] leading-none relative top-0 opacity-60 font-sans">TM</sup>
   </span>
-  Mesure votre potentiel réel de transformation (ipt),
-  adapte la stratégie à votre système biologique,
-  puis optimise ce potentiel avant toute tentative de transformation.
+  <span className="mx-1 text-white/20">|</span>
+  Analyse de potentiel (IPT).
+  <br className="mb-2" />
+  La transformation n’est pas une lutte contre soi-même, c’est une équation.
+  Cessez de deviner. <span className="text-white/80">Commencez à piloter.</span>
 </p>
 
 
@@ -650,7 +669,7 @@ export default function AnalyseIPTPage() {
 
   <div className="w-full h-[1px] bg-white/5 mb-8" />
 
-  {/* CONTENU — PREND LA PLACE */}
+  {/* CONTENU */}
   <ul className="flex-1 space-y-4 text-[14px] text-white/60 font-light mb-8">
     <li className="flex items-center gap-3">
       <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
@@ -666,8 +685,9 @@ export default function AnalyseIPTPage() {
     </li>
   </ul>
 
-  {/* FOOTER — COLLÉ EN BAS */}
+  {/* FOOTER ALIGNÉ */}
   <div className="mt-8 h-[160px] flex flex-col justify-between">
+    {/* Description avec hauteur min pour alignement */}
     <p className="mb-3 text-[11px] text-white/40 leading-relaxed min-h-[34px]">
       Vous payez pour une analyse et un rapport d’interprétation.
       Aucun programme ni transformation n’est inclus à ce stade.
@@ -687,9 +707,8 @@ export default function AnalyseIPTPage() {
   </div>
 </div>
 
-            
 
-            {/* 2. G+ (Card #404040 - Active) */}
+{/* 2. G+ (Card #404040 - Active) */}
 <div className="flex flex-col h-full p-8 rounded-[24px] bg-[#404040] border border-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl relative overflow-hidden">
   
   <div className="absolute top-0 left-0 w-full h-1 bg-[#DAFA72]"></div>
@@ -722,7 +741,7 @@ export default function AnalyseIPTPage() {
 
   <div className="w-full h-[1px] bg-white/10 mb-8" />
 
-  {/* CONTENU — PREND LA PLACE */}
+  {/* CONTENU */}
   <ul className="flex-1 space-y-4 text-[14px] text-white/80 font-light mb-8">
     <li className="flex items-center gap-3">
       <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
@@ -738,34 +757,34 @@ export default function AnalyseIPTPage() {
     </li>
   </ul>
 
-  {/* FOOTER — COLLÉ EN BAS */}
+  {/* FOOTER ALIGNÉ */}
   <div className="mt-8 h-[160px] flex flex-col justify-between">
+    {/* Hauteur min identique à IPT pour alignement */}
     <p className="mb-3 text-[11px] text-white/40 leading-relaxed min-h-[34px]">
       Ce paiement active le protocole G+ et inclut une analyse IPT complète.
-      le protocole est adapté uniquement après évaluation de votre potentiel
-      de transformation.
+      le protocole est adapté uniquement après évaluation.
     </p>
 
+    {/* BOUTON HARMONISÉ (Pas de bold, pas d'uppercase, style fin) */}
     <button
       onClick={handleStripePaymentGPlus}
       disabled={isStripeLoading}
-      className={`w-full py-4 rounded-xl bg-white text-[#1A1A1A] font-bold text-[13px] transition-all duration-300 hover:bg-[#DAFA72] ${
+      className={`w-full py-4 rounded-xl bg-white text-[#1A1A1A] text-[13px] transition-all duration-300 hover:bg-[#DAFA72] ${
         isStripeLoading ? 'opacity-70' : ''
       }`}
     >
-      {'Activer le protocole G+'}
+      Activer le protocole G+
     </button>
 
     <p className="mt-3 text-[10px] text-white/30 leading-relaxed min-h-[32px]">
       Après paiement, vous serez redirigé vers le questionnaire
-      d’analyse IPT, indispensable pour adapter le protocole
-      à votre système.
+      d’analyse IPT, indispensable pour adapter le protocole.
     </p>
   </div>
 </div>
 
 
-            {/* 3. OMNI (Card #303030 - Elite) */}
+{/* 3. OMNI (Card #303030 - Elite) */}
 <div className="relative flex flex-col h-full p-8 rounded-[24px] bg-[#303030] border border-[#DAFA72]/30 shadow-lg transition-all duration-300 hover:-translate-y-2">
   
   <div className="absolute top-8 right-8">
@@ -794,38 +813,56 @@ export default function AnalyseIPTPage() {
 
   <div className="w-full h-[1px] bg-white/10 mb-8" />
 
+  {/* MODIFICATION ICI : Points verts (#DAFA72) au lieu de blancs */}
   <ul className="flex-1 space-y-4 text-[14px] text-white/60 font-light mb-8">
     <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
       Optimisation continue du potentiel de transformation
     </li>
     <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
       Élévation progressive de l’indice IPT dans le temps
     </li>
     <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
       Recalibrage stratégique selon l’évolution du système
     </li>
   </ul>
 
+  {/* FOOTER ALIGNÉ */}
   <div className="mt-8 h-[160px] flex flex-col justify-between">
-    <p className="text-[11px] text-white/40 leading-relaxed">
+    {/* Ajout de min-h-[34px] et mb-3 pour aligner avec les autres cartes */}
+    <p className="mb-3 text-[11px] text-white/40 leading-relaxed min-h-[34px]">
       OMNI s’adresse aux profils nécessitant une optimisation
       continue et une supervision stratégique avancée.
-      l’accès se fait uniquement après entretien.
     </p>
+    {/* lien admission omni */}
+<div className="mb-3 text-center">
+  <a
+    href="/omni/admission"
+    className="text-[10px] text-white/40 hover:text-white underline underline-offset-4 transition-colors"
+  >
+    Conditions d’admission au protocole OMNI
+  </a>
+</div>
 
-    <CalendlyButton
-      text="Entretien d’admission"
-      className="w-full py-4 rounded-xl bg-[#DAFA72] text-black text-[13px] font-medium hover:bg-white transition-colors duration-200"
-    />
 
-    <p className="text-[10px] text-white/30 leading-relaxed">
-      Aucun paiement n’est possible sans validation préalable.
+    {/* BOUTON HARMONISÉ (Pas de bold, pas d'uppercase, style fin) */}
+    <button
+  onClick={handleStripePaymentOmni}
+  className="flex items-center justify-center w-full py-4 rounded-xl bg-[#DAFA72] hover:bg-white text-[#1A1A1A] text-[13px] transition-all duration-200 shadow-[0_0_15px_-5px_rgba(218,250,114,0.4)]"
+>
+Démarrer l’admission OMNI
+</button>
+
+
+    {/* Ajout de mt-3 et min-h-[32px] pour aligner le bas */}
+    <p className="mt-3 text-[10px] text-white/30 leading-relaxed text-center min-h-[32px]">
+    Le paiement déclenche le processus d’admission.
+    Un appel stratégique obligatoire est requis avant toute activation.
     </p>
   </div>
-  </div>
+</div>
   </div> {/* fin grid */}
 </div> {/* fin max-w-7xl */}
 </section>

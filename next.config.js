@@ -1,5 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // --- CONFIGURATION CAPACITOR (OBLIGATOIRE) ---
+  output: 'export', // Crée un dossier statique "out" au lieu d'un serveur Node
+  images: {
+    unoptimized: true, // Désactive l'optimisation serveur des images
+  },
+  // ---------------------------------------------
+
   typescript: {
     // Ignore les erreurs TypeScript pour le déploiement
     ignoreBuildErrors: true,
@@ -9,6 +16,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
+  // Note : Ces headers fonctionneront sur le site web (Vercel), 
+  // mais seront ignorés par l'application mobile (car c'est du statique).
   async headers() {
     return [
       {
@@ -18,7 +27,6 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // AJOUT DE 'unsafe-eval' ICI 👇
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://assets.calendly.com",
               "style-src 'self' 'unsafe-inline' https://assets.calendly.com",
               "connect-src 'self' https://calendly.com https://*.calendly.com",

@@ -2,7 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Send, Sparkles, X, RotateCcw } from 'lucide-react'
-import { chatWithGenesis } from '@/app/actions/genesis'
+// -------------------------------------------------------------------------
+// 🛑 MODIFICATION POUR MOBILE (CAPACITOR)
+// On commente l'import serveur car il empêche le build statique
+// import { chatWithGenesis } from '@/app/_actions/genesis'
+// -------------------------------------------------------------------------
 import { CalendlyButton } from './CalendlyButton'
 
 type Message = {
@@ -10,7 +14,6 @@ type Message = {
   content: string
 }
 
-// Ajout d'une interface pour accepter des actions externes (comme lancer l'IPT)
 interface GenesisAssistantProps {
   onStartIPT?: () => void;
 }
@@ -39,7 +42,7 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
     if (typeof window !== 'undefined') {
       localStorage.setItem('genesis-chat-history', JSON.stringify(messages));
     }
-  }, [messages, isOpen, isLoading]) // ← Ajout isLoading pour scroll pendant typing
+  }, [messages, isOpen, isLoading])
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return
@@ -48,19 +51,32 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
     setInputValue('')
     setIsLoading(true)
 
+    // 1. Ajout du message utilisateur
     const newHistory = [...messages, { role: 'user', content: userMsg } as Message]
     setMessages(newHistory)
 
-    // Détecter la page actuelle pour contexte
+    // ---------------------------------------------------------------------
+    // 🛑 LOGIQUE MOBILE (SIMULATION)
+    // Au lieu d'appeler le serveur, on simule une réponse locale pour que le build passe.
+    
+    // Simulation du temps de réponse (1.5 secondes)
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Réponse statique pour la démo mobile
+    const fakeResponse = "Mode Mobile Autonome : La connexion neuronale (IA) est désactivée sur cette version pour garantir la performance hors-ligne. Veuillez utiliser la version Web pour l'assistant complet.";
+    
+    setMessages(prev => [...prev, { role: 'assistant', content: fakeResponse }]);
+    
+    /* --- ANCIEN CODE SERVEUR (Garder pour la version Web plus tard) ---
     const currentPage = typeof window !== 'undefined' ? window.location.pathname : undefined;
-
     const result = await chatWithGenesis(userMsg, messages, currentPage)
-
     if (result.success) {
       setMessages(prev => [...prev, { role: 'assistant', content: result.response }])
     } else {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Erreur de connexion au système central." }])
+      setMessages(prev => [...prev, { role: 'assistant', content: "Erreur de connexion..." }])
     }
+    */
+    // ---------------------------------------------------------------------
     
     setIsLoading(false)
   }
@@ -79,7 +95,6 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
     }
   }
 
-  // Rendu intelligent des boutons
   const renderMessageContent = (content: string) => {
     let cleanContent = content
       .replace('[BOUTON_CALENDLY]', '')
@@ -90,7 +105,6 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
       <div className="flex flex-col gap-3">
         <div className="whitespace-pre-wrap">{cleanContent}</div>
         
-        {/* Détection Bouton Calendly */}
         {content.includes('[BOUTON_CALENDLY]') && (
            <CalendlyButton 
              text="RÉSERVER CONSULTATION" 
@@ -98,11 +112,10 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
            />
         )}
 
-        {/* Détection Bouton IPT (Si la fonction onStartIPT est fournie) */}
         {content.includes('[BOUTON_IPT]') && onStartIPT && (
            <button 
              onClick={() => {
-                setIsOpen(false); // Ferme le chat pour voir le modal
+                setIsOpen(false);
                 onStartIPT();
              }}
              className="w-full text-center text-black text-[13px] px-5 py-[10px] rounded-full bg-[#DAFA72] transition-transform duration-200 hover:scale-[1.05] active:scale-[0.98] cursor-pointer font-medium"
@@ -184,23 +197,13 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
                 </div>
               ))}
 
-              {/* ✨ ANIMATION TYPING DOTS AMÉLIORÉE */}
               {isLoading && (
                 <div className="text-left">
                   <div className="inline-block bg-white/5 text-white/80 px-4 py-3 rounded-lg border border-white/5">
                     <div className="flex items-center gap-1">
-                      <div 
-                        className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce"
-                        style={{ animationDelay: '0ms', animationDuration: '1s' }}
-                      />
-                      <div 
-                        className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce"
-                        style={{ animationDelay: '200ms', animationDuration: '1s' }}
-                      />
-                      <div 
-                        className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce"
-                        style={{ animationDelay: '400ms', animationDuration: '1s' }}
-                      />
+                      <div className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1s' }} />
+                      <div className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1s' }} />
+                      <div className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1s' }} />
                     </div>
                   </div>
                 </div>

@@ -3,115 +3,154 @@
 @tailwind utilities;
 
 /* =====================================================
-   GLOBAL TYPOGRAPHY & SIZES (THE FIX)
+   CSS VARIABLES — SYSTEM SOURCE OF TRUTH
    ===================================================== */
-@layer base {
-  /* H1 : Hero Titles - Grand, Impactant, Minuscules autorisées */
-  h1 {
-    @apply font-outfit font-medium text-white leading-[0.95] tracking-[-0.02em];
-    /* Responsive : Mobile -> Tablette -> Desktop (Clamp) */
-    @apply text-5xl sm:text-6xl md:text-[clamp(3.5rem,7vw,9rem)];
-    hyphens: auto;
-    word-break: break-word;
-  }
-
-  /* H2 : Section Titles - Architecture de l'échec, Solutions... */
-  h2 {
-    @apply font-outfit font-medium text-white leading-[1.05] tracking-tight;
-    @apply text-3xl sm:text-4xl md:text-6xl;
-    margin-bottom: 2rem;
-  }
-
-  /* H3 : Card Titles - Azonix (Toujours un peu technique/futuriste) */
-  h3 {
-    @apply font-azonix text-white uppercase tracking-wide;
-    @apply text-lg md:text-xl mb-3;
-  }
-
-  /* P : Paragraphes standards - Gris lecture confortable */
-  p {
-    @apply font-outfit text-white/60 leading-relaxed;
-    @apply text-base md:text-lg;
-  }
-
-  /* Small : Mentions légales, détails */
-  small {
-    @apply font-outfit text-white/40 text-xs;
-  }
-
-  /* Force Outfit à rester light (Legacy) */
-  .font-outfit,
-  [class*="font-[var(--font-outfit)]"] {
-    font-weight: 300 !important;
-  }
-}
-
-/* =====================================================
-   MEDUSMO SYSTEM — COLORS
-   ===================================================== */
-
 :root {
-  --bg-main:   #303030; 
-  --bg-soft:   #3D3D3D;
-  --bg-dark:   #1A1A1A;
 
-  --text-main: #FFFFFF;
-  --text-soft: rgba(255, 255, 255, 0.6);
+  /* =========================
+     APP BACKGROUND (DASHBOARD)
+     ========================= */
+  --bg-main: #ECECEC;        /* fond global app */
+  --bg-soft: #F4F4F4;        /* panneaux principaux */
+  --bg-secondary: #E5E7EB;   /* séparateurs discrets */
 
-  --divider: rgba(255, 255, 255, 0.1);
+  /* =========================
+     TYPOGRAPHY
+     ========================= */
+  --text-main: #111111;      /* titres */
+  --text-soft: #374151;      /* corps */
+  --text-muted: #6B7280;     /* labels */
+  --text-invert: #FFFFFF;
+
+  /* =========================
+     UI ELEMENTS
+     ========================= */
+  --divider: rgba(0,0,0,0.08);
+  --accent: #111111;         /* action primaire */
+  --accent-active: #16A34A;  /* état actif / validation */
+
+  /* =========================
+     FONTS (fallback)
+     ========================= */
+  --font-outfit: 'Outfit', sans-serif;
+  --font-azonix: 'Arial', sans-serif;
+  --font-ramabhadra: 'Impact', sans-serif;
+  --font-mono: 'Courier New', monospace;
 }
 
 /* =====================================================
-   DOCUMENT SETUP
+   BASE RESET — APPLICATION
    ===================================================== */
-
 html,
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #303030; 
-  color: white;
-  overscroll-behavior-y: none;
-  font-family: var(--font-outfit), system-ui, sans-serif; /* Default font is now Outfit */
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Désactivation de toute narration décorative globale */
+body::before,
+body::after {
+  content: none !important;
 }
 
 /* =====================================================
-   GRAIN EFFECT (Overlay)
+   COMPONENT PRIMITIVES — GENESIS UI
    ===================================================== */
+@layer components {
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 50; /* Z-index ajusté pour être subtil mais visible */
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.22' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.06'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
-  opacity: 0.04;
+  /* =========================
+     APP CONTAINER
+     ========================= */
+  .app-root {
+    @apply min-h-screen w-full bg-genesis-bg;
+  }
+
+  /* =========================
+     PANEL — CONTAINER PRINCIPAL
+     ========================= */
+  .panel {
+    @apply
+      bg-genesis-panel
+      border border-genesis-border
+      rounded-panel
+      shadow-panel
+      p-8;
+  }
+
+  /* =========================
+     WIDGET — SOUS-BLOC
+     ========================= */
+  .widget {
+    @apply
+      bg-genesis-surface
+      border border-white/80
+      rounded-widget
+      shadow-widget
+      p-6;
+  }
+
+  /* =========================
+     BUTTON — ACTION SYSTÈME
+     ========================= */
+  .btn-primary {
+    @apply
+      h-[56px]
+      px-8
+      rounded-button
+      bg-genesis-action
+      text-white
+      text-xs
+      uppercase
+      tracking-[0.3em]
+      transition
+      ease-genesis;
+  }
+
+  .btn-primary:hover {
+    @apply shadow-hover;
+  }
+
+  /* =========================
+     TEXT STYLES (OPTIONNELS)
+     ========================= */
+  .text-title {
+    @apply text-lg font-semibold text-genesis-text;
+  }
+
+  .text-body {
+    @apply text-sm text-genesis-sub leading-relaxed;
+  }
+
+  .text-muted {
+    @apply text-xs text-genesis-muted;
+  }
+
+  /* =========================
+     STATUS / ACCENT
+     ========================= */
+  .status-active {
+    @apply text-genesis-accent;
+  }
+
 }
 
 /* =====================================================
-   UTILITIES
+   DEPRECATED (LEGACY SUPPORT)
+   À SUPPRIMER PROGRESSIVEMENT
    ===================================================== */
 
-.section { background-color: transparent; }
-.section-soft { background-color: var(--bg-soft); }
-.section-dark { background-color: var(--bg-dark); color: #EDEDED; }
-.text-soft { color: var(--text-soft); }
-.divider { height: 1px; background-color: var(--divider); }
-
-/* Animations Chatbot */
-.typing-dots span {
-  display: inline-block;
-  animation: blink 1.4s infinite both;
+/* grain / noise */
+.bg-noise {
+  display: none;
 }
-.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
-@keyframes blink {
-  0% { opacity: 0.2; }
-  20% { opacity: 1; }
-  100% { opacity: 0.2; }
+/* anciens containers glass */
+.genesis-card,
+.genesis-widget,
+.btn-genesis {
+  /* volontairement neutre */
 }

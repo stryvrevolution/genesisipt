@@ -51,7 +51,8 @@ export async function POST() {
       },
       
 
-      success_url: `${baseUrl}/success-gplus?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${baseUrl}/checkout-success/gplus?session_id={CHECKOUT_SESSION_ID}`,
+
       cancel_url: `${baseUrl}/analyse-ipt`,
     });
 
