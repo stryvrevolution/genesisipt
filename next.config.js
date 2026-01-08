@@ -1,26 +1,38 @@
 /** @type {import('next').NextConfig} */
+
+// ASTUCE : Changez cette variable en 'true' pour construire le mobile, 
+// et en 'false' quand vous envoyez sur Vercel !
+const isMobileBuild = false; // <--- METTRE SUR 'FALSE' AVANT DE POUSSER SUR VERCEL
+
 const nextConfig = {
-  // --- CONFIGURATION CAPACITOR (OBLIGATOIRE) ---
-  output: 'export', // Crée un dossier statique "out" au lieu d'un serveur Node
+  // Active l'export statique UNIQUEMENT si on construit pour le mobile
+  output: isMobileBuild ? 'export' : undefined,
+
   images: {
-    unoptimized: true, // Désactive l'optimisation serveur des images
+    unoptimized: true,
   },
-  // ---------------------------------------------
 
   typescript: {
-    // Ignore les erreurs TypeScript pour le déploiement
     ignoreBuildErrors: true,
   },
   eslint: {
-    // Ignore les erreurs de style
     ignoreDuringBuilds: true,
   },
 
-  // Note : Ces headers fonctionneront sur le site web (Vercel), 
-  // mais seront ignorés par l'application mobile (car c'est du statique).
   async headers() {
     return [
       {
+        // 1. RÈGLES CORS (Pour autoriser l'App Mobile à contacter l'API)
+        source: "/api/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          { key: "Access-Control-Allow-Origin", value: "*" }, // Autorise tout le monde (iPhone inclus)
+          { key: "Access-Control-Allow-Methods", value: "GET,DELETE,PATCH,POST,PUT" },
+          { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" },
+        ]
+      },
+      {
+        // 2. RÈGLES DE SÉCURITÉ (Votre configuration existante Calendly, etc.)
         source: '/(.*)',
         headers: [
           {
@@ -29,7 +41,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://assets.calendly.com",
               "style-src 'self' 'unsafe-inline' https://assets.calendly.com",
-              "connect-src 'self' https://calendly.com https://*.calendly.com",
+              "connect-src 'self' https://calendly.com https://*.calendly.com https://genesis-system.vercel.app", // J'ai ajouté votre API ici par sécurité
               "frame-src https://calendly.com https://*.calendly.com",
               "img-src 'self' data: https://assets.calendly.com",
               "font-src 'self' https://assets.calendly.com",
