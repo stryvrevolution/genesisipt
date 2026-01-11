@@ -1,99 +1,149 @@
-'use client'
+'use client';
 
-import { useState, useRef, useEffect } from 'react'
-import { Send, Sparkles, X, RotateCcw } from 'lucide-react'
-// -------------------------------------------------------------------------
-// 🛑 MODIFICATION POUR MOBILE (CAPACITOR)
-// On commente l'import serveur car il empêche le build statique
-// import { chatWithGenesis } from '@/app/_actions/genesis'
-// -------------------------------------------------------------------------
-import { CalendlyButton } from './CalendlyButton'
+import React, { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
+import { 
+  ArrowUp, 
+  X, 
+  RotateCcw, 
+  Minimize2
+} from 'lucide-react';
+import { CalendlyButton } from './CalendlyButton';
+import { chatWithGenesis } from '@/app/_actions/genesis';
 
 type Message = {
-  role: 'user' | 'assistant'
-  content: string
-}
+  role: 'user' | 'assistant';
+  content: string;
+};
 
 interface GenesisAssistantProps {
   onStartIPT?: () => void;
 }
 
 export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [inputValue, setInputValue] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // 1. MESSAGE D'ACCUEIL (Modifié pour "Expert" et non "Médecin")
   const [messages, setMessages] = useState<Message[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('genesis-chat-history');
-      return saved ? JSON.parse(saved) : [];
+      return saved ? JSON.parse(saved) : [
+        { role: 'assistant', content: "Je vous attendais.\n\nDerrière chaque stagnation, il y a une logique biologique. Je suis ici pour analyser vos données.\n\nQuel est votre objectif principal ?" }
+      ];
     }
-    return [];
+    return [{ role: 'assistant', content: "Je vous attendais.\nQuel est votre objectif principal ?" }];
   });
 
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    scrollToBottom()
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [inputValue]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'; 
+      scrollToBottom();
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isOpen]);
+
+  useEffect(() => {
+    scrollToBottom();
     if (typeof window !== 'undefined') {
       localStorage.setItem('genesis-chat-history', JSON.stringify(messages));
     }
-  }, [messages, isOpen, isLoading])
+  }, [messages, isLoading]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!inputValue.trim() || isLoading) return;
 
-    const userMsg = inputValue.trim()
-    setInputValue('')
-    setIsLoading(true)
-
-    // 1. Ajout du message utilisateur
-    const newHistory = [...messages, { role: 'user', content: userMsg } as Message]
-    setMessages(newHistory)
-
-    // ---------------------------------------------------------------------
-    // 🛑 LOGIQUE MOBILE (SIMULATION)
-    // Au lieu d'appeler le serveur, on simule une réponse locale pour que le build passe.
+    const userMsg = inputValue.trim();
+    setInputValue('');
+    setIsLoading(true);
     
-    // Simulation du temps de réponse (1.5 secondes)
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
 
-    // Réponse statique pour la démo mobile
-    const fakeResponse = "Mode Mobile Autonome : La connexion neuronale (IA) est désactivée sur cette version pour garantir la performance hors-ligne. Veuillez utiliser la version Web pour l'assistant complet.";
-    
-    setMessages(prev => [...prev, { role: 'assistant', content: fakeResponse }]);
-    
-    /* --- ANCIEN CODE SERVEUR (Garder pour la version Web plus tard) ---
-    const currentPage = typeof window !== 'undefined' ? window.location.pathname : undefined;
-    const result = await chatWithGenesis(userMsg, messages, currentPage)
-    if (result.success) {
-      setMessages(prev => [...prev, { role: 'assistant', content: result.response }])
-    } else {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Erreur de connexion..." }])
+    const newHistory = [...messages, { role: 'user', content: userMsg } as Message];
+    setMessages(newHistory);
+
+    try {
+      const result = await chatWithGenesis(userMsg, messages);
+      if (result.success) {
+        setMessages(prev => [...prev, { role: 'assistant', content: result.response }]);
+      } else {
+        setMessages(prev => [...prev, { role: 'assistant', content: "Connexion interrompue. Le système redémarre..." }]);
+      }
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'assistant', content: "Erreur critique du noyau." }]);
+    } finally {
+      setIsLoading(false);
     }
-    */
-    // ---------------------------------------------------------------------
-    
-    setIsLoading(false)
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+      e.preventDefault();
+      handleSendMessage();
     }
-  }
+  };
 
   const clearHistory = () => {
-    if (confirm('Effacer toute la conversation ?')) {
-      setMessages([]);
-      localStorage.removeItem('genesis-chat-history');
-    }
-  }
+    setMessages([{ role: 'assistant', content: "Reprenons l'analyse. Je vous écoute." }]);
+    localStorage.removeItem('genesis-chat-history');
+  };
+
+  // PARSEUR (LIENS + GRAS + LISTES)
+  const formatText = (text: string) => {
+    return text.split('\n').map((line, i) => (
+      <p key={i} className={`min-h-[1em] ${line.startsWith('-') || line.startsWith('•') ? 'pl-4 mb-1' : 'mb-2 last:mb-0'}`}>
+        {line.split(' ').map((word, j) => {
+          if (word.includes('/outils/')) {
+            const cleanLink = word.replace(/[()]/g, ''); 
+            return (
+              <React.Fragment key={j}>
+                <Link 
+                    href={cleanLink} 
+                    className="text-accent font-medium underline underline-offset-4 hover:text-primary transition-colors cursor-pointer"
+                    onClick={() => setIsOpen(false)}
+                >
+                    {cleanLink}
+                </Link>
+                {' '}
+              </React.Fragment>
+            );
+          }
+          if (word.includes('**')) {
+             const parts = word.split('**');
+             return (
+               <React.Fragment key={j}>
+                 {parts.map((part, k) => (
+                   k % 2 === 1 
+                     ? <strong key={k} className="font-bold text-primary">{part}</strong> 
+                     : <span key={k}>{part}</span>
+                 ))}
+                 {' '}
+               </React.Fragment>
+             );
+          }
+          return <span key={j}>{word} </span>;
+        })}
+      </p>
+    ));
+  };
 
   const renderMessageContent = (content: string) => {
     let cleanContent = content
@@ -103,136 +153,151 @@ export default function GenesisAssistant({ onStartIPT }: GenesisAssistantProps) 
 
     return (
       <div className="flex flex-col gap-3">
-        <div className="whitespace-pre-wrap">{cleanContent}</div>
+        <div className="text-sm leading-relaxed">
+            {formatText(cleanContent)}
+        </div>
         
         {content.includes('[BOUTON_CALENDLY]') && (
            <CalendlyButton 
-             text="RÉSERVER CONSULTATION" 
-             className="w-full text-center text-black text-[13px] px-5 py-[10px] rounded-full bg-[#DAFA72] transition-transform duration-200 hover:scale-[1.05] active:scale-[0.98] cursor-pointer font-medium"
+             text="PRENDRE RENDEZ-VOUS" 
+             className="w-full text-center text-white text-[10px] font-bold tracking-widest px-5 py-3 rounded-lg bg-accent hover:bg-accent/90 shadow-sm transition-all uppercase mt-2"
            />
         )}
 
         {content.includes('[BOUTON_IPT]') && onStartIPT && (
            <button 
-             onClick={() => {
-                setIsOpen(false);
-                onStartIPT();
-             }}
-             className="w-full text-center text-black text-[13px] px-5 py-[10px] rounded-full bg-[#DAFA72] transition-transform duration-200 hover:scale-[1.05] active:scale-[0.98] cursor-pointer font-medium"
+             onClick={() => { setIsOpen(false); onStartIPT(); }}
+             className="w-full text-center text-white text-[10px] font-bold tracking-widest px-5 py-3 rounded-lg bg-primary hover:bg-primary/90 shadow-sm transition-all uppercase mt-2"
            >
-             DÉMARRER L'ANALYSE IPT
+             LANCER L'AUDIT (IPT)
            </button>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <>
       {/* BOUTON FLOTTANT */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-11 h-11 bg-[#DAFA72] rounded-[14px] flex items-center justify-center hover:scale-[1.06] transition-transform cursor-pointer shadow-[0_0_20px_-5px_rgba(218,250,114,0.3)]"
-        aria-label="Chat"
-      >
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="#303030">
-          <path d="M4 5.5C4 4.67 4.67 4 5.5 4H18.5C19.33 4 20 4.67 20 5.5V15.5C20 16.33 19.33 17 18.5 17H9L5 20V17H5.5C4.67 17 4 16.33 4 15.5V5.5Z" />
-        </svg>
-      </button>
+      {!isOpen && (
+        <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-4">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ease-out shadow-soft-out hover:scale-105 active:scale-95 bg-accent text-white group"
+            aria-label="Genesis AI"
+          >
+            <div className="flex items-start leading-none font-bold font-outfit">
+              <span className="text-xl tracking-tighter">G</span>
+              <span className="text-[9px] mt-0.5 ml-0.5 opacity-90 font-outfit tracking-wide">AI</span>
+            </div>
+          </button>
+        </div>
+      )}
 
-      {/* MODAL / DRAWER */}
+      {/* INTERFACE */}
       {isOpen && (
-        <>
-          <div
-            onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-black/40 z-[55] backdrop-blur-[2px]"
-          />
+        <div className="fixed inset-0 z-[100] md:inset-auto md:bottom-24 md:right-6 md:w-[400px] md:h-[650px] flex flex-col">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm md:hidden" />
 
-          <aside className="fixed top-0 right-0 w-full sm:w-[420px] h-full bg-[#0E0E0E] z-[60] p-6 flex flex-col border-l border-white/5 shadow-2xl animate-in slide-in-from-right duration-300">
+          <div className="relative flex flex-col w-full h-full md:rounded-card bg-[#f8f8f8] shadow-2xl md:shadow-soft-out border-none md:border border-white/50 overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300">
             
-            <div className="flex justify-between items-center mb-6">
+            {/* HEADER */}
+            <div className="px-5 py-4 border-b border-gray-200/50 flex justify-between items-center bg-white/90 backdrop-blur-md z-10">
               <div className="flex items-center gap-3">
-                 <span className="text-white text-lg font-azonix">GENESIS</span>
-                 <span className="text-white/40 text-sm font-outfit">Assistant</span>
+                <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-white shadow-lg">
+                    <div className="flex items-start leading-none font-bold font-outfit">
+                      <span className="text-xl tracking-tighter">G</span>
+                      <span className="text-[9px] mt-0.5 ml-0.5 opacity-90 font-outfit tracking-wide">AI</span>
+                    </div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold tracking-widest text-primary uppercase font-sans">
+                    GENESIS AI
+                  </span>
+                  <span className="flex items-center gap-1.5 mt-0.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+                    </span>
+                  </span>
+                </div>
               </div>
               
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={clearHistory}
-                  className="text-white/40 hover:text-white/80 transition-colors"
-                  title="Nouvelle conversation"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-                
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-white/60 hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              <div className="flex items-center gap-1">
+                  <button onClick={clearHistory} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors" title="Réinitialiser">
+                    <RotateCcw size={18} />
+                  </button>
+                  <button onClick={() => setIsOpen(false)} className="p-2 rounded-lg hover:bg-gray-100 text-primary transition-colors">
+                    <span className="md:hidden"><X size={22} /></span>
+                    <span className="hidden md:block"><Minimize2 size={20} /></span>
+                  </button>
               </div>
             </div>
 
-            <div className="flex-1 border border-white/10 rounded-lg p-4 overflow-auto text-sm space-y-4 bg-[#0E0E0E]">
-              
-              {messages.length === 0 && !isLoading && (
-                <div className="h-full flex flex-col items-center justify-center text-center opacity-60">
-                   <Sparkles className="w-8 h-8 text-[#DAFA72] mb-4" />
-                   <p className="text-white/60 font-outfit">
-                    GENESIS est prêt pour répondre à vos questions.
-                   </p>
-                </div>
-              )}
-
+            {/* MESSAGES (SANS LABELS) */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-[#f4f4f4]">
               {messages.map((msg, index) => (
-                <div key={index} className={msg.role === 'user' ? 'text-right' : 'text-left'}>
-                  <div className={`inline-block max-w-[85%] px-4 py-3 rounded-lg text-[13px] leading-relaxed font-outfit ${
-                      msg.role === 'user'
-                        ? 'bg-[#DAFA72] text-[#303030]'
-                        : 'bg-white/5 text-white/80 border border-white/5'
-                    }`}>
+                <div 
+                  key={index} 
+                  className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+                >
+                  {/* LABEL SUPPRIMÉ ICI */}
+
+                  <div className={`
+                    max-w-[85%] px-5 py-3.5 text-sm font-sans shadow-sm
+                    ${msg.role === 'user' 
+                      ? 'bg-primary text-white rounded-2xl rounded-tr-sm' 
+                      : 'bg-white text-primary border border-white/60 rounded-2xl rounded-tl-sm shadow-sm'} 
+                  `}>
                     {renderMessageContent(msg.content)}
                   </div>
                 </div>
               ))}
-
+              
+              {/* LOADING (SANS TEXTE) */}
               {isLoading && (
-                <div className="text-left">
-                  <div className="inline-block bg-white/5 text-white/80 px-4 py-3 rounded-lg border border-white/5">
-                    <div className="flex items-center gap-1">
-                      <div className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1s' }} />
-                      <div className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1s' }} />
-                      <div className="w-1 h-1 bg-[#DAFA72] rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1s' }} />
-                    </div>
+                <div className="flex flex-col items-start animate-pulse">
+                  {/* LABEL "RÉFLEXION" SUPPRIMÉ ICI */}
+                  <div className="bg-white px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm flex gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce delay-0" />
+                    <div className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce delay-150" />
+                    <div className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce delay-300" />
                   </div>
                 </div>
               )}
-              
-              <div ref={messagesEndRef} />
+              <div ref={messagesEndRef} className="h-2" />
             </div>
 
-            <div className="mt-4 flex gap-2">
-              <input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Écris ici…"
-                disabled={isLoading}
-                className="flex-1 bg-[#1A1A1A] text-white/90 px-4 py-3 rounded-lg outline-none border border-white/5 focus:border-[#DAFA72]/30 transition-colors font-outfit placeholder:text-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
+            {/* INPUT */}
+            <form className="p-4 bg-white border-t border-gray-200/50 shrink-0 pb-safe">
+              <div className="relative flex items-end gap-2 bg-background rounded-2xl p-2 shadow-inner">
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Dites-moi tout..."
+                  disabled={isLoading}
+                  rows={1}
+                  className="w-full bg-transparent text-sm text-primary placeholder:text-gray-400 focus:outline-none resize-none py-3 px-3 max-h-[150px] overflow-y-auto leading-relaxed font-sans"
+                  style={{ minHeight: '44px' }}
+                />
+                <button 
+                  onClick={(e) => handleSendMessage(e)}
+                  disabled={!inputValue.trim() || isLoading}
+                  className="mb-1 p-2.5 bg-accent text-white rounded-xl hover:bg-accent/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 flex-shrink-0"
+                >
+                  <ArrowUp size={20} strokeWidth={2.5} />
+                </button>
+              </div>
+              <div className="text-[9px] text-center text-gray-400 mt-3 font-medium tracking-wide uppercase font-sans">
+                Genesis AI v1.1 • Protected by Stryv Lab
+              </div>
+            </form>
 
-              <button
-                onClick={handleSendMessage}
-                disabled={isLoading || !inputValue.trim()}
-                className="bg-[#DAFA72] text-[#303030] px-4 py-3 rounded-lg hover:scale-[1.03] transition-transform disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
-          </aside>
-        </>
+          </div>
+        </div>
       )}
     </>
-  )
+  );
 }

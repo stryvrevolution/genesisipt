@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import ToolsGrid from './ToolsGrid'; // Import de ton design
 
 export const metadata: Metadata = {
-  title: 'Tools Hub | STRYV LAB',
+  title: 'Lab Open Source',
   description: 'Accédez aux calculateurs de précision pour l\'optimisation métabolique, hormonale et de la performance (Macros, Body Fat, Cycle Sync...).',
   openGraph: {
-    title: 'Tools Hub | STRYV LAB',
+    title: ' | STRYV LAB',
     description: 'La suite d\'outils pour transformer votre physique.',
     url: 'https://www.stryvlab.com/outils',
     siteName: 'STRYV LAB',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tools Hub | STRYV LAB',
+    title: 'Lab Open Source',
     description: 'La suite d\'outils métaboliques pour transformer votre physique.',
     images: ['/og-toolshub.png'],
   },

@@ -3,154 +3,91 @@
 @tailwind utilities;
 
 /* =====================================================
-   CSS VARIABLES — SYSTEM SOURCE OF TRUTH
+   BASE SETUP
    ===================================================== */
 :root {
+  /* Seule la variable de font injectée par Next.js est conservée.
+     Toutes les couleurs sont gérées via tailwind.config.ts */
+}
 
-  /* =========================
-     APP BACKGROUND (DASHBOARD)
-     ========================= */
-  --bg-main: #ECECEC;        /* fond global app */
-  --bg-soft: #F4F4F4;        /* panneaux principaux */
-  --bg-secondary: #E5E7EB;   /* séparateurs discrets */
+@layer base {
+  html,
+  body {
+    @apply bg-background text-primary antialiased;
+    
+    /* Police unique : Lufga */
+    font-family: var(--font-lufga), 'Lufga', sans-serif;
+    
+    /* Tracking technique (-0.01em) pour le texte courant */
+    letter-spacing: -0.01em;
+  }
 
-  /* =========================
-     TYPOGRAPHY
-     ========================= */
-  --text-main: #111111;      /* titres */
-  --text-soft: #374151;      /* corps */
-  --text-muted: #6B7280;     /* labels */
-  --text-invert: #FFFFFF;
-
-  /* =========================
-     UI ELEMENTS
-     ========================= */
-  --divider: rgba(0,0,0,0.08);
-  --accent: #111111;         /* action primaire */
-  --accent-active: #16A34A;  /* état actif / validation */
-
-  /* =========================
-     FONTS (fallback)
-     ========================= */
-  --font-outfit: 'Outfit', sans-serif;
-  --font-azonix: 'Arial', sans-serif;
-  --font-ramabhadra: 'Impact', sans-serif;
-  --font-mono: 'Courier New', monospace;
+  /* Reset des titres pour le tracking spécifique (-0.02em) */
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    @apply font-medium;
+  }
 }
 
 /* =====================================================
-   BASE RESET — APPLICATION
-   ===================================================== */
-html,
-body {
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-/* Désactivation de toute narration décorative globale */
-body::before,
-body::after {
-  content: none !important;
-}
-
-/* =====================================================
-   COMPONENT PRIMITIVES — GENESIS UI
+   COMPONENT PRIMITIVES — STRICT IMPLEMENTATION
    ===================================================== */
 @layer components {
 
-  /* =========================
-     APP CONTAINER
-     ========================= */
-  .app-root {
-    @apply min-h-screen w-full bg-genesis-bg;
+  /* SURFACE PRINCIPALE (CARTE)
+     - Usage : Conteneurs principaux
+     - Rendu : Volume positif (Soft Outset)
+     - Rayon : 24px
+  */
+  .ui-card {
+    @apply bg-surface rounded-card shadow-soft-out;
   }
 
-  /* =========================
-     PANEL — CONTAINER PRINCIPAL
-     ========================= */
-  .panel {
-    @apply
-      bg-genesis-panel
-      border border-genesis-border
-      rounded-panel
-      shadow-panel
-      p-8;
+  /* WIDGET / SOUS-CARTE
+     - Usage : Éléments internes
+     - Rendu : Volume positif
+     - Rayon : 16px
+  */
+  .ui-widget {
+    @apply bg-surface rounded-widget shadow-soft-out;
   }
 
-  /* =========================
-     WIDGET — SOUS-BLOC
-     ========================= */
-  .widget {
-    @apply
-      bg-genesis-surface
-      border border-white/80
-      rounded-widget
-      shadow-widget
-      p-6;
+  /* ZONE INPUT (INSET)
+     - Usage : Champs de texte, search bars, zones "creusées"
+     - Rendu : Volume négatif (Soft Inset)
+  */
+  .ui-inset {
+    @apply bg-surface-light rounded-widget shadow-soft-in text-primary placeholder:text-muted;
+    border: none;
+    outline: none;
   }
 
-  /* =========================
-     BUTTON — ACTION SYSTÈME
-     ========================= */
-  .btn-primary {
-    @apply
-      h-[56px]
-      px-8
-      rounded-button
-      bg-genesis-action
-      text-white
-      text-xs
-      uppercase
-      tracking-[0.3em]
-      transition
-      ease-genesis;
+  /* BOUTON PRIMAIRE
+     - Usage : Action principale unique
+     - Rendu : Accent + Glow coloré
+  */
+  .ui-btn-primary {
+    @apply bg-accent text-white rounded-btn shadow-glow-accent px-6 py-3 text-sm font-medium transition-all active:scale-95;
   }
 
-  .btn-primary:hover {
-    @apply shadow-hover;
+  /* BOUTON SECONDAIRE
+     - Usage : Actions alternatives
+     - Rendu : Surface neutre + Ombre douce
+  */
+  .ui-btn-secondary {
+    @apply bg-surface text-secondary rounded-btn shadow-soft-out px-6 py-3 text-sm transition-all active:scale-95 hover:text-primary;
   }
-
-  /* =========================
-     TEXT STYLES (OPTIONNELS)
-     ========================= */
-  .text-title {
-    @apply text-lg font-semibold text-genesis-text;
-  }
-
-  .text-body {
-    @apply text-sm text-genesis-sub leading-relaxed;
-  }
-
-  .text-muted {
-    @apply text-xs text-genesis-muted;
-  }
-
-  /* =========================
-     STATUS / ACCENT
-     ========================= */
-  .status-active {
-    @apply text-genesis-accent;
-  }
-
 }
 
 /* =====================================================
-   DEPRECATED (LEGACY SUPPORT)
-   À SUPPRIMER PROGRESSIVEMENT
+   UTILITIES
    ===================================================== */
-
-/* grain / noise */
-.bg-noise {
-  display: none;
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
-
-/* anciens containers glass */
-.genesis-card,
-.genesis-widget,
-.btn-genesis {
-  /* volontairement neutre */
-}
+  

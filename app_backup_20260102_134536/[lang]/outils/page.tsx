@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import { CalendlyButton } from '@/components/CalendlyButton'
-import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
+import { LanguageSwitcher } from '@/components/sections/LanguageSwitcher'
 import { useTranslation } from '@/lib/context/LanguageContext'
 import { 
   Dna, 

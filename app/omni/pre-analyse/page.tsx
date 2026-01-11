@@ -1,23 +1,24 @@
 "use client";
 
 import React, { useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import localFont from "next/font/local";
+import SwipeButton from "@/components/ui/SwipeButton";
 
-// Chemin corrigé pour remonter de 2 niveaux (app/omni/pre-analyse -> app/fonts)
 const michroma = localFont({
   src: "../../fonts/Michroma-Regular.ttf",
   display: "swap",
 });
 
 export default function OmniPreAnalysePage() {
+  const router = useRouter();
 
-  // Sauvegarde spécifique pour OMNI
-  const handleSessionInit = () => {
+  const handleValidation = () => {
     if (typeof window !== "undefined") {
       localStorage.setItem("omni_session_status", "started");
       localStorage.setItem("omni_timestamp", Date.now().toString());
     }
+    router.push("/omni/run");
   };
 
   useEffect(() => {
@@ -25,113 +26,168 @@ export default function OmniPreAnalysePage() {
   }, []);
 
   return (
-    <main className="min-h-screen w-full bg-slate-50 text-slate-900 flex items-center justify-center p-4 font-sans">
-      
-      {/* Texture de fond */}
-      <div className="fixed inset-0 pointer-events-none opacity-40 z-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
-      
-      {/* Dégradés d'arrière-plan (Nuance légèrement plus froide/violette pour OMNI si désiré, ou identique) */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-indigo-100 rounded-full mix-blend-multiply filter blur-[80px] opacity-70"></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-slate-200 rounded-full mix-blend-multiply filter blur-[80px] opacity-70"></div>
+    <main className="app-root p-4 sm:p-6 md:p-10">
+      {/* frame */}
+      <div className="mx-auto max-w-[1200px] dr-card overflow-hidden">
+        <div className="flex flex-col md:flex-row">
+
+          {/* sidebar desktop */}
+          <aside className="hidden md:flex w-[84px] flex-col items-center gap-4 p-4 border-r border-black/10">
+            <div className="dr-pill w-11 h-11 flex items-center justify-center">
+              <span className={`${michroma.className} text-[12px] tracking-[0.14em]`}>
+                G
+              </span>
+            </div>
+
+            <div className="w-full h-px bg-black/10" />
+
+            {Array.from({ length: 4 }).map((_, i) => (
+              <button
+                key={i}
+                className="dr-pill w-11 h-11 transition-transform duration-200 hover:scale-[1.03]"
+                aria-label={`nav-${i}`}
+              />
+            ))}
+
+            <div className="flex-1" />
+            <button className="dr-pill w-11 h-11" aria-label="settings" />
+          </aside>
+
+          {/* content */}
+          <div className="flex-1 p-4 sm:p-6 md:p-8">
+            {/* topbar */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-baseline gap-3">
+                <span className={`${michroma.className} text-[16px] tracking-[0.14em]`}>
+                  GENESIS
+                </span>
+                <span className="text-xs tracking-[0.25em] uppercase text-black/50">
+                  système omni
+                </span>
+              </div>
+
+              <div className="flex gap-2">
+                <span className="dr-pill px-4 py-2 text-xs font-semibold">Pré-analyse</span>
+                <span className="dr-pill px-4 py-2 text-xs font-semibold opacity-60">Questionnaire</span>
+                <span className="dr-pill px-4 py-2 text-xs font-semibold opacity-60">Résultats</span>
+              </div>
+            </div>
+
+            <div className="my-6 h-px bg-black/10" />
+
+            {/* grid responsive */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+              {/* main card */}
+              <section className="lg:col-span-2 dr-widget p-5 sm:p-6 md:p-7">
+                <h1 className="text-[22px] sm:text-[24px] font-semibold tracking-tight">
+                  Pré-analyse omni
+                </h1>
+
+                <p className="mt-3 text-[14px] leading-relaxed text-black/70">
+                  Le système établit un point de référence fonctionnel. Les règles suivantes garantissent la cohérence du traitement.
+                </p>
+
+                <div className="mt-5 space-y-4">
+                  {[
+                    {
+                      n: "01.",
+                      t: "Point de référence.",
+                      d: "La situation actuelle est analysée telle qu’elle est. Aucune interprétation n’est appliquée à ce stade.",
+                    },
+                    {
+                      n: "02.",
+                      t: "Corrélation multi-axes.",
+                      d: "Chaque réponse influence l’équilibre global. Les axes sont traités de manière interdépendante.",
+                    },
+                    {
+                      n: "03.",
+                      t: "Précision requise.",
+                      d: "Les réponses doivent refléter la réalité actuelle. Une approximation réduit la fiabilité des résultats.",
+                    },
+                  ].map((x) => (
+                    <div key={x.n} className="dr-pill p-4 sm:p-5">
+                      <div className="flex gap-3">
+                        <span className="font-mono text-black/45">{x.n}</span>
+                        <div className="text-[14px] leading-relaxed text-black/75">
+                          <strong className="text-black">{x.t}</strong>
+                          <br />
+                          {x.d}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* assistant card */}
+              <aside className="dr-widget p-5 sm:p-6 md:p-7 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.25em] text-black/50 font-semibold">
+                      Conditions requises
+                    </p>
+                    <p className="mt-2 text-[14px] leading-relaxed text-black/70">
+                      Vérifiez ces éléments avant de lancer l’analyse.
+                    </p>
+                  </div>
+
+                  <div className="w-10 h-10 rounded-[16px] bg-white/35 border border-white/60 shadow-[0_14px_30px_rgba(0,0,0,0.08)] flex items-center justify-center">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#16A34A]" />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="dr-pill p-4 text-[14px] text-black/75">
+                    Environnement calme et sans distraction.
+                  </div>
+                  <div className="dr-pill p-4 text-[14px] text-black/75">
+                    Disponibilité continue d’environ dix minutes.
+                  </div>
+                </div>
+
+                <div className="h-px bg-black/10" />
+
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-black/50 font-semibold">
+                    Temps estimé
+                  </p>
+                  <p className="mt-2 text-[14px] leading-relaxed text-black/70">
+                    8–12 minutes. Une analyse commencée doit être menée à son terme.
+                  </p>
+                </div>
+              </aside>
+            </div>
+
+            {/* action strip */}
+            <section className="mt-6 dr-widget p-5 sm:p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-black/50 font-semibold">
+                    Initialisation
+                  </p>
+                  <p className="mt-1 text-[14px] text-black/70">
+                    Glissez pour lancer le protocole.
+                  </p>
+                </div>
+
+                <div className="w-full md:max-w-[460px]">
+                  <SwipeButton onSuccess={handleValidation} text="GLISSER POUR INITIALISER" />
+                </div>
+              </div>
+
+              <p className="mt-4 text-[11px] text-center text-black/45 leading-relaxed">
+                L’analyse fournit une lecture fonctionnelle du potentiel. Elle ne constitue ni un diagnostic médical, ni une prescription.
+              </p>
+            </section>
+          </div>
+        </div>
       </div>
 
-      <div className="w-full max-w-[500px] flex flex-col gap-4 relative z-10">
-
-        {/* --- CARTE 1 : IDENTITÉ & TEXTES --- */}
-        <div className="bg-white/80 backdrop-blur-xl border border-white p-6 md:p-8 rounded-[32px] shadow-xl shadow-slate-200/50 flex flex-col items-center space-y-6">
-          
-          {/* Header */}
-          <div className="flex flex-col items-center text-center space-y-1">
-            <span className={`${michroma.className} text-xl md:text-2xl font-bold uppercase tracking-[0.1em] text-slate-900`}>
-              GENESIS
-            </span>
-            <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400">
-              BY STRYV LAB
-            </p>
-          </div>
-
-          <div className="w-full border-t border-slate-200"></div>
-
-          {/* Titre & Textes */}
-          <div className="space-y-6 w-full">
-            <h1 className="text-lg font-semibold tracking-tight text-slate-900 text-center">
-              Pré-analyse IPT™
-            </h1>
-            
-            <div className="text-[13px] leading-relaxed text-slate-600 space-y-4 font-medium text-left">
-              <p>
-                Vous entrez dans une phase de pré-analyse. Cette étape configure le cadre 
-                bioclimatique avant le lancement de l’analyse OMNI. 
-                Aucune donnée n’est encore interprétée à ce stade.
-              </p>
-              <p>
-                L’analyse OMNI™ repose sur une corrélation globale (Physiologie & Environnement). 
-                Chaque paramètre influence directement votre profil final.
-              </p>
-              <p>
-                Certaines réponses nécessitent de consulter vos données récentes (poids, activité). 
-                La précision est primordiale ici.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* --- CARTE 2 : PROTOCOLE --- */}
-        <div className="bg-white/60 backdrop-blur-md border border-white/60 p-6 md:p-8 rounded-[24px] shadow-lg shadow-slate-200/40 space-y-4">
-          <div className="flex items-center gap-3">
-             <div className="w-2.5 h-2.5 rounded-full bg-slate-900 shadow-sm ring-2 ring-white/50"></div>
-             <p className="text-xs font-bold uppercase tracking-wide text-slate-900">
-               Protocole de qualité
-             </p>
-          </div>
-
-          <ul className="text-[13px] text-slate-600 space-y-4 relative pl-2 font-medium text-left">
-            <div className="absolute left-[3px] top-2 bottom-2 w-[1px] bg-slate-300"></div>
-            
-            <li className="pl-4 relative">
-                <span className="absolute left-0 top-2.5 w-1.5 h-[1px] bg-slate-400"></span>
-                Répondez seul(e), sans distraction
-            </li>
-            <li className="pl-4 relative">
-                <span className="absolute left-0 top-2.5 w-1.5 h-[1px] bg-slate-400"></span>
-                Soyez factuel, ne surestimez pas
-            </li>
-            <li className="pl-4 relative">
-                <span className="absolute left-0 top-2.5 w-1.5 h-[1px] bg-slate-400"></span>
-                Ne tentez pas d’anticiper les résultats
-            </li>
-          </ul>
-        </div>
-
-        {/* --- CARTE 3 : ACTION --- */}
-        <div className="bg-white/80 backdrop-blur-xl border border-white p-5 md:p-6 rounded-[24px] shadow-xl shadow-slate-200/50 space-y-5">
-          
-          <div className="space-y-1 pl-1 text-left">
-             <p className="text-[10px] font-bold uppercase tracking-wider bg-white/50 text-slate-500 inline-block px-2 py-1 rounded-md border border-white/60">
-                 Temps estimé : 8-12 min
-             </p>
-             <p className="text-sm font-medium pl-1 text-slate-800">
-                 Une analyse commencée doit être menée à terme.
-             </p>
-          </div>
-
-          {/* Lien vers le runner OMNI */}
-          <Link href="/omni/run" className="block w-full">
-            <button
-              onClick={handleSessionInit}
-              className="w-full py-5 rounded-xl bg-slate-900 text-white text-xs font-bold tracking-[0.15em] uppercase shadow-lg shadow-slate-900/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
-            >
-              LANCER OMNI
-            </button>
-          </Link>
-
-          <p className="text-[9px] text-center leading-relaxed text-slate-400 px-4 font-medium">
-            L’analyse fournit une lecture fonctionnelle du potentiel.
-            Elle ne constitue ni un diagnostic médical, ni une prescription.
-          </p>
-        </div>
-
+      {/* bottom bar mobile (optionnel, dribbble-like) */}
+      <div className="md:hidden mt-4 mx-auto max-w-[1200px] dr-pill p-3 flex justify-center gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <button key={i} className="w-11 h-11 dr-pill" aria-label={`mobile-nav-${i}`} />
+        ))}
       </div>
     </main>
   );

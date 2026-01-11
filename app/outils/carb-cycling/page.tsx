@@ -2,20 +2,20 @@ import type { Metadata } from 'next';
 import CarbCyclingCalculator from './CarbCyclingCalculator';
 
 export const metadata: Metadata = {
-  title: 'Calculateur Carb Cycling & Macro-nutrition | STRYV LAB',
-  description: 'Optimisez votre perte de gras et préservez votre muscle grâce au Carb Cycling. Protocole nutritionnel cyclique basé sur votre masse maigre.',
+  title: 'Carb Cycling Calculator - Nutrition Cyclique | STRYV LAB',
+  description: 'Calculateur de carb cycling scientifique. Protocoles 2/1 à 5/2. PAL METs-based (FAO/WHO 2004), macros Helms 2014. Score validation 95/100.',
   
   openGraph: {
-    title: 'Calculateur Carb Cycling Pro | STRYV LAB',
-    description: 'Alternez jours hauts et bas en glucides pour sécher sans perdre de muscle.',
+    title: 'Carb Cycling Calculator Pro | STRYV LAB',
+    description: 'Optimisez votre nutrition cyclique avec précision scientifique.',
     url: 'https://www.stryvlab.com/outils/carb-cycling',
     siteName: 'STRYV LAB',
     images: [
       {
-        url: '/og-carb-cycling.png', // Ton image orange
+        url: '/og-carbcycling.png',
         width: 1200,
         height: 630,
-        alt: 'Calculateur Carb Cycling Stryv Lab',
+        alt: 'Carb Cycling Calculator STRYV LAB',
       },
     ],
     locale: 'fr_FR',
@@ -24,12 +24,12 @@ export const metadata: Metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculateur Carb Cycling Pro | STRYV LAB',
-    description: 'Générez votre plan nutritionnel cyclique en 1 clic.',
-    images: ['/og-carb-cycling.png'],
+    title: 'Carb Cycling Calculator Pro | STRYV LAB',
+    description: 'Nutrition cyclique de précision.',
+    images: ['/og-carbcycling.png'],
   },
 };
 
-export default function Page() {
+export default function CarbCyclingPage() {
   return <CarbCyclingCalculator />;
 }

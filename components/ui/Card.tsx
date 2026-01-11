@@ -1,36 +1,25 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
-interface CardProps {
-  children: ReactNode;
-  className?: string;
-  hover?: boolean;
+// On étend HTMLAttributes pour accepter onClick, onMouseEnter, id, etc.
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'default' | 'widget';
+  children: React.ReactNode;
 }
 
-export function Card({ children, className = '', hover = true }: CardProps) {
-  const hoverClass = hover ? 'hover:-translate-y-1' : '';
+export function Card({ className, variant = 'default', children, ...props }: CardProps) {
   return (
     <div 
-      className={`glass-card rounded-2xl p-6 transition-all ${hoverClass} ${className}`}
-      style={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: 'none',
-      }}
+      className={cn(
+        "rounded-card p-6 transition-all duration-300",
+        variant === 'default' 
+          ? "bg-surface shadow-soft-out" 
+          : "bg-surface border border-white/50 shadow-soft-out hover:shadow-soft-in",
+        className
+      )} 
+      {...props}
     >
       {children}
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

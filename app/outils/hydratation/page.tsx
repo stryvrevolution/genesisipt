@@ -1,21 +1,21 @@
 import type { Metadata } from 'next';
-import HydratationCalculator from './HydratationCalculator';
+import HydrationCalculator from './HydratationCalculator';
 
 export const metadata: Metadata = {
-  title: 'Calculateur Hydratation & Performance | STRYV LAB',
-  description: 'Calculez vos besoins hydriques quotidiens selon votre poids, votre niveau d\'activité et le climat. Prévention déshydratation et baisse de performance.',
+  title: 'Hydration Calculator - Besoins Hydriques | STRYV LAB',
+  description: 'Calculateur d\'hydratation scientifique. Base EFSA 2010 (35ml/kg). Ajustements ACSM 2007 activité/climat. Prévention déshydratation et optimisation performance.',
   
   openGraph: {
-    title: 'Calculateur Hydratation Pro | STRYV LAB',
+    title: 'Hydration Calculator Pro | STRYV LAB',
     description: 'Combien d\'eau boire vraiment ? Calculez vos besoins précis.',
     url: 'https://www.stryvlab.com/outils/hydratation',
     siteName: 'STRYV LAB',
     images: [
       {
-        url: '/og-hydratation.png', // Ton image cyan
+        url: '/og-hydratation.png',
         width: 1200,
         height: 630,
-        alt: 'Calculateur Hydratation Stryv Lab',
+        alt: 'Hydration Calculator STRYV LAB',
       },
     ],
     locale: 'fr_FR',
@@ -24,12 +24,12 @@ export const metadata: Metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculateur Hydratation Pro | STRYV LAB',
+    title: 'Hydration Calculator Pro | STRYV LAB',
     description: 'Optimisez votre hydratation pour la performance.',
     images: ['/og-hydratation.png'],
   },
 };
 
-export default function Page() {
-  return <HydratationCalculator />;
+export default function HydrationPage() {
+  return <HydrationCalculator />;
 }

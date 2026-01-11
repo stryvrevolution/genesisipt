@@ -1,5 +1,5 @@
 {
-  "name": "genesis-lab",
+  "name": "stryvlab",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "@calcom/embed-react": "^1.5.3",
     "@capacitor/android": "^8.0.0",
     "@capacitor/cli": "^8.0.0",
     "@capacitor/core": "^8.0.0",
@@ -21,11 +22,14 @@
     "@react-three/drei": "^9.56.3",
     "@react-three/fiber": "^8.15.12",
     "@react-three/postprocessing": "^2.15.0",
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.6.1",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
-    "@supabase/supabase-js": "^2.89.0",
+    "@supabase/supabase-js": "^2.90.1",
     "@types/three": "^0.182.0",
     "@vercel/speed-insights": "^1.3.1",
     "clsx": "^2.1.1",
+    "csv-parse": "^6.1.0",
     "framer-motion": "^11.18.2",
     "gsap": "^3.14.2",
     "jspdf": "^4.0.0",
@@ -35,6 +39,7 @@
     "openai": "^6.15.0",
     "postprocessing": "^6.38.1",
     "react": "^18.3.1",
+    "react-calendly": "^4.4.0",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.69.0",
     "recharts": "^3.6.0",
@@ -46,7 +51,7 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
-    "@types/node": "^22.1.0",
+    "@types/node": "^22.19.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",

@@ -2,68 +2,109 @@ import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import Script from 'next/script';
 import './globals.css';
-import './typography.css';
+import GenesisAssistant from '@/components/GenesisAssistant';
 
-// --- CONFIGURATION DES POLICES ---
+
+/* =====================================================
+   FONT CONFIGURATION
+   ===================================================== */
+// 1. LUFGA (Principale / Corps de texte / "lab")
+const lufga = localFont({
+  src: [
+    { path: './fonts/Lufga/Lufga-Regular.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/Lufga/Lufga-Medium.woff2', weight: '500', style: 'normal' },
+    { path: './fonts/Lufga/Lufga-SemiBold.woff2', weight: '600', style: 'normal' },
+  ],
+  variable: '--font-lufga',
+  display: 'swap',
+});
+
+// 2. AZONIX (Logo "S" uniquement)
 const azonix = localFont({
-  src: './fonts/Azonix.otf',
+  src: './fonts/AzonixRegular.woff2',
   variable: '--font-azonix',
   display: 'swap',
 });
 
-const ramabhadra = localFont({
-  src: './fonts/Ramabhadra-Regular.ttf',
-  variable: '--font-ramabhadra',
+// 3. ONEST (Logo "tryv" uniquement)
+const onest = localFont({
+  src: './fonts/Onest/Onest-Bold.woff2',
+  variable: '--font-onest',
   display: 'swap',
 });
 
-const outfit = localFont({
-  src: './fonts/Outfit-VariableFont_wght.ttf',
-  variable: '--font-outfit',
-  display: 'swap',
-});
-
-// --- METADONNÉES SEO (SEO ON-PAGE) ---
+/* =====================================================
+   VIEWPORT
+   ===================================================== */
 export const viewport: Viewport = {
-  themeColor: '#0E0E0E',
+  themeColor: '#ededed',
   width: 'device-width',
   initialScale: 1,
 };
 
+/* =====================================================
+   METADATA — STRYV LAB (STRATÉGIE "LABORATOIRE")
+   ===================================================== */
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.stryvlab.com'),
+
   title: {
-    default: 'STRYV Lab | Coaching Sportif & Analyse Métabolique Mons',
-    template: '%s | STRYV Lab'
+    default: 'STRYV lab — laboratoire d’ingénierie du potentiel humain',
+    template: '%s | STRYV lab',
   },
-  description: 'Centre d\'ingénierie corporelle à Mons. Spécialiste de la perte de poids (IPT), gestion du cortisol et coaching haute performance pour dirigeants.',
-  keywords: ['Coach sportif Mons', 'Analyse IPT', 'Perte de poids Belgique', 'Bilan métabolique', 'Coaching dirigeant', 'Stryv Lab'],
-  authors: [{ name: 'Stryv Lab Team' }],
-  creator: 'Stryv Lab',
-  publisher: 'Stryv Lab Genesis',
+
+  description:
+    "STRYV lab est un laboratoire d’ingénierie du potentiel humain. Nous mesurons, modélisons et orchestrons la transformation à partir de données réelles via des systèmes propriétaires comme l’IPT™, sans promesse, sans standardisation.",
+
+  keywords: [
+    'ingénierie du potentiel humain',
+    'indice de potentiel de transformation',
+    'analyse IPT',
+    'transformation basée sur les données',
+    'systèmes adaptatifs de transformation',
+    'laboratoire de performance humaine',
+    'optimisation long terme',
+    'STRYV lab',
+    'STRYV',
+    'GENESIS',
+    'IPT',
+    'Mons',
+    'Belgique',
+  ],
+
+  authors: [{ name: 'STRYV lab' }],
+  creator: 'STRYV lab',
+  publisher: 'STRYV lab',
+
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
       'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
     },
   },
-  // CORRECTION ICI : Utilisation de 'other' pour les meta tags géo personnalisés
+
+  alternates: {
+    canonical: 'https://www.stryvlab.com',
+  },
+
   other: {
-    'geo.region': 'BE-WHT', // Hainaut/Wallonie
+    'geo.region': 'BE-WHT',
     'geo.placename': 'Mons',
     'geo.position': '50.4542;3.9567',
-    'ICBM': '50.4542, 3.9567'
+    ICBM: '50.4542, 3.9567',
   },
+
   openGraph: {
-    title: 'STRYV Lab | La Science de la Transformation Physique',
-    description: 'Ne devinez plus. Analysez. Coaching sportif basé sur vos données biologiques (IPT) à Mons.',
+    title: 'STRYV lab — laboratoire d’ingénierie du potentiel humain',
+    description:
+      'Nous ne promettons pas la transformation. Nous mesurons si elle est possible.',
     url: 'https://www.stryvlab.com',
-    siteName: 'STRYV Lab',
+    siteName: 'STRYV lab',
     locale: 'fr_BE',
     type: 'website',
     images: [
@@ -71,33 +112,40 @@ export const metadata: Metadata = {
         url: '/images/og-stryv.png',
         width: 1200,
         height: 630,
-        alt: 'Stryv Lab - Ingénierie Métabolique',
+        alt: 'STRYV lab — ingénierie du potentiel humain',
       },
     ],
   },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: 'STRYV lab — laboratoire d’ingénierie du potentiel humain',
+    description:
+      'Mesurer avant d’agir. Orchestrer plutôt que forcer.',
+    images: ['/images/og-stryv.png'],
+  },
 };
 
-// --- DONNÉES STRUCTURÉES (SCHEMA.ORG) ---
+/* =====================================================
+   STRUCTURED DATA — SCHEMA.ORG
+   ===================================================== */
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "HealthClub",
+      "@type": ["Organization", "ResearchOrganization", "ProfessionalService"],
       "@id": "https://www.stryvlab.com/#organization",
-      "name": "Stryv Lab - Ingénierie Métabolique",
-      "alternateName": ["Stryv Lab", "Stryv Genesis"],
-      "description": "Centre d'expertise en transformation physique et métabolique à Mons. Analyse IPT et coaching High-Ticket.",
+      "name": "STRYV lab",
+      "alternateName": ["STRYV", "STRYV Genesis", "STRYV Lab Genesis"],
+      "description":
+        "Laboratoire d’ingénierie du potentiel humain développant des systèmes propriétaires de mesure et d’orchestration de la transformation.",
       "url": "https://www.stryvlab.com",
       "logo": "https://www.stryvlab.com/logo-stryv.png",
-      "priceRange": "€€€",
-      "telephone": "+32472238612", 
-      "email": "contact@stryvlab.com",
+      "image": "https://www.stryvlab.com/images/og-stryv.png",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Boulevard Président Kennedy",
         "addressLocality": "Mons",
         "postalCode": "7000",
-        "addressRegion": "Wallonie",
         "addressCountry": "BE"
       },
       "geo": {
@@ -105,67 +153,57 @@ const jsonLd = {
         "latitude": 50.4542,
         "longitude": 3.9567
       },
-      "areaServed": ["Mons", "Bruxelles", "Hainaut", "Wallonie"],
+      "areaServed": "BE",
+      "knowsAbout": [
+        "ingénierie du potentiel humain",
+        "indice de potentiel de transformation",
+        "systèmes adaptatifs",
+        "adhérence comportementale",
+        "optimisation long terme",
+        "systèmes propriétaires de mesure du potentiel",
+        "modélisation adaptative de la transformation humaine",
+        "évaluation de capacité de transformation"
+      ],
       "sameAs": [
         "https://www.instagram.com/stryvlab",
         "https://www.linkedin.com/company/stryvlab"
-      ],
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Services Stryv",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Analyse IPT (Diagnostic)"
-            },
-            "price": "35.00",
-            "priceCurrency": "EUR"
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Coaching OMNI Elite"
-            },
-            "price": "650.00",
-            "priceCurrency": "EUR"
-          }
-        ]
-      }
+      ]
     },
     {
       "@type": "WebSite",
       "@id": "https://www.stryvlab.com/#website",
       "url": "https://www.stryvlab.com",
-      "name": "Stryv Lab",
+      "name": "STRYV lab",
+      "publisher": {
+        "@id": "https://www.stryvlab.com/#organization"
+      },
       "inLanguage": "fr-BE"
     }
   ]
 };
 
-interface RootLayoutProps {
-  children: React.ReactNode;
-}
-
+/* =====================================================
+   ROOT LAYOUT
+   ===================================================== */
 export default function RootLayout({
   children,
-}: RootLayoutProps) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="fr">
-      <body
-        className={`${azonix.variable} ${ramabhadra.variable} ${outfit.variable} font-outfit antialiased bg-[#0E0E0E] text-white`}
-      >
+    // Injection des 3 variables de police pour utilisation CSS globale
+    <html lang="fr" className={`${lufga.variable} ${azonix.variable} ${onest.variable}`}>
+      <body className="antialiased min-h-screen bg-background text-primary">
         {children}
-        
-        {/* INJECTION DU SCHEMA.ORG */}
+
+        {/* SCHEMA.ORG */}
         <Script
           id="stryv-schema"
           type="application/ld+json"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <GenesisAssistant />
       </body>
     </html>
   );

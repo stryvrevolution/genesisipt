@@ -1,31 +1,27 @@
-import { ReactNode } from 'react';
+import React from 'react';
+import { cn } from '@/lib/utils';
 
-interface SectionHeaderProps {
-  label?: string;
+interface HeaderProps {
   title: string;
-  description?: string | ReactNode;
+  subtitle?: string;
+  align?: 'left' | 'center';
   className?: string;
 }
 
-export function SectionHeader({ label, title, description, className = '' }: SectionHeaderProps) {
+export function SectionHeader({ title, subtitle, align = 'left', className }: HeaderProps) {
   return (
-    <div className={`section-header ${className}`}>
-      {label && <p className="text-label">{label}</p>}
-      <h2 className="text-title">{title}</h2>
-      {description && (
-        <p className="text-body-lg">{description}</p>
+    <div className={cn("flex flex-col gap-3", align === 'center' && "items-center text-center", className)}>
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-[2px] bg-accent" />
+        <h2 className="text-2xl md:text-3xl font-medium text-primary tracking-tight">
+          {title}
+        </h2>
+      </div>
+      {subtitle && (
+        <p className="text-secondary text-sm md:text-base max-w-2xl leading-relaxed">
+          {subtitle}
+        </p>
       )}
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

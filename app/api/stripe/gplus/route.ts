@@ -9,14 +9,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export async function POST() {
   try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    // 👇 CORRECTION CRITIQUE : On force l'adresse du site en ligne
+    // (Cela empêche le retour vers localhost après paiement)
+    const baseUrl = 'https://stryvlab.com';
 
     // Création session Stripe — PROTOCOLE G+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
 
-      // 👇 AJOUTE CETTE LIGNE POUR ACTIVER LE CHAMP CODE PROMO
+      // ✅ Codes promo activés
       allow_promotion_codes: true,
 
       line_items: [
@@ -31,7 +32,7 @@ export async function POST() {
                 'un rapport de potentiel de transformation et une adaptation stratégique ' +
                 'basée sur le potentiel mesuré.',
             },
-            unit_amount: 17500, // 175 €
+            unit_amount: 25000, // 250,00 €
           },
           quantity: 1,
         },
@@ -39,7 +40,7 @@ export async function POST() {
 
       mode: 'payment',
 
-      // ✅ MÉTADONNÉES CANONIQUES
+      // ✅ MÉTADONNÉES
       metadata: {
         product_type: 'protocol',
         formula: 'gplus',
@@ -50,9 +51,8 @@ export async function POST() {
         version: 'v1',
       },
       
-
+      // URLs de redirection utilisant la bonne adresse
       success_url: `${baseUrl}/checkout-success/gplus?session_id={CHECKOUT_SESSION_ID}`,
-
       cancel_url: `${baseUrl}/analyse-ipt`,
     });
 

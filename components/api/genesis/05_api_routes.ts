@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
 // -------------------------------------------------------
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { calculateIPTScore } from '@/lib/genesis/scoring-engine';
+import { calculateIPTScore } from '@/app/lib/genesis/scoring-engine';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

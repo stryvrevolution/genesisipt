@@ -1,919 +1,803 @@
 'use client';
 
-// --- 1. IMPORTS ---
-import { useState, useEffect, useRef } from 'react';
-import { ArrowUpRight, Lock, Activity, ChevronDown, Check, Play, Menu, X } from 'lucide-react';
-import { Utensils, BarChart3, Moon, RefreshCw, Droplet, HeartPulse, Dumbbell } from 'lucide-react';
+// --- 1. IMPORTS SYSTEM ---
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
-// Composants locaux
+// --- 2. IMPORTS UI (DESIGN SYSTEM) ---
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import SwipeButton from '@/components/ui/SwipeButton';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Accordion } from '@/components/ui/Accordion';
+import Link from 'next/link';
+import CalConsultationModal from '@/components/booking/CalConsultationModal';
+import { useEffect, useRef } from 'react';
+
+// --- 3. IMPORTS ICONS (LUCIDE) ---
+import { 
+  Activity, 
+  Flame, 
+  Users, 
+  Brain,
+  Dna,
+  Check,
+  Moon, 
+  ArrowRight,
+  Phone,
+  MessageCircle,
+  ScanSearch,
+  CheckCircle2
+} from 'lucide-react';
+
+// --- 4. IMPORTS MÉTIER ---
 import IPTQuestionnaire from '@/components/genesis/IPTQuestionnaire';
-import { CalendlyButton } from '@/components/CalendlyButton';
-import GenesisAssistant from '@/components/GenesisAssistant';
-import FaqMetabolicSchema from '@/components/seo/FaqMetabolicSchema';
-import MetabolicFAQ from '@/components/ui/MetabolicFAQ';
 
-// --- 2. COMPOSANT PRINCIPAL ---
 export default function AnalyseIPTPage() {
+  const router = useRouter();
   
-  // --- STATES & REFS ---
+  // --- STATES ---
   const [startIPT, setStartIPT] = useState(false);
-  const [isStripeLoading, setIsStripeLoading] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const handleStripePaymentOmni = async () => {
+  const [loadingStripe, setLoadingStripe] = useState<string | null>(null);
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+
+  // --- LOGIQUE PAIEMENT ---
+  const handlePayment = async (type: 'ipt' | 'gplus' | 'omni') => {
+    setLoadingStripe(type);
     try {
-      const res = await fetch('/api/stripe/omni', {
+      const endpoints = {
+        ipt: '/api/stripe',
+        gplus: '/api/stripe/gplus',
+        omni: '/api/stripe/omni'
+      };
+
+      const res = await fetch(endpoints[type], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
-  
       const data = await res.json();
-  
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error('Erreur paiement OMNI', error);
-    }
-  };
-  
-  
-  // États d'animation
-  const [ctaVisible, setCtaVisible] = useState(false);
-  const [failureGraphVisible, setFailureGraphVisible] = useState(false);
-  const [growthGraphVisible, setGrowthGraphVisible] = useState(false);
-
-  // Refs
-  const ctaRef = useRef<HTMLDivElement | null>(null);
-  const failureRef = useRef<HTMLDivElement | null>(null);
-  const growthRef = useRef<HTMLDivElement | null>(null);
-
-  // --- LOGIQUE ---
-  const handleStripePayment = async () => {
-    setIsStripeLoading(true);
-    try {
-      const res = await fetch('/api/stripe', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await res.json();
+      
       if (data.url) window.location.href = data.url;
     } catch (error) {
-      console.error(error);
-      setIsStripeLoading(false);
+      console.error(`Erreur paiement ${type}`, error);
+    } finally {
+      setLoadingStripe(null);
     }
   };
-  const handleStripePaymentGPlus = async () => {
-    setIsStripeLoading(true);
-    try {
-      const res = await fetch('/api/stripe/gplus', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error('Erreur paiement G+', error);
-      setIsStripeLoading(false);
-    }
-  };
+  // --- COLLE ÇA AU DÉBUT DE TA FONCTION ---
+  const [lines, setLines] = useState([
+    "> INITIALIZING GENESIS CORE...",
+    "> CONNECTING TO BIOMETRIC DB...",
+    "...",
+    "> LOADING MODULES:",
+    "  [OK] Metabolic_Rate (HOMA-IR)",
+    "  [OK] Neuro_Profile (Braverman)",
+    "  [OK] HPA_Axis_Load",
+    "...",
+    "> DETECTED ROOT CAUSES:",
+    "  ! WARNING: Cortisol Spike (AM)",
+    "  ! ALERT: Dopamine deficiency",
+    "...",
+    "> CALCULATING PROBABILITY...",
+    "  Processing... 100%",
+    "> RESULT: 87.4% SUCCESS",
+    "_",
+    "> REBOOTING SYSTEM..."
+  ]);
   
-  const handleStripePaymentIPT = async () => {
-    try {
-      const res = await fetch('/api/stripe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error('Erreur paiement analyse IPT', error);
-    }
-  };
-  
-  
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const indexRef = useRef(0);
 
+  // Ce qui fait bouger le texte
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (entry.target === ctaRef.current) setCtaVisible(true);
-            if (entry.target === failureRef.current) setFailureGraphVisible(true);
-            if (entry.target === growthRef.current) setGrowthGraphVisible(true);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    if (ctaRef.current) observer.observe(ctaRef.current);
-    if (failureRef.current) observer.observe(failureRef.current);
-    if (growthRef.current) observer.observe(growthRef.current);
-    
-    return () => observer.disconnect();
+    const interval = setInterval(() => {
+      setLines(prev => {
+        const nextLine = prev[indexRef.current % prev.length];
+        indexRef.current++;
+        return [...prev.slice(-15), nextLine]; // Garde les 15 dernières lignes
+      });
+    }, 600); // Vitesse
+    return () => clearInterval(interval);
   }, []);
 
-  // --- RENDER ---
+  // Ce qui fait scroller vers le bas
+  useEffect(() => {
+    if(terminalRef.current) terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+  }, [lines]);
+// ----------------------------------------
+
   return (
-    <main className="relative bg-[#303030] text-white overflow-x-hidden font-outfit selection:bg-[#DAFA72] selection:text-black">
+    <main className="min-h-screen w-full bg-background text-primary selection:bg-accent selection:text-white pb-24">
 
-      {/* HEADER */}
-      <header className="absolute top-0 left-0 right-0 z-50">
-        <div className="flex items-center justify-between px-6 md:px-16 pt-6 md:pt-8">
-          <a href="/" className="block cursor-pointer group relative z-50">
-            <div className="leading-none tracking-wide flex items-baseline gap-[6px] text-white transition-transform duration-200 group-hover:scale-[1.02]">
-              <span 
-                className="text-[22px] md:text-[26px] tracking-wider"
-                style={{ fontFamily: 'var(--font-azonix)', textTransform: 'uppercase' }}
-              >
-                STRYV
-              </span>
-              <span 
-                className="text-[22px] md:text-[25px] opacity-60" 
-                style={{ fontFamily: 'var(--font-outfit)', fontWeight: 300, textTransform: 'lowercase' }}
-              >
-                lab
-              </span>
-            </div>
-          </a>
+      {/* Modal Consultation */}
+      <CalConsultationModal 
+        isOpen={showConsultationModal} 
+        onClose={() => setShowConsultationModal(false)} 
+      />
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-4">
-            <button 
-              onClick={() => document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' })}
-              className="flex items-center justify-center h-[38px] text-white/60 text-[13px] px-6 rounded-xl bg-[#252525] border border-white/5 transition-all duration-200 hover:border-white/20 hover:text-white cursor-pointer"
-            >
-              Nos solutions
-            </button>
-            <CalendlyButton
-              text="Consultation"
-              className="flex items-center justify-center h-[38px] text-black text-[13px] px-6 rounded-xl bg-[#DAFA72] transition-transform duration-200 hover:scale-[1.05] active:scale-[0.98] cursor-pointer font-medium"
+      {/* =========================================
+          1. HEADER RESPONSIVE avec bouton consultation
+          ========================================= */}
+      <header className="w-full py-6 md:py-8 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50 transition-all duration-300 pointer-events-none">
+        
+        {/* LOGO ADAPTATIF */}
+        <div 
+          className="pointer-events-auto cursor-pointer group flex items-center" 
+          onClick={() => router.push('/')}
+        >
+             <Image 
+               src="/images/Stryvlab-logo.svg" 
+               alt="STRYV lab" 
+               width={0}
+               height={0}
+               sizes="100vw"
+               className="
+                 w-auto 
+                 h-[50px] md:h-[50px] 
+                 object-contain 
+                 transition-all duration-300 ease-out
+                 group-hover:scale-105 group-hover:opacity-90
+               "
+               priority
+             />
+        </div>
+
+        {/* NAVIGATION DESKTOP : STYLE "DOCK FLOTTANT" */}
+        <nav className="hidden md:flex items-center gap-3 bg-surface p-2 rounded-full shadow-soft-out absolute left-1/2 -translate-x-1/2 pointer-events-auto border border-white/40">
+          
+          <button 
+            onClick={() => router.push('/outils')}
+            className="px-6 py-2.5 rounded-full text-sm font-bold tracking-wide text-secondary hover:text-primary hover:bg-surface-light hover:shadow-soft-in transition-all duration-200"
+          >
+            Outils
+          </button>
+
+          <button 
+            onClick={() => document.getElementById('pricing')?.scrollIntoView({behavior: 'smooth'})}
+            className="px-6 py-2.5 rounded-full text-sm font-bold tracking-wide text-secondary hover:text-primary hover:bg-surface-light hover:shadow-soft-in transition-all duration-200"
+          >
+            Protocoles
+          </button>
+          
+        </nav>
+
+        {/* WIDGET DROITE (STATUS + CONSULTATION) */}
+        <div className="flex items-center gap-3 pointer-events-auto">
+          
+          {/* BOUTON CONSULTATION (Desktop) */}
+          <button
+            onClick={() => setShowConsultationModal(true)}
+            className="hidden md:flex items-center gap-2 h-[48px] px-6 bg-accent text-white rounded-btn shadow-lg shadow-accent/30 hover:shadow-accent/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 font-bold text-sm"
+          >
+            <Phone size={16} />
+            <span>Consultation</span>
+          </button>
+
+
+          {/* BOUTON CONSULTATION (Mobile - Icône seule) */}
+          <button
+            onClick={() => setShowConsultationModal(true)}
+            className="md:hidden w-[42px] h-[42px] bg-accent text-white rounded-btn shadow-lg shadow-accent/30 hover:shadow-accent/50 active:shadow-accent/20 transition-all duration-200 flex items-center justify-center"
+          >
+            <Phone size={18} />
+          </button>
+        
+
+          {/* Menu Button */}
+          <button className="
+            w-[42px] h-[42px] md:w-[48px] md:h-[48px] 
+            rounded-btn 
+            bg-surface text-secondary 
+            shadow-soft-out 
+            hover:text-primary hover:-translate-y-0.5
+            active:shadow-soft-in active:translate-y-0 active:bg-surface-light
+            transition-all duration-200 ease-out
+            flex items-center justify-center
+          ">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+               <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" strokeLinejoin="round"/>
+             </svg>
+          </button>
+        </div>
+      </header>
+
+      {/* =========================================
+          2. HERO SECTION avec CTA consultation
+          ========================================= */}
+      <section className="relative flex flex-col items-center justify-center pt-12 pb-32 px-6">
+        <h1 className="text-center max-w-4xl mx-auto mb-6">
+          <span className="block text-4xl md:text-6xl font-medium tracking-tight text-primary leading-[1.1] mb-2">
+          Le dernier système<br />que vous utiliserez.
+          </span>
+        </h1>
+
+        <p className="text-center text-secondary text-base md:text-lg max-w-lg mx-auto leading-relaxed mb-12">
+          Le système <strong>GENESIS IPT™</strong> analyse <strong>273 points de données forensiques</strong> pour modéliser le seul protocole mathématiquement viable pour votre biologie.
+        </p>
+
+        {/* DOUBLE CTA : Analyse + Consultation */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-md">
+          <div className="w-full">
+            <SwipeButton 
+              onSuccess={() => setStartIPT(true)} 
+              text="INITIALISER L'ANALYSE" 
             />
           </div>
-
-          {/* Mobile Nav Toggle */}
-          <button 
-            className="md:hidden relative z-50 p-2 text-white"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X /> : <Menu />}
-          </button>
+        
         </div>
+        
+        <p className="mt-4 text-[10px] uppercase tracking-widesthover: text-primary/45">
+          Système propriétaire. Pas de coaching standardisé.
+        </p>
+      </section>
 
-        {/* 👇 MENU MOBILE : COMPACT & TECH STYLE 👇 */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#303030] animate-fade-in-up">
-          
-          {/* 1. HEADER (Plus compact) */}
-          <div className="flex justify-between items-center p-5 border-b border-white/5 bg-[#303030]">
-            <div>
-              <h3 className="text-base font-bold text-white leading-none tracking-wide">MENU</h3>
-              <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1.5">Navigation rapide</p>
-            </div>
-            
-            <button 
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2 bg-[#252525] border border-white/5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all active:scale-90"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-
-          {/* 2. CONTENU (Sans footer, sans labels superflus) */}
-          <div className="p-5 space-y-3">
-            
-            {/* CARTE 1 : NOS SOLUTIONS */}
-            <button 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="w-full group bg-[#252525] border border-white/5 hover:border-white/20 rounded-xl p-4 text-left transition-all active:scale-[0.98] flex items-center justify-between"
-            >
-              <div className="pr-4">
-                <h4 className="text-lg font-bold text-white mb-1 group-hover:text-[#DAFA72] transition-colors">Nos solutions</h4>
-                <p className="text-xs text-white/40 font-medium leading-relaxed">
-                  De l'analyse forensic de pointe au coaching 3.0
-                </p>
-              </div>
-              
-              {/* Flèche parfaitement alignée et corrigée */}
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/30 group-hover:text-white group-hover:bg-white/10 transition-all">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14"></path>
-                  <path d="M12 5l7 7-7 7"></path>
-                </svg>
-              </div>
-            </button>
-
-            {/* CARTE 2 : BOUTON RDV */}
-            <div className="bg-[#252525] border border-white/5 rounded-xl p-1">
-              <CalendlyButton
-                text="Prendre RDV"
-                className="w-full py-3.5 bg-[#DAFA72] hover:bg-[#ccec60] text-[#1A1A1A] rounded-lg font-bold text-sm uppercase tracking-wide transition-all active:scale-[0.99] shadow-lg flex items-center justify-center gap-2"
-              />
-            </div>
-
-          </div>
-          
-          {/* Zone vide en bas pour éviter le chevauchement avec le chat si besoin */}
-          <div className="flex-1 min-h-[50px]"></div>
-
-        </div>
-      )}
-    </header>
-
-      {/* HERO SECTION (ÉPURÉE & H1 CORRIGÉ) */}
-      <section className="relative min-h-screen flex items-center pt-20 md:pt-0">
-        <video
-          className="absolute inset-0 w-full h-full object-cover opacity-70 mix-blend-overlay z-0 pointer-events-none"
-          src="/videos/hero.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
+      {/* =========================================
+          3. SECTION FORENSIQUE (Design: System Audit Log)
+          ========================================= */}
+      <section className="px-6 md:px-12 max-w-7xl mx-auto mb-32">
+        <SectionHeader 
+          title="Matrice de Détection" 
+          subtitle="Notre moteur ne cherche pas à vous motiver. Il audite 15 points de friction biologiques précis pour isoler la cause de l'échec."
+          className="mb-12"
         />
-        <div className="absolute inset-0 bg-[#303030]/50 z-0 pointer-events-none" />
 
-        <div className="relative z-20 w-full px-6 sm:px-10 md:px-16 lg:px-24">
-          <div className="max-w-5xl">
-            
-            {/* BADGE SUPPRIMÉ ICI */}
-
-            {/* H1 CORRIGÉ : Utilisation explicite de font-outfit pour autoriser les minuscules */}
-            <h1 className="font-outfit text-white/40 font-light leading-[0.95] tracking-[-0.02em] 
-  text-3xl sm:text-5xl md:text-[clamp(2.5rem,4.5vw,4.5rem)] 
-  mb-8">
-  
-  {/* Première phrase : Très fine, presque un murmure */}
-  <span className="block whitespace-normal md:whitespace-nowrap">
-    Ne pliez pas votre vie à un régime.
-  </span>
-  
-  {/* Espaceur */}
-  <span className="block h-2 md:h-0"></span>
-
-  {/* Deuxième phrase : Plus présente, avec l'accent couleur */}
-  <span className="text-white font-normal block whitespace-normal md:whitespace-nowrap">
-    Alignez votre biologie sur <span className="text-[#DAFA72]">vos ambitions.</span>
-  </span>
-</h1>
-
-<p className="mt-8 text-white/50 text-sm md:text-base max-w-lg leading-relaxed border-l border-[#DAFA72]/40 pl-5">
-  <span className="inline-flex items-start gap-1 text-white/90 font-medium">
-    STRYV lab
-    <sup className="text-[9px] leading-none relative top-0 opacity-60 font-sans">TM</sup>
-  </span>
-  <span className="mx-1 text-white/20">|</span>
-  Analyse de potentiel (IPT).
-  <br className="mb-2" />
-  La transformation n’est pas une lutte contre soi-même, c’est une équation.
-  Cessez de deviner. <span className="text-white/80">Commencez à piloter.</span>
-</p>
-
-
-
-            <div className="mt-10 md:mt-12 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 w-full sm:w-auto">
-              <button
-                onClick={() => setStartIPT(true)}
-                className="w-full sm:w-auto group relative inline-flex items-center justify-center gap-3 px-8 py-[14px] rounded-xl bg-[#DAFA72]/10 border border-[#DAFA72]/20 text-[#DAFA72] text-[13px] font-medium tracking-wide backdrop-blur-sm transition-all duration-500 hover:bg-[#DAFA72] hover:text-[#1A1A1A] hover:border-[#DAFA72] cursor-pointer"
-              >
-                <span className="relative z-10">Lancer l'analyse IPT</span>
-                <ArrowUpRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
-              </button>
-
-              <a
-                href="/outils"
-                className="w-full sm:w-auto group inline-flex items-center justify-center gap-3 px-8 py-[14px] rounded-xl bg-[#252525] border border-white/5 text-white/60 text-[13px] tracking-wide backdrop-blur-sm transition-all duration-500 hover:bg-[#404040] hover:text-white hover:border-white/10 cursor-pointer"
-              >
-                <span>Accès outils open source</span>
-              </a>
-            </div>
+        <div className="bg-surface rounded-card shadow-soft-out border border-white/60 overflow-hidden">
+          
+          {/* Header du Tableau Technique */}
+          <div className="hidden md:grid grid-cols-12 gap-4 px-8 py-4 bg-surface-light border-b border-gray-200/50 text-[10px] font-bold text-muted uppercase tracking-widest">
+            <div className="col-span-3">Système Biologique</div>
+            <div className="col-span-5">Root Causes (Variables bloquantes)</div>
+            <div className="col-span-4">Méthode de détection</div>
           </div>
+
+          <div className="divide-y divide-gray-200/50">
+
+            {/* 1. MÉTALBOLISME */}
+            <div className="grid md:grid-cols-12 gap-6 px-8 py-8 items-start hover:bg-surface-light/30 transition-colors">
+              <div className="col-span-3 flex items-center gap-3">
+                <div className="p-2 bg-orange-100/50 text-orange-600 rounded-lg">
+                  <Flame size={18} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-primary">Métabolisme</h4>
+                  <span className="text-[10px] text-muted uppercase tracking-wide">Infrastructure Énergétique</span>
+                </div>
+              </div>
+              <div className="col-span-5 space-y-2">
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Résistance à l'insuline :</span> La cellule refuse le nutriment.</p>
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Inflexibilité métabolique :</span> Incapacité à brûler le gras au repos.</p>
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Dysfonction Mitochondriale :</span> Production d'ATP défaillante.</p>
+              </div>
+              <div className="col-span-4 flex items-center gap-2 text-xs text-muted font-mono bg-surface-light/50 p-2 rounded border border-gray-100">
+                <ScanSearch size={14} className="text-accent" />
+                Score HOMA-IR (est.) + Glycemic Load Analysis
+              </div>
+            </div>
+
+            {/* 2. HORMONAL */}
+            <div className="grid md:grid-cols-12 gap-6 px-8 py-8 items-start hover:bg-surface-light/30 transition-colors">
+              <div className="col-span-3 flex items-center gap-3">
+                <div className="p-2 bg-red-100/50 text-red-600 rounded-lg">
+                  <Activity size={18} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-primary">Hormonal (HPA)</h4>
+                  <span className="text-[10px] text-muted uppercase tracking-wide">Gestion du Stress</span>
+                </div>
+              </div>
+              <div className="col-span-5 space-y-2">
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Cortisol Chronique :</span> État catabolique permanent (stockage viscéral).</p>
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Fatigue Surrénalienne :</span> Épuisement des catécholamines.</p>
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Déséquilibre Oestrogénique :</span> Rétention d'eau et inflammation.</p>
+              </div>
+              <div className="col-span-4 flex items-center gap-2 text-xs text-muted font-mono bg-surface-light/50 p-2 rounded border border-gray-100">
+                <ScanSearch size={14} className="text-accent" />
+                Allostatic Load Index + Cycle Tracking
+              </div>
+            </div>
+
+            {/* 3. NEUROCHIMIE */}
+            <div className="grid md:grid-cols-12 gap-6 px-8 py-8 items-start hover:bg-surface-light/30 transition-colors">
+              <div className="col-span-3 flex items-center gap-3">
+                <div className="p-2 bg-purple-100/50 text-purple-600 rounded-lg">
+                  <Brain size={18} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-primary">Neurochimie</h4>
+                  <span className="text-[10px] text-muted uppercase tracking-wide">Adhérence & Volonté</span>
+                </div>
+              </div>
+              <div className="col-span-5 space-y-2">
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Déficit Dopaminergique :</span> Besoin de récompense immédiate (craving).</p>
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Carence Sérotonine :</span> Instabilité de l'humeur et sommeil haché.</p>
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Profil GABA faible :</span> Anxiété systémique empêchant la récupération.</p>
+              </div>
+              <div className="col-span-4 flex items-center gap-2 text-xs text-muted font-mono bg-surface-light/50 p-2 rounded border border-gray-100">
+                <ScanSearch size={14} className="text-accent" />
+                Braverman Assessment Type 2
+              </div>
+            </div>
+
+            {/* 4. TRAINING & ENV */}
+            <div className="grid md:grid-cols-12 gap-6 px-8 py-8 items-start hover:bg-surface-light/30 transition-colors">
+              <div className="col-span-3 flex items-center gap-3">
+                <div className="p-2 bg-blue-100/50 text-blue-600 rounded-lg">
+                  <Dna size={18} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-primary">Performance</h4>
+                  <span className="text-[10px] text-muted uppercase tracking-wide">Stimulus & Récupération</span>
+                </div>
+              </div>
+              <div className="col-span-5 space-y-2">
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Junk Volume :</span> Entraînement excessif sans signal anabolique.</p>
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Dette de Récupération :</span> Le SNC ne suit plus la charge.</p>
+                <p className="text-sm text-secondary"><span className="text-primary font-medium">• Friction Environnementale :</span> Complexité logistique trop élevée.</p>
+              </div>
+              <div className="col-span-4 flex items-center gap-2 text-xs text-muted font-mono bg-surface-light/50 p-2 rounded border border-gray-100">
+                <ScanSearch size={14} className="text-accent" />
+                MRV Calculation + GSE Score
+              </div>
+            </div>
+
+          </div>
+          
+          {/* Footer technique */}
+          <div className="bg-surface-light px-8 py-4 border-t border-gray-200/50 flex justify-between items-center">
+             <span className="text-[10px] font-mono text-muted uppercase tracking-widest">
+               Diagnostic Protocol v2.4
+             </span>
+             <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></div>
+                <span className="text-[10px] font-bold text-accent uppercase tracking-wide">
+                  Scanner Actif
+                </span>
+             </div>
+          </div>
+
         </div>
       </section>
 
-      {/* SECTION 1 : ARCHITECTURE DE L'ÉCHEC */}
-      <section className="bg-[#303030] px-6 sm:px-10 md:px-16 lg:px-24 py-24 md:py-32 relative overflow-hidden border-t border-white/5">
-        <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-white/5 rounded-full blur-[100px] md:blur-[120px] pointer-events-none" />
+      {/* =========================================
+          SECTION 4 : LE MOTEUR ANIMÉ
+          ========================================= */}
+      <section className="px-6 md:px-12 max-w-7xl mx-auto mb-32">
+        <div className="bg-surface rounded-card p-8 md:p-12 shadow-soft-out border border-white/5 relative overflow-hidden">
+          
+          {/* Décoration Fond */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-16 lg:mb-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            
+            {/* GAUCHE : TEXTE */}
             <div>
-              <div className="text-[#DAFA72] text-xs font-bold tracking-widest uppercase mb-6 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-[#DAFA72] rounded-full animate-pulse"/>
-                Analyse forensique
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+                <span className="text-xs font-mono text-accent">ENGINE_STATUS: ONLINE</span>
               </div>
-              <h2 className="font-outfit text-white text-3xl sm:text-4xl md:text-6xl font-medium leading-[1.05] mb-8 tracking-tight">
-                L'Architecture <br/>
-                de l'échec.
+              <h2 className="text-3xl md:text-4xl font-medium text-primary mb-6">
+                Nous ne devinons pas.<br/>Nous mesurons.
               </h2>
-              <p className="text-white/60 text-base md:text-lg leading-relaxed border-l border-[#DAFA72]/30 pl-6">
-                Vous pensez manquer de volonté ? Faux. <br/>
-                Vos échecs précédents sont le résultat de **mécanismes de protection biologique**. 
-                Quand l'insuline et le cortisol sont déréglés, votre corps refuse physiologiquement de brûler du gras.
+              <p className="text-secondary text-sm leading-relaxed mb-8 max-w-md">
+                GENESIS n'est pas un questionnaire. C'est un moteur d'analyse forensique. Il croise votre biologie, votre neurologie et votre environnement.
               </p>
+              
+              <div className="grid grid-cols-2 gap-4">
+                 <div className="bg-background/50 p-4 rounded-lg border border-primary/5">
+                    <span className="block text-3xl font-mono text-primary font-bold">273</span>
+                    <span className="text-[10px] uppercase tracking-widest text-muted">Data Points</span>
+                 </div>
+                 <div className="bg-background/50 p-4 rounded-lg border border-primary/5">
+                    <span className="block text-3xl font-mono text-primary font-bold">0.57</span>
+                    <span className="text-[10px] uppercase tracking-widest text-muted">Coeff. Prédiction (r²)</span>
+                 </div>
+              </div>
             </div>
 
-            {/* GRAPHIQUE ÉCHEC (UPGRADED - Thème Alerte) */}
-            <div ref={failureRef} className="relative bg-[#252525] rounded-2xl p-6 md:p-8 border border-white/5 shadow-2xl group cursor-crosshair overflow-hidden">
-              
-              {/* Header du Graphique */}
-              <div className="relative flex justify-between items-end mb-10 z-10">
-                <div>
-                  <span className="text-xs font-bold text-white uppercase tracking-wider">Réponse Insuline / Cortisol</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-red-500 font-mono text-xl font-bold leading-none">CRITIQUE</div>
-                  <div className="text-[9px] text-white/30 font-mono uppercase">Statut Métabolique</div>
-                </div>
-              </div>
-
-              {/* ZONE DU GRAPHIQUE */}
-              <div className="h-[220px] flex items-end justify-between gap-2 relative z-10 pb-6 border-b border-white/5">
-                
-                {/* Ligne de Seuil Inflammatoire */}
-                <div className="absolute top-[30%] w-full h-[1px] bg-red-500/20 border-t border-dashed border-red-500/40 flex items-center z-0">
-                  <span className="text-[9px] font-bold text-red-400 bg-[#252525] px-1 ml-1 uppercase tracking-widest">Seuil Inflammatoire</span>
-                </div>
-
-                {/* Les Barres de Données */}
-                {[40, 65, 90, 45, 30, 80, 100, 40, 20, 50, 70, 30].map((h, i) => {
-                  // Logique : Si la barre dépasse 75%, c'est un pic critique (Rouge)
-                  const isCritical = h > 75;
-
-                  return (
-                     <div key={i} className="relative w-full h-full flex items-end group/bar">
-                       <div 
-                         style={{ 
-                           height: failureGraphVisible ? `${h}%` : '5%', 
-                           transitionDelay: `${i * 50}ms`,
-                           transitionDuration: '1000ms'
-                         }} 
-                         className={`w-full rounded-sm relative min-w-[8px] transition-all ease-out group-hover:scale-x-110
-                         ${isCritical 
-                           ? 'bg-gradient-to-t from-red-500/20 via-red-500 to-red-500 shadow-[0_0_15px_-5px_rgba(239,68,68,0.5)]' 
-                           : 'bg-gradient-to-t from-white/5 to-white/30'
-                         }`}
-                       >
-                          {/* Scanline */}
-                          <div className="absolute top-0 left-0 w-full h-[1px] bg-white opacity-0 group-hover/bar:opacity-100 shadow-[0_0_10px_white]" />
-                       </div>
-                       
-                       {/* Tooltip */}
-                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 group-hover/bar:opacity-100 transition-all duration-200 pointer-events-none z-20">
-                         <div className="bg-[#1A1A1A] border border-white/20 text-white text-[9px] font-mono px-2 py-1 rounded shadow-xl whitespace-nowrap">
-                           {i * 2 + 8}:00 <span className="text-red-500"> // </span> {h} mg/dL
-                         </div>
-                         <div className="w-[1px] h-3 bg-white/20"></div>
-                       </div>
-                     </div>
-                   )
-                })}
-              </div>
-
-              {/* Footer Graphique */}
-              <div className="mt-4 flex justify-between items-center text-[9px] font-mono uppercase tracking-widest text-white/20">
-                <div className="flex items-center gap-2">
-                  <span>08:00</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-red-500">14:00 (Crash)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>20:00</span>
-                </div>
-              </div>
-              
-              <div className="mt-6 pt-4 border-t border-white/5 flex flex-wrap gap-4">
-                <div className="px-3 py-1 bg-[#303030] border border-red-500/20 rounded text-[10px] text-red-400 uppercase font-medium">Zone critique détectée</div>
-                <div className="px-3 py-1 bg-[#303030] border border-white/10 rounded text-[10px] text-white/30 uppercase">Flexibilité métabolique: 12%</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {[
-              { title: "Le Crash de 14h", sub: "Hypoglycémie Réactionnelle", desc: "Envie de dormir après le repas ? C'est votre insuline qui s'effondre.", path: "M13 10V3L4 14h7v7l9-11h-7z" },
-              { title: "Le Ventre Cortisol", sub: "Axe HPA Déréglé", desc: "Vous mangez peu mais stockez au ventre ? Le stress bloque la perte de gras.", path: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" },
-              { title: "Le Réveil de 3h", sub: "Pic Cortisol Inversé", desc: "Réveils nocturnes = Panique glycémique. Pas d'hormone de croissance.", path: "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" }
-            ].map((item, i) => (
-              <div key={i} className="group bg-[#252525] p-6 md:p-8 rounded-[20px] border border-white/5 hover:border-white/20 transition-all duration-500">
-                <div className="w-12 h-12 rounded-full bg-[#303030] flex items-center justify-center mb-6 group-hover:bg-[#DAFA72] transition-colors duration-500">
-                  <svg className="w-6 h-6 text-white/60 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.path} />
-                  </svg>
-                </div>
-                <h3 className="text-white text-lg md:text-xl font-azonix mb-3">{item.title}</h3>
-                <p className="text-white/60 text-sm leading-relaxed">
-                  <span className="text-[#DAFA72] text-[10px] font-bold uppercase tracking-wider block mb-2">{item.sub}</span>
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* ================= SECTION 2 : HYPERTROPHIE (ENRICHIE) ================= */}
-      <section className="bg-[#303030] px-6 sm:px-10 md:px-16 lg:px-24 py-24 md:py-32 border-t border-white/5 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            
-            {/* VISUALISATION GRAPHIQUE (ÉPURÉE) */}
-            <div ref={growthRef} className="order-2 lg:order-1 relative bg-[#252525] rounded-2xl p-6 md:p-8 border border-white/5 shadow-2xl group cursor-crosshair overflow-hidden">
-              
-              {/* Header du Graphique (Simplifié) */}
-              <div className="relative flex justify-between items-end mb-10 z-10">
-                <div>
-                  <span className="text-xs font-bold text-white uppercase tracking-wider">SPM / Synthèse</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-[#DAFA72] font-mono text-xl font-bold leading-none">+12.4%</div>
-                  <div className="text-[9px] text-white/30 font-mono uppercase">Gain Masse Maigre</div>
-                </div>
-              </div>
-
-              {/* ZONE DU GRAPHIQUE */}
-              <div className="h-[220px] flex items-end justify-between gap-2 relative z-10 pb-6 border-b border-white/5">
-                
-                {/* Ligne de Limite Génétique */}
-                <div className="absolute top-[45%] w-full h-[1px] bg-red-500/20 border-t border-dashed border-red-500/40 flex items-center z-0">
-                  <span className="text-[9px] font-bold text-red-400/60 bg-[#252525] px-1 ml-1 uppercase tracking-widest">Seuil Génétique Théorique</span>
-                </div>
-
-                {/* Les Barres de Données */}
-                {[25, 35, 30, 45, 40, 55, 50, 65, 80, 75, 90, 100].map((height, i) => {
-                  const isBreakthrough = height > 55;
-                  
-                  return (
-                    <div key={i} className="relative w-full h-full flex items-end group/bar">
-                      {/* La Barre */}
-                      <div 
-                        style={{ 
-                          height: growthGraphVisible ? `${height}%` : '0%', 
-                          transitionDelay: `${i * 80}ms`,
-                          transitionDuration: '1000ms'
-                        }} 
-                        className={`w-full rounded-sm relative min-w-[8px] transition-all ease-out group-hover:scale-x-110
-                        ${isBreakthrough 
-                          ? 'bg-gradient-to-t from-[#DAFA72]/20 via-[#DAFA72] to-[#DAFA72] shadow-[0_0_15px_-5px_rgba(218,250,114,0.5)]' 
-                          : 'bg-gradient-to-t from-white/5 to-white/30'
-                        }`}
-                      >
-                         {/* Scanline au survol */}
-                         <div className="absolute top-0 left-0 w-full h-[1px] bg-white opacity-0 group-hover/bar:opacity-100 shadow-[0_0_10px_white]" />
-                      </div>
-
-                      {/* Tooltip */}
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-0 group-hover/bar:opacity-100 transition-all duration-200 pointer-events-none z-20">
-                        <div className="bg-[#1A1A1A] border border-white/20 text-white text-[9px] font-mono px-2 py-1 rounded shadow-xl whitespace-nowrap">
-                          S{i+1} <span className="text-[#DAFA72]"> // </span> {height * 1.2}KG
-                        </div>
-                        <div className="w-[1px] h-3 bg-white/20"></div>
-                      </div>
+            {/* DROITE : ÉCRAN ANIMÉ */}
+            <div 
+              ref={terminalRef}
+              className="bg-[#1a1a1a] p-6 rounded-xl shadow-inner font-mono text-xs text-gray-300 relative overflow-hidden h-72 overflow-y-auto"
+            >
+               {/* Ligne verte scanner */}
+               <div className="absolute top-0 left-0 w-full h-1 bg-accent/50 z-10 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+               
+               {/* Le Code qui défile */}
+               <div className="relative z-0 space-y-1">
+                  {lines.map((line, i) => (
+                    <div key={i} className={`${line.includes('!') ? 'text-yellow-500' : line.includes('>') ? 'text-accent' : ''}`}>
+                      {line}
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Footer Graphique */}
-              <div className="mt-4 flex justify-between items-center text-[9px] font-mono uppercase tracking-widest text-white/20">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-white/20 rounded-full"></div>
-                  <span>Activation</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#DAFA72]/50 rounded-full"></div>
-                  <span className="text-[#DAFA72]/50">Surcharge</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-[#DAFA72] rounded-full animate-pulse"></div>
-                  <span className="text-[#DAFA72]">Pic</span>
-                </div>
-              </div>
+                  ))}
+                  <span className="inline-block w-2 h-4 bg-accent ml-1 animate-pulse"></span>
+               </div>
             </div>
 
-            {/* CONTENU TEXTE (VERSION ENRICHIE SCIENCE) */}
-            <div className="order-1 lg:order-2">
-              <div className="text-[#DAFA72] text-xs font-bold tracking-widest uppercase mb-6 flex items-center gap-2">
-                <span className="w-2 h-2 bg-[#DAFA72] rounded-full"/>
-                Ingénierie Cellulaire
-              </div>
-              
-              <h2 className="font-outfit text-white text-3xl sm:text-4xl md:text-6xl font-medium leading-[1.05] mb-8 tracking-tight">
-                Architecture <br/>
-                anabolique.
-              </h2>
-              
-              <p className="text-white/60 text-base md:text-lg leading-relaxed border-l border-[#DAFA72]/30 pl-6 mb-10">
-                L'hypertrophie n'est pas du hasard, c'est une cascade biochimique. <br/>
-                Nous ne "poussons" pas simplement de la fonte. Nous manipulons les voies de signalisation **mTORC1** et la synthèse protéique (MPS) pour forcer l'adaptation cellulaire, au-delà de votre génétique initiale.
-              </p>
-
-              <ul className="space-y-6">
-                <li className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#252525] flex items-center justify-center shrink-0 border border-white/10">
-                    <span className="text-[#DAFA72] font-bold text-lg">M</span>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-azonix text-sm mb-1">Mécano-transduction</h4>
-                    <p className="text-white/50 text-xs leading-relaxed">Conversion du stimulus mécanique en signal chimique. Nous calibrons la tension pour saturer les récepteurs membranaires sans épuiser le SNC.</p>
-                  </div>
-                </li>
-
-                <li className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#252525] flex items-center justify-center shrink-0 border border-white/10">
-                    <span className="text-[#DAFA72] font-bold text-lg">S</span>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-azonix text-sm mb-1">Signalisation mTOR</h4>
-                    <p className="text-white/50 text-xs leading-relaxed">Activation précise du régulateur central de croissance via le seuil de Leucine et la manipulation des fenêtres d'insuline post-effort.</p>
-                  </div>
-                </li>
-
-                <li className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#252525] flex items-center justify-center shrink-0 border border-white/10">
-                    <span className="text-[#DAFA72] font-bold text-lg">U</span>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-azonix text-sm mb-1">Unités Motrices</h4>
-                    <p className="text-white/50 text-xs leading-relaxed">Recrutement sélectif des fibres de Type II (High-Threshold) via une gestion algorithmique du RPE (Rate of Perceived Exertion).</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
       </section>
-      {/* ================= SECTION OUTILS (POSITIONNÉE AVANT LES PRIX) ================= */}
-      <section className="bg-[#303030] px-6 sm:px-10 md:px-16 lg:px-24 py-24 md:py-32 border-t border-white/5">
-        <div className="max-w-5xl mb-16">
-          <div className="text-[#DAFA72] text-xs font-bold tracking-widest uppercase mb-6">Lab open source</div>
-          <h2 className="font-outfit text-white text-3xl sm:text-4xl md:text-6xl font-medium leading-[1.1] mb-8">
-            Outils &<br />Calculateurs
-          </h2>
-          <p className="text-white/60 text-lg leading-relaxed max-w-3xl font-outfit">
-            Accédez gratuitement aux algorithmes utilisés par nos coachs.
-            Des outils précis pour tracker votre composition corporelle et vos performances.
+
+      {/* =========================================
+          5. TABLEAU COMPARATIF (AUTORITÉ)
+          ========================================= */}
+      <section className="px-6 md:px-12 max-w-5xl mx-auto mb-32">
+        <SectionHeader 
+          title="Standards du Marché" 
+          subtitle="Coaching Traditionnel vs Ingénierie Forensique."
+          align="center"
+          className="mb-12"
+        />
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr>
+                <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-muted font-medium w-1/4">Critère</th>
+                <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-muted font-medium w-1/3">Coaching Classique</th>
+                <th className="py-4 px-6 text-[10px] uppercase tracking-widest text-accent font-bold bg-accent/5 rounded-t-lg w-1/3">
+                  STRYV LAB (Genesis)
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200/50">
+              
+              <tr>
+                <td className="py-6 px-6 font-medium text-sm text-primary">Approche</td>
+                <td className="py-6 px-6 text-sm text-secondary">Basée sur l'opinion ou l'expérience</td>
+                <td className="py-6 px-6 text-sm text-primary font-medium bg-accent/5 border-l-2 border-accent">
+                  Data Forensique (273 points)
+                </td>
+              </tr>
+
+              <tr>
+                <td className="py-6 px-6 font-medium text-sm text-primary">Nutrition</td>
+                <td className="py-6 px-6 text-sm text-secondary">Macros génériques / Menu fixe</td>
+                <td className="py-6 px-6 text-sm text-primary font-medium bg-accent/5 border-l-2 border-accent">
+                  Calculée selon Insuline & Neurotype
+                </td>
+              </tr>
+
+              <tr>
+                <td className="py-6 px-6 font-medium text-sm text-primary">Psychologie</td>
+                <td className="py-6 px-6 text-sm text-secondary">"Il faut avoir de la volonté"</td>
+                <td className="py-6 px-6 text-sm text-primary font-medium bg-accent/5 border-l-2 border-accent">
+                  Profilage Neurochimique (Braverman)
+                </td>
+              </tr>
+
+              <tr>
+                <td className="py-6 px-6 font-medium text-sm text-primary">Adaptation</td>
+                <td className="py-6 px-6 text-sm text-secondary">Réactive (quand on stagne)</td>
+                <td className="py-6 px-6 text-sm text-primary font-medium bg-accent/5 border-l-2 border-accent rounded-b-lg">
+                  Prédictive (anticipation de l'échec)
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+     {/* =========================================
+    SECTION LAB OPEN SOURCE (Fixed Dimensions)
+    ========================================= */}
+<section id="open-lab" className="px-6 md:px-12 py-24 mb-32 bg-background">
+  
+  <div className="max-w-6xl mx-auto">
+
+    <SectionHeader 
+      title="Lab Open Source" 
+      subtitle="Accès gratuit aux calculateurs utilisés dans nos protocoles. Ces outils fournissent des métriques isolées."
+      className="mb-16"
+    />
+
+    {/* AJOUT : 'items-stretch' force les enfants de la grille à avoir la même hauteur */}
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16 items-stretch">
+      
+      {/* CARTE 1 : BODY FAT */}
+      <Link href="/outils/body-fat" className="group h-full">
+        <div className="h-full bg-surface rounded-card shadow-soft-out p-8 transition-all duration-300 hover:shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff] hover:-translate-y-1 cursor-pointer flex flex-col">
+          
+          <div className="flex items-center justify-between mb-6">
+            <Users size={24} className="text-primary" />
+            <span className="text-[9px] font-mono text-muted font-bold uppercase tracking-wider">Open Source</span>
+          </div>
+
+          <h3 className="text-lg font-bold text-primary mb-2 group-hover:text-accent transition-colors">
+            Body Fat %
+          </h3>
+
+          <p className="text-xs text-secondary leading-relaxed mt-auto">
+            Navy Method & Jackson-Pollock
           </p>
         </div>
+      </Link>
 
-        <div className="grid md:grid-cols-3 gap-6">
+      {/* CARTE 2 : MACROS */}
+      <Link href="/outils/macros" className="group h-full">
+        <div className="h-full bg-surface rounded-card shadow-soft-out p-8 transition-all duration-300 hover:shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff] hover:-translate-y-1 cursor-pointer flex flex-col">
           
-          {/* CARTE 1 */}
-          <a href="/outils/1rm" className="group relative bg-[#252525] rounded-[24px] p-8 border border-white/5 hover:border-white/20 transition-all flex flex-col h-full">
-            <div className="flex justify-between items-start mb-10">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-[#303030] flex items-center justify-center text-white">
-                  <Dumbbell className="w-7 h-7 stroke-[1.5]" />
-                </div>
-              </div>
-              <span className="font-mono text-[10px] text-white/10 font-bold group-hover:text-[#DAFA72]">01</span>
-            </div>
-            <div className="relative flex-1">
-              <h3 className="text-xl text-white mb-4 font-azonix">Calculateur 1RM</h3>
-              <p className="text-white/50 text-[13px] leading-relaxed font-light border-t border-white/5 pt-4 font-outfit">
-                Estimez votre charge maximale théorique pour calibrer vos cycles.
-              </p>
-            </div>
-            <div className="relative mt-auto pt-6 flex items-center justify-between group/btn">
-              <span className="text-[11px] font-medium text-white/30 group-hover:text-white transition-colors uppercase tracking-wide">Calculer</span>
-              <ArrowUpRight className="w-5 h-5 text-[#DAFA72] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-            </div>
-          </a>
-
-          {/* CARTE 2 */}
-          <a href="/outils/cycle-sync" className="group relative bg-[#252525] rounded-[24px] p-8 border border-white/5 hover:border-white/20 transition-all flex flex-col h-full">
-            <div className="flex justify-between items-start mb-10">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-[#303030] flex items-center justify-center text-white">
-                  <Moon className="w-7 h-7 stroke-[1.5]" />
-                </div>
-              </div>
-              <span className="font-mono text-[10px] text-white/10 font-bold group-hover:text-[#DAFA72]">02</span>
-            </div>
-            <div className="relative flex-1">
-              <h3 className="text-xl text-white mb-4 font-azonix">Cycle Sync</h3>
-              <p className="text-white/50 text-[13px] leading-relaxed font-light border-t border-white/5 pt-4 font-outfit">
-              Respectez votre physiologie féminine. Transformez votre cycle féminin en atout : une programmation ajustée aux phases hormonales.
-              </p>
-            </div>
-            <div className="relative mt-auto pt-6 flex items-center justify-between group/btn">
-              <span className="text-[11px] font-medium text-white/30 group-hover:text-white transition-colors uppercase tracking-wide">Optimiser</span>
-              <ArrowUpRight className="w-5 h-5 text-[#DAFA72] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-            </div>
-          </a>
-
-          {/* CARTE 3 */}
-          <a href="/outils" className="group relative bg-[#252525] rounded-[24px] p-8 border border-dashed border-white/10 hover:border-[#DAFA72] hover:bg-[#303030] transition-all duration-500 flex flex-col items-center justify-center text-center h-full min-h-[250px]">
-            <div className="mb-8 flex flex-wrap justify-center gap-3 opacity-50 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all">
-               <div className="p-2 bg-[#303030] rounded-lg"><Utensils size={18} strokeWidth={2} /></div>
-               <div className="p-2 bg-[#303030] rounded-lg"><BarChart3 size={18} strokeWidth={2} /></div>
-               <div className="p-2 bg-[#303030] rounded-lg"><HeartPulse size={18} strokeWidth={2} /></div>
-            </div>
-            <h3 className="text-sm text-white mb-2 font-azonix uppercase tracking-widest">Bibliothèque</h3>
-            <p className="text-white/40 text-xs font-light">Calculateurs macros, TDEE, Body Fat.</p>
-          </a>
-
-        </div>
-      </section>
-
-      {/* ================= SECTION OFFRES (PRIX) ================= */}
-      <section id="services-section" className="relative px-6 sm:px-10 md:px-16 lg:px-24 py-24 md:py-32 bg-[#303030] text-white border-t border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-20">
-            <div className="text-[#DAFA72] text-xs font-bold tracking-widest uppercase mb-6">Écosystème GENESIS</div>
-            <h2 className="font-outfit text-white font-medium leading-[0.95] tracking-[-0.02em] text-4xl sm:text-5xl md:text-[5.5rem] mb-8 md:mb-16">
-              Nos solutions <br/> d'accompagnement
-            </h2>
-            <div className="text-white/60 text-lg leading-relaxed max-w-3xl">
-              De l'audit métabolique ponctuel à l'optimisation continue de la performance.
-            </div>
+          <div className="flex items-center justify-between mb-6">
+            <Activity size={24} className="text-primary" />
+            <span className="text-[9px] font-mono text-muted font-bold uppercase tracking-wider">Open Source</span>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 items-stretch auto-rows-fr">
+          <h3 className="text-lg font-bold text-primary mb-2 group-hover:text-accent transition-colors">
+            Kcal & Macros
+          </h3>
 
-            
-            {/* 1. RAPPORT IPT (Card #252525) */}
-<div className="flex flex-col h-full p-8 rounded-[24px] bg-[#252525] border border-white/5 hover:border-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
-  
-  {/* HEADER */}
-  <div className="mb-8">
-    <h3
-      className="text-2xl text-white mb-2"
-      style={{ fontFamily: 'var(--font-azonix)' }}
-    >
-      RAPPORT IPT
-    </h3>
-    <span className="text-white/40 text-[11px] uppercase tracking-wider font-light">
-      Bilan métabolique complet
-    </span>
+          <p className="text-xs text-secondary leading-relaxed mt-auto">
+            Mifflin-St Jeor + Katch-McArdle
+          </p>
+        </div>
+      </Link>
+
+      {/* CARTE 3 : CYCLE SYNC */}
+      <Link href="/outils/cycle-sync" className="group h-full">
+        <div className="h-full bg-surface rounded-card shadow-soft-out p-8 transition-all duration-300 hover:shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff] hover:-translate-y-1 cursor-pointer flex flex-col">
+          
+          <div className="flex items-center justify-between mb-6">
+            <Moon size={24} className="text-primary" />
+            <span className="text-[9px] font-mono text-accent font-bold uppercase tracking-wider">Open Source</span>
+          </div>
+
+          <h3 className="text-lg font-bold text-primary mb-2 group-hover:text-accent transition-colors">
+            Cycle Sync
+          </h3>
+
+          <p className="text-xs text-secondary leading-relaxed mt-auto">
+            Protocole hormonal adaptatif
+          </p>
+        </div>
+      </Link>
+
+      {/* CARTE 4 : TOUS LES OUTILS */}
+      <Link href="/outils" className="group h-full">
+        <div className="h-full bg-surface rounded-card shadow-soft-out p-8 transition-all duration-300 hover:shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff] hover:-translate-y-1 cursor-pointer flex flex-col items-center justify-center text-center">
+          
+          <div className="mb-4 p-3 bg-surface-light rounded-full shadow-soft-in group-hover:scale-110 transition-transform duration-300">
+            <ArrowRight size={24} className="text-accent" />
+          </div>
+
+          <h3 className="text-lg font-bold text-primary mb-2 group-hover:text-accent transition-colors">
+            Tous les outils
+          </h3>
+
+          <p className="text-xs text-secondary leading-relaxed">
+            Carb Cycling, HR Zones, 1RM, Hydratation & plus
+          </p>
+        </div>
+      </Link>
+
+    </div>
+
+    <div className="text-center">
+      <p className="text-sm text-secondary mb-6 max-w-xl mx-auto">
+        Pour un diagnostic forensique complet et un protocole d'intervention : <strong className="text-primary">GENESIS IPT™</strong>
+      </p>
+      
+      <a href="#pricing">
+        <Button variant="primary">
+          Découvrir GENESIS
+        </Button>
+      </a>
+    </div>
+
   </div>
-
-  {/* PRIX */}
-  <div className="flex items-baseline gap-1 mb-8">
-    <span
-      className="text-4xl text-white font-light"
-      style={{ fontFamily: 'var(--font-outfit)' }}
-    >
-      35€
-    </span>
-  </div>
-
-  <div className="w-full h-[1px] bg-white/5 mb-8" />
-
-  {/* CONTENU */}
-  <ul className="flex-1 space-y-4 text-[14px] text-white/60 font-light mb-8">
-    <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
-      Analyse IPT (collecte & modélisation)
-    </li>
-    <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
-      Calcul de l’indice de potentiel de transformation (IPT™)
-    </li>
-    <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
-      Rapport de potentiel de transformation
-    </li>
-  </ul>
-
-  {/* FOOTER ALIGNÉ */}
-  <div className="mt-8 h-[160px] flex flex-col justify-between">
-    {/* Description avec hauteur min pour alignement */}
-    <p className="mb-3 text-[11px] text-white/40 leading-relaxed min-h-[34px]">
-      Vous payez pour une analyse et un rapport d’interprétation.
-      Aucun programme ni transformation n’est inclus à ce stade.
-    </p>
-
-    <button
-      onClick={handleStripePaymentIPT}
-      className="w-full py-4 rounded-xl border border-white/10 text-white/60 text-[13px] hover:bg-white hover:text-black transition-all duration-300"
-    >
-      Accéder à l’analyse IPT
-    </button>
-
-    <p className="mt-3 text-[11px] text-white/30 leading-relaxed min-h-[32px]">
-      Après paiement, vous accédez au questionnaire d’analyse IPT.
-      Le rapport est généré à partir de vos données et livré selon les délais indiqués.
-    </p>
-  </div>
-</div>
-
-
-{/* 2. G+ (Card #404040 - Active) */}
-<div className="flex flex-col h-full p-8 rounded-[24px] bg-[#404040] border border-white/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl relative overflow-hidden">
-  
-  <div className="absolute top-0 left-0 w-full h-1 bg-[#DAFA72]"></div>
-
-  {/* HEADER */}
-  <div className="mb-8">
-    <h3
-      className="text-2xl text-white mb-2"
-      style={{ fontFamily: 'var(--font-azonix)' }}
-    >
-      PROTOCOL G+
-    </h3>
-    <span className="text-white/60 text-[11px] uppercase tracking-wider font-light">
-      Programme ultra personnalisé
-    </span>
-  </div>
-
-  {/* PRIX */}
-  <div className="flex items-baseline gap-1 mb-8">
-    <span
-      className="text-4xl text-white font-light"
-      style={{ fontFamily: 'var(--font-outfit)' }}
-    >
-      175€
-    </span>
-    <span className="text-white/40 text-xs font-light">
-      / 6 semaines
-    </span>
-  </div>
-
-  <div className="w-full h-[1px] bg-white/10 mb-8" />
-
-  {/* CONTENU */}
-  <ul className="flex-1 space-y-4 text-[14px] text-white/80 font-light mb-8">
-    <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
-      Adaptation stratégique basée sur votre IPT
-    </li>
-    <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
-      Priorisation des leviers à potentiel élevé
-    </li>
-    <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
-      Ajustements continus selon l’évolution de l’IPT
-    </li>
-  </ul>
-
-  {/* FOOTER ALIGNÉ */}
-  <div className="mt-8 h-[160px] flex flex-col justify-between">
-    {/* Hauteur min identique à IPT pour alignement */}
-    <p className="mb-3 text-[11px] text-white/40 leading-relaxed min-h-[34px]">
-      Ce paiement active le protocole G+ et inclut une analyse IPT complète.
-      le protocole est adapté uniquement après évaluation.
-    </p>
-
-    {/* BOUTON HARMONISÉ (Pas de bold, pas d'uppercase, style fin) */}
-    <button
-      onClick={handleStripePaymentGPlus}
-      disabled={isStripeLoading}
-      className={`w-full py-4 rounded-xl bg-white text-[#1A1A1A] text-[13px] transition-all duration-300 hover:bg-[#DAFA72] ${
-        isStripeLoading ? 'opacity-70' : ''
-      }`}
-    >
-      Activer le protocole G+
-    </button>
-
-    <p className="mt-3 text-[10px] text-white/30 leading-relaxed min-h-[32px]">
-      Après paiement, vous serez redirigé vers le questionnaire
-      d’analyse IPT, indispensable pour adapter le protocole.
-    </p>
-  </div>
-</div>
-
-
-{/* 3. OMNI (Card #303030 - Elite) */}
-<div className="relative flex flex-col h-full p-8 rounded-[24px] bg-[#303030] border border-[#DAFA72]/30 shadow-lg transition-all duration-300 hover:-translate-y-2">
-  
-  <div className="absolute top-8 right-8">
-    <span className="text-[#DAFA72] text-[10px] font-bold tracking-widest uppercase border border-[#DAFA72]/30 px-2 py-1 rounded">
-      Elite
-    </span>
-  </div>
-
-  <div className="mb-8">
-    <h3 className="text-2xl text-white mb-2" style={{ fontFamily: 'var(--font-azonix)' }}>
-      OMNI
-    </h3>
-    <span className="text-white/40 text-[11px] uppercase tracking-wider font-light">
-      Optimisation continue & ingénierie du potentiel
-    </span>
-  </div>
-
-  <div className="flex items-baseline gap-1 mb-8">
-    <span className="text-4xl text-white font-light" style={{ fontFamily: 'var(--font-outfit)' }}>
-      650€
-    </span>
-    <span className="text-white/40 text-xs font-light">
-      / 12 semaines
-    </span>
-  </div>
-
-  <div className="w-full h-[1px] bg-white/10 mb-8" />
-
-  {/* MODIFICATION ICI : Points verts (#DAFA72) au lieu de blancs */}
-  <ul className="flex-1 space-y-4 text-[14px] text-white/60 font-light mb-8">
-    <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
-      Optimisation continue du potentiel de transformation
-    </li>
-    <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
-      Élévation progressive de l’indice IPT dans le temps
-    </li>
-    <li className="flex items-center gap-3">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#DAFA72]" />
-      Recalibrage stratégique selon l’évolution du système
-    </li>
-  </ul>
-
-  {/* FOOTER ALIGNÉ */}
-  <div className="mt-8 h-[160px] flex flex-col justify-between">
-    {/* Ajout de min-h-[34px] et mb-3 pour aligner avec les autres cartes */}
-    <p className="mb-3 text-[11px] text-white/40 leading-relaxed min-h-[34px]">
-      OMNI s’adresse aux profils nécessitant une optimisation
-      continue et une supervision stratégique avancée.
-    </p>
-    {/* lien admission omni */}
-<div className="mb-3 text-center">
-  <a
-    href="/omni/admission"
-    className="text-[10px] text-white/40 hover:text-white underline underline-offset-4 transition-colors"
-  >
-    Conditions d’admission au protocole OMNI
-  </a>
-</div>
-
-
-    {/* BOUTON HARMONISÉ (Pas de bold, pas d'uppercase, style fin) */}
-    <button
-  onClick={handleStripePaymentOmni}
-  className="flex items-center justify-center w-full py-4 rounded-xl bg-[#DAFA72] hover:bg-white text-[#1A1A1A] text-[13px] transition-all duration-200 shadow-[0_0_15px_-5px_rgba(218,250,114,0.4)]"
->
-Démarrer l’admission OMNI
-</button>
-
-
-    {/* Ajout de mt-3 et min-h-[32px] pour aligner le bas */}
-    <p className="mt-3 text-[10px] text-white/30 leading-relaxed text-center min-h-[32px]">
-    Le paiement déclenche le processus d’admission.
-    Un appel stratégique obligatoire est requis avant toute activation.
-    </p>
-  </div>
-</div>
-  </div> {/* fin grid */}
-</div> {/* fin max-w-7xl */}
 </section>
 
-      {/* ================= FAQ SECTION (JUSTE APRÈS LES OFFRES) ================= */}
-      <MetabolicFAQ />
+      {/* =========================================
+          SECTION CONSULTATION (Avant Pricing)
+          ========================================= */}
+      <section className="px-6 md:px-12 max-w-4xl mx-auto mb-32">
+        <div className="bg-surface rounded-card p-8 md:p-12 shadow-soft-out text-center relative overflow-hidden">
+          
+          {/* Accent visuel */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-accent rounded-full" />
 
-      {/* ================= SECTION FINALE (CTA) ================= */}
-      <section className="bg-[#303030] px-6 sm:px-10 md:px-16 lg:px-24 py-32 border-t border-white/5">
-        <div className="max-w-4xl">
-          <h2 className="text-[#6D6D6D] font-medium leading-[0.95] tracking-[-0.02em] text-4xl sm:text-5xl md:text-[5.5rem] mb-12 md:mb-16">
-            Votre transformation<br />est une science, pas un combat.
-          </h2>
-          <button 
-            onClick={() => setStartIPT(true)} 
-            className="w-full sm:w-auto inline-flex items-center justify-center text-black text-[13px] px-8 py-4 rounded-xl bg-[#DAFA72] transition-transform duration-200 hover:scale-[1.05] active:scale-[0.98] cursor-pointer font-bold"
+          <div className="mb-6">
+            <div className="w-16 h-16 mx-auto rounded-full bg-accent/10 flex items-center justify-center mb-4">
+              <MessageCircle size={28} className="text-accent" />
+            </div>
+            <h2 className="text-2xl font-bold text-primary mb-3">
+              Échangez avec un expert STRYV
+            </h2>
+            <p className="text-sm text-secondary leading-relaxed max-w-lg mx-auto">
+              Questions sur GENESIS ? Besoin de conseils ? Nos coachs sont disponibles pour un échange personnalisé gratuit.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setShowConsultationModal(true)}
+            className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white rounded-btn shadow-lg shadow-accent/30 hover:shadow-accent/50 hover:-translate-y-1 active:translate-y-0 transition-all duration-200 font-bold text-sm"
           >
-            Commencer le diagnostic IPT
+            <Phone size={18} />
+            <span>Réserver une consultation gratuite</span>
           </button>
+
+          <p className="mt-4 text-xs text-primary/45">
+            30 minutes • Visioconférence • Sans engagement
+          </p>
+
         </div>
       </section>
 
-      {/* ================= FOOTER (#252525) ================= */}
-      <footer className="relative z-10 bg-[#252525] text-white/40 py-12 px-6 sm:px-10 md:px-16 lg:px-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-          <div className="text-[11px] tracking-wide font-light">© {new Date().getFullYear()} STRYV lab - Genesis.</div>
-          <div className="flex flex-wrap justify-center items-center gap-6 text-[11px] tracking-wide uppercase">
-            <a href="/mentions-legales" className="hover:text-white transition-colors">Mentions</a>
-            <a href="/confidentialite" className="hover:text-white transition-colors">Confidentialité</a>
-            <a href="/cgv" className="hover:text-white transition-colors">CGV</a>
-          </div>
+      {/* =========================================
+    6. PRICING & PROTOCOLES
+    ========================================= */}
+<section id="pricing" className="px-6 md:px-12 max-w-7xl mx-auto mb-32">
+  <SectionHeader 
+    title="Protocoles d'Intervention" 
+    subtitle="Cessez de lutter contre votre biologie. Initialisez le système."
+    className="mb-12"
+  />
+
+  <div className="grid md:grid-cols-3 gap-6">
+    
+    <Card variant="default" className="flex flex-col h-full">
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-primary mt-1">Rapport IPT™</h3>
+      </div>
+      <div className="text-3xl font-light text-primary mb-6">
+        35€ <span className="text-sm text-muted font-normal">/ one-shot</span>
+      </div>
+      <ul className="flex-1 space-y-3 mb-8">
+        <li className="text-sm text-secondary flex gap-2"><Check size={16} className="text-accent"/>Analyse métabolique complète</li>
+        <li className="text-sm text-secondary flex gap-2"><Check size={16} className="text-accent"/>Score de Potentiel & Risques</li>
+        <li className="text-sm text-secondary flex gap-2"><Check size={16} className="text-accent"/>Détection Root Causes</li>
+      </ul>
+      
+      <Link href="/checkout/ipt" className="w-full mt-auto">
+        <Button variant="secondary" className="w-full">
+          Obtenir mon rapport
+        </Button>
+      </Link>
+    </Card>
+
+    <Card variant="default" className="flex flex-col h-full border-2 border-accent/10 relative">
+      <div className="absolute top-0 right-0 bg-accent text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl rounded-tr-[12px]">
+        SYSTÈME RECOMMANDÉ
+      </div>
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-primary mt-1">Système G+</h3>
+      </div>
+      <div className="text-3xl font-light text-primary mb-6">
+        250€ <span className="text-sm text-muted font-normal">/ 6 sem.</span>
+      </div>
+      <ul className="flex-1 space-y-3 mb-8">
+        <li className="text-sm text-primary font-medium flex gap-2"><Check size={16} className="text-accent"/>Rapport IPT Complet Inclus</li>
+        <li className="text-sm text-secondary flex gap-2"><Check size={16} className="text-accent"/>Programmation Neuro-Métabolique</li>
+        <li className="text-sm text-secondary flex gap-2"><Check size={16} className="text-accent"/>Ajustements Algorithmiques Hebdo</li>
+      </ul>
+      
+      <Link href="/checkout/gplus" className="w-full mt-auto">
+        <Button variant="primary" className="w-full">
+          Activer le système
+        </Button>
+      </Link>
+    </Card>
+
+    <Card variant="default" className="flex flex-col h-full">
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-primary mt-1">OMNI Hybrid</h3>
+      </div>
+      <div className="text-3xl font-light text-primary mb-6">
+        800€ <span className="text-sm text-muted font-normal">/ 12 sem.</span>
+      </div>
+      <ul className="flex-1 space-y-3 mb-8">
+        <li className="text-sm text-secondary flex gap-2"><Check size={16} className="text-accent"/>Supervision Biologique Totale</li>
+        <li className="text-sm text-secondary flex gap-2"><Check size={16} className="text-accent"/>Ingénierie de l'Hypertrophie</li>
+        <li className="text-sm text-secondary flex gap-2"><Check size={16} className="text-accent"/>Canal Privé Chercheur (24/7)</li>
+      </ul>
+      
+      <Link href="/checkout/omni" className="w-full mt-auto">
+        <Button variant="secondary" className="w-full">
+          Candidater (Admission)
+        </Button>
+      </Link>
+    </Card>
+
+  </div>
+</section>
+
+
+{/* =========================================
+          7. FAQ (Compilée & Stratégique)
+          ========================================= */}
+      <section className="px-6 md:px-12 max-w-3xl mx-auto mb-32">
+        <SectionHeader 
+          title="Questions Fréquentes" 
+          align="center"
+          className="mb-12"
+        />
+        
+        <Accordion items={[
+           {
+            title: "Quelle est la différence entre GENESIS et un programme classique ?",
+            content: "Un programme classique vous donne un plan (macros, exercices, répétitions). GENESIS analyse POURQUOI votre système échoue AVANT de vous prescrire quoi que ce soit. Nous mesurons 273 variables métaboliques, hormonales, neurochimiques et psychologiques pour identifier les Root Causes d'échec (résistance insuline, HPA dysfunction, incompatibilité neurotype). Résultat : protocole mathématiquement calibré sur VOTRE biochimie, pas sur une moyenne théorique. Exemple : un déficit de -500kcal peut accélérer la perte de graisse chez un système métaboliquement flexible, mais saboter un profil en HPA dysfonction (cortisol élevé → catabolisme musculaire, fatigue surrénale)."
+          },
+          {
+            title: "Pourquoi l'IPT (Indice de Potentiel de Transformation) est-il si important ?",
+            content: "L'IPT prédit votre probabilité de succès AVANT que vous investissiez temps et argent. Score 0-100 calculé sur 5 piliers validés : Métabolique (30%), Infrastructure (25%), Psychologie (20%), Physiologie (15%), Adhérence (10%). Un IPT élevé (>75/100) garantit une progression rapide. Un IPT faible (<50/100) signale des blocages invisibles (ex: résistance insuline non corrigée, charge allostatique excessive, neurochimie incompatible avec restriction). Sans correction préalable, vous perdrez 6-8 semaines à appliquer le mauvais protocole. L'IPT vous dit : 'Voici ce qu'il faut réparer AVANT de commencer'."
+          },
+          {
+            title: "Vous garantissez les résultats ?",
+            content: "Non. Nous garantissons une méthodologie forensique, un diagnostic Root Cause validé, et un protocole mathématiquement optimal pour VOTRE système. Les résultats dépendent de VOTRE exécution. Si votre IPT prédit 23% de succès, nous vous le disons AVANT de prendre votre argent. Nous préférons refuser un client que promettre l'impossible. Notre coefficient de prédiction (r²=0.57) signifie que le modèle explique 57% de la variance des résultats (vs 12% pour un simple calcul TDEE). Nous ne vendons pas de rêve, nous appliquons de l'ingénierie sur des systèmes humains."
+          },
+      
+          // ============================================
+          // OBJECTIONS ÉCHECS PASSÉS
+          // ============================================
+          {
+            title: "Est-ce que GENESIS fonctionne si j'ai déjà tout essayé sans succès ?",
+            content: "C'est précisément notre cible. L'échec répété n'est PAS un problème de volonté, c'est un problème de Root Cause non identifiée. Les protocoles génériques ignorent les blocages métaboliques invisibles (résistance insuline, HPA dysfunction, neurotype incompatible, charge allostatique excessive). GENESIS ne vous donne pas un 17ème régime, il identifie POURQUOI les 16 précédents ont échoué. Exemple : forcer une restriction calorique sur un profil dopaminergique déficient garantit l'abandon à J+21. Nous analysons votre chimie cérébrale (dopamine vs sérotonine) et votre score GSE (General Self-Efficacy) pour calibrer un protocole compatible avec VOTRE capacité d'exécution réelle, pas avec un fantasme de discipline infinie."
+          },
+      
+          // ============================================
+          // VALIDATION SCIENTIFIQUE
+          // ============================================
+          {
+            title: "C'est scientifique ou c'est encore du marketing ? Vos chiffres sont-ils vérifiés ?",
+            content: "Chaque affirmation GENESIS repose sur des publications validées (PubMed, études cliniques). Les 273 points de données couvrent 5 piliers issus de la recherche en médecine fonctionnelle, endocrinologie et neurosciences comportementales : test Braverman (profil neurochimique), index HOMA-IR (résistance insuline), charge allostatique (axe HPA). Le coefficient r²=0.57 signifie que notre modèle explique 57% de la variance des résultats, mesuré sur nos cohortes internes (50+ clients). Pourquoi 273 variables ? Parce qu'un bilan sanguin standard mesure ~20 marqueurs, un médecin pose ~15 questions. Ignorer les interactions cortisol-sommeil-insuline, c'est programmer l'échec. Sans cette granularité forensique, vous appliquez le mauvais protocole."
+          },
+      
+          // ============================================
+          // SPÉCIFICITÉS PUBLICS
+          // ============================================
+          {
+            title: "C'est adapté aux femmes (cycle menstruel, hormones) ?",
+            content: "Absolument. Le module Cycle Sync adapte nutrition et entraînement aux 4 phases hormonales (folliculaire, ovulatoire, lutéale, menstruelle). Ignorer la fluctuation œstrogène-progestérone = stagnation programmée. Nos protocoles féminins tiennent compte de la sensibilité insulinique cyclique (pic en phase folliculaire), rétention d'eau lutéale, régulation du cortisol selon les phases. Résultat : progression linéaire malgré les variations hormonales. La majorité des protocoles 'unisexes' sont calibrés sur une physiologie masculine stable → échec garanti chez 60% des femmes après 8 semaines."
+          },
+          {
+            title: "Je suis végétarien/vegan, ça fonctionne ?",
+            content: "Oui, avec contraintes. GENESIS adapte les macros selon vos préférences, mais certaines carences (B12, fer héminique, créatine, oméga-3 DHA) devront être corrigées par supplémentation ciblée. Le protocole calculera les combinaisons protéiques optimales (riz + légumineuses, quinoa + noix) et les fenêtres d'absorption pour maximiser la synthèse protéique. Réalité biochimique : un protocole vegan sera 15-20% moins efficient qu'un protocole omnivore à calories égales (biodisponibilité protéique inférieure, densité micronutritionnelle moindre). Faisable, mais progression proportionnelle."
+          },
+      
+          // ============================================
+          // LOGISTIQUE & DISCLAIMERS
+          // ============================================
+          {
+            title: "Combien de temps ça prend ? Dois-je aller en salle de sport ? C'est accessible aux débutants ?",
+            content: "**Temps requis :** G+ = 3-4 séances (45-60min) + meal prep (2-3h/semaine). OMNI = 4-5 séances (60-75min) + tracking quotidien (10min/jour). GENESIS intègre votre disponibilité réelle dans le calcul d'adhérence. Si vous disposez de <4h/semaine, un protocole full sera contre-productif.\n\n**Salle obligatoire ?** Non, mais recommandé pour G+/OMNI. Adaptable en home training (poids du corps, élastiques, haltères), efficacité moindre (progression métabolique optimale nécessite charge externe contrôlable). Nous calibrons votre MRV (Maximum Recoverable Volume) selon équipement disponible.\n\n**Débutants ?** Oui. Plus vous êtes débutant, plus l'analyse est cruciale pour éviter déficit trop agressif, volume inadapté, attentes irréalistes. Protocole calibré selon VOTRE niveau de départ, pas selon un idéal fantasmé."
+          },
+          {
+            title: "Puis-je faire GENESIS si j'ai des problèmes de santé ? Vous vendez des compléments ?",
+            content: "**Santé :** GENESIS n'est PAS un substitut médical. Si diabète, hypertension, troubles thyroïdiens ou pathologie diagnostiquée, consultez votre médecin AVANT. Nous travaillons sur l'optimisation métabolique, pas sur le traitement de maladies. Le rapport IPT peut être partagé avec votre médecin pour validation. GENESIS complète un traitement médical, ne le remplace jamais.\n\n**Compléments :** STRYV LAB ne vend AUCUN complément, shake ou produit. Si le diagnostic révèle des carences probables (vitamine D, magnésium, oméga-3), nous orientons vers marques tierces vérifiées (MyProtein, Nutrimuscle, Bulk) sans commission. Modèle économique basé sur l'expertise, pas sur la vente de poudres. Zéro conflit d'intérêt."
+          }
+        ]} 
+      />
+      
+      {/* CTA après FAQ */}
+      <div className="text-center mt-12 p-8 bg-gradient-to-br from-dark-lighter/30 to-dark-lighter/10 rounded-2xl border border-accent/20">
+        <p className="text-neutral-light mb-6 text-lg">
+          D'autres questions ? Échangez gratuitement avec un expert STRYV pour valider si GENESIS est adapté à votre situation.
+        </p>
+        <button
+          onClick={() => setShowConsultationModal(true)}
+          className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white rounded-btn shadow-lg shadow-accent/30 hover:shadow-accent/50 hover:-translate-y-1 active:translate-y-0 transition-all duration-200 font-bold text-sm"
+        >
+          Réserver une consultation gratuite
+          <ArrowRight className="w-5 h-5" />
+        </button>
+      </div>
+
+      </section>
+
+      {/* =========================================
+          8. FOOTER
+          ========================================= */}
+      <footer className="mt-32 border-t border-gray-200 pt-12 text-center pb-8">
+        <p className="text-[12px] hover:text-primary tracking-wide uppercase mb-4">
+          STRYV lab. Le dernier système que vous utiliserez.
+        </p>
+        <div className="flex justify-center gap-6 text-[11px] text-secondary">
+          <a href="/legal" className="hover:text-primary">Mentions Légales</a>
+          <a href="/cgv" className="hover:text-primary">CGV</a>
+          <span className="hover:text-primary">© 2026 STRYV Lab Genesis</span>
         </div>
       </footer>
-
-      {/* GLOBAL COMPONENTS (Chatbot, Schema, Modal) */}
-      <GenesisAssistant onStartIPT={() => setStartIPT(true)} />
-      <FaqMetabolicSchema />
-
-      {startIPT && (
-        <div className="fixed inset-0 bg-black/90 z-[70] overflow-auto backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="min-h-screen py-8 px-4">
-            <button 
-              onClick={() => setStartIPT(false)} 
-              className="fixed top-6 right-6 text-white/60 hover:text-white text-2xl z-[80] cursor-pointer"
-            >
-              ✕
-            </button>
-            <IPTQuestionnaire onComplete={() => setStartIPT(false)} />
-          </div>
-        </div>
-      )}
+      
     </main>
   );
 }

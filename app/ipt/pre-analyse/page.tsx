@@ -1,17 +1,19 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
-import Link from "next/link"; // Import nécessaire pour le lien
-import localFont from "next/font/local";
-
-const michroma = localFont({
-  src: "../../fonts/Michroma-Regular.ttf",
-  display: "swap",
-});
+import React, { useEffect } from 'react';
+import Link from 'next/link';
+import { 
+  ScanFace, 
+  Target, 
+  ShieldAlert, 
+  ListOrdered, 
+  Play, 
+  Clock 
+} from 'lucide-react';
 
 export default function PreAnalysePage() {
 
-  // Fonction pour sauvegarder le statut (même si on change de page via Link)
+  // --- LOGIQUE (INTOUCHABLE) ---
   const handleSessionInit = () => {
     if (typeof window !== "undefined") {
       localStorage.setItem("genesis_session_status", "started");
@@ -24,108 +26,103 @@ export default function PreAnalysePage() {
   }, []);
 
   return (
-    <main className="min-h-screen w-full bg-slate-50 text-slate-900 flex items-center justify-center p-4 font-sans">
+    <main className="min-h-screen w-full bg-background text-primary flex items-center justify-center p-6 font-outfit">
       
-      {/* Texture de fond */}
-      <div className="fixed inset-0 pointer-events-none opacity-40 z-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
-      
-      {/* Dégradés d'arrière-plan */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-blue-100 rounded-full mix-blend-multiply filter blur-[80px] opacity-70"></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-slate-200 rounded-full mix-blend-multiply filter blur-[80px] opacity-70"></div>
-      </div>
+      <div className="w-full max-w-lg flex flex-col gap-6 relative z-10">
 
-      <div className="w-full max-w-[500px] flex flex-col gap-4 relative z-10">
-
-        {/* --- CARTE 1 : IDENTITÉ & TEXTES --- */}
-        <div className="bg-white/80 backdrop-blur-xl border border-white p-6 md:p-8 rounded-[32px] shadow-xl shadow-slate-200/50 flex flex-col items-center space-y-6">
+        {/* --- MODULE 1 : HEADER & IDENTITÉ --- */}
+        <div className="bg-surface border border-white/60 p-8 rounded-2xl shadow-soft-out flex flex-col items-center text-center">
           
-          {/* Header */}
-          <div className="flex flex-col items-center text-center space-y-1">
-            <span className={`${michroma.className} text-xl md:text-2xl font-bold uppercase tracking-[0.1em] text-slate-900`}>
-              GENESIS
-            </span>
-            <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400">
-              by stryv lab
+          <div className="w-16 h-16 rounded-xl bg-accent/10 flex items-center justify-center mb-6 shadow-inner">
+             <ScanFace className="w-8 h-8 text-accent" strokeWidth={1.5} />
+          </div>
+
+          <div className="space-y-2 mb-6">
+            <h1 className="text-2xl font-bold tracking-tight text-primary">
+              Pré-analyse IPT™
+            </h1>
+            <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-accent">
+              Genesis • Stryv Lab
             </p>
           </div>
 
-          <div className="w-full border-t border-slate-200"></div>
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-6"></div>
 
-          {/* Titre & Textes */}
-          <div className="space-y-6 w-full">
-            <h1 className="text-lg font-semibold tracking-tight text-slate-900 text-center">
-              Pré-analyse IPT™
-            </h1>
-            
-            <div className="text-[13px] leading-relaxed text-slate-600 space-y-4 font-medium text-left">
-              <p>
-                Vous entrez dans une phase de pré-analyse. Cette étape pose le cadre 
-                méthodologique avant le lancement de l’analyse adaptative. 
-                Aucune donnée n’est encore interprétée à ce stade.
-              </p>
-              <p>
-                L’analyse IPT™ repose sur un système adaptatif et conditionnel. 
-                Toutes les questions ne sont pas posées à tout le monde.
-              </p>
-              <p>
-                Certaines réponses activent ou neutralisent des branches d’analyse. 
-                Il n’existe ni bonne ni mauvaise réponse.
-              </p>
+          <div className="text-sm text-secondary leading-relaxed font-light">
+            Initialisation du protocole de profilage métabolique.
+            <br />
+            Calibration du point de départ.
+          </div>
+        </div>
+
+        {/* --- MODULE 2 : DIRECTIVES OPÉRATIONNELLES --- */}
+        <div className="bg-surface border border-white/60 p-6 rounded-2xl shadow-soft-out space-y-6">
+          
+          {/* Item 1 */}
+          <div className="flex gap-4 items-start">
+            <div className="mt-1 p-1.5 rounded-lg bg-surface-light text-accent shadow-sm border border-white/50">
+                <Target size={16} />
+            </div>
+            <div>
+                <h3 className="text-xs font-bold uppercase tracking-wide text-primary mb-1">Le But : Fixer le Point Zéro</h3>
+                <p className="text-xs text-secondary leading-relaxed">
+                    Le système doit savoir exactement où vous en êtes <em>maintenant</em>. Sans ce point précis, impossible de tracer la route vers votre objectif.
+                </p>
             </div>
           </div>
-        </div>
 
-        {/* --- CARTE 2 : PROTOCOLE --- */}
-        <div className="bg-white/60 backdrop-blur-md border border-white/60 p-6 md:p-8 rounded-[24px] shadow-lg shadow-slate-200/40 space-y-4">
-          <div className="flex items-center gap-3">
-             <div className="w-2.5 h-2.5 rounded-full bg-slate-900 shadow-sm ring-2 ring-white/50"></div>
-             <p className="text-xs font-bold uppercase tracking-wide text-slate-900">
-               Protocole de qualité
-             </p>
+          {/* Item 2 */}
+          <div className="flex gap-4 items-start">
+            <div className="mt-1 p-1.5 rounded-lg bg-red-50 text-red-500 shadow-sm border border-red-100">
+                <ShieldAlert size={16} />
+            </div>
+            <div>
+                <h3 className="text-xs font-bold uppercase tracking-wide text-primary mb-1">La Règle : Zéro Mensonge</h3>
+                <p className="text-xs text-secondary leading-relaxed">
+                    Ne dites pas ce que vous <em>aimeriez</em> faire, dites ce que vous faites vraiment. Si vous trichez ici, tout le calcul sera faux. Le système exige des faits.
+                </p>
+            </div>
           </div>
 
-          <ul className="text-[13px] text-slate-600 space-y-4 relative pl-2 font-medium text-left">
-            <div className="absolute left-[3px] top-2 bottom-2 w-[1px] bg-slate-300"></div>
+          {/* Item 3 */}
+          <div className="flex gap-4 items-start">
+            <div className="mt-1 p-1.5 rounded-lg bg-surface-light text-primary shadow-sm border border-white/50">
+                <ListOrdered size={16} />
+            </div>
+            <div>
+                <h3 className="text-xs font-bold uppercase tracking-wide text-primary mb-1">Ordre & Précision</h3>
+                <p className="text-xs text-secondary leading-relaxed">
+                    Ayez vos chiffres exacts sous les yeux (poids, mensurations, sommeil) avant de cliquer. L'à-peu-près est interdit.
+                </p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* --- MODULE 3 : PROTOCOLE & ACTION --- */}
+        <div className="bg-surface border border-white/60 p-6 rounded-2xl shadow-soft-out">
             
-            <li className="pl-4 relative">
-                <span className="absolute left-0 top-2.5 w-1.5 h-[1px] bg-slate-400"></span>
-                Répondez seul(e), sans distraction
-            </li>
-            <li className="pl-4 relative">
-                <span className="absolute left-0 top-2.5 w-1.5 h-[1px] bg-slate-400"></span>
-                Répondez spontanément, sans optimiser
-            </li>
-            <li className="pl-4 relative">
-                <span className="absolute left-0 top-2.5 w-1.5 h-[1px] bg-slate-400"></span>
-                Ne tentez pas d’anticiper les résultats
-            </li>
-          </ul>
-        </div>
-
-        {/* --- CARTE 3 : ACTION --- */}
-        <div className="bg-white/80 backdrop-blur-xl border border-white p-5 md:p-6 rounded-[24px] shadow-xl shadow-slate-200/50 space-y-5">
-          
-          <div className="space-y-1 pl-1 text-left">
-             <p className="text-[10px] font-bold uppercase tracking-wider bg-white/50 text-slate-500 inline-block px-2 py-1 rounded-md border border-white/60">
-                 Temps estimé : 10-15 min
-             </p>
-             <p className="text-sm font-medium pl-1 text-slate-800">
-                 Une analyse commencée doit être menée à terme.
-             </p>
+          {/* Info Timer */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-light border border-gray-100">
+                <Clock size={12} className="text-accent" />
+                <span className="text-[10px] font-bold text-secondary uppercase tracking-wide">10-15 Minutes</span>
+            </div>
+            <span className="text-[10px] font-medium text-gray-400">Session ID: #INIT_01</span>
           </div>
 
-          {/* BOUTON AVEC LIEN DIRECT (Design conservé) */}
-          <Link href="/questionnaire?session=test123" className="block w-full">
+          {/* BOUTON ACTION */}
+          <Link href="/questionnaire?session=test123" className="block w-full group">
             <button
               onClick={handleSessionInit}
-              className="w-full py-5 rounded-xl bg-slate-900 text-white text-xs font-bold tracking-[0.15em] uppercase shadow-lg shadow-slate-900/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="w-full py-5 rounded-xl bg-accent text-white text-xs font-bold tracking-[0.15em] uppercase shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
             >
-              LANCER L'ANALYSE
+              Lancer l'analyse
+              <Play size={14} fill="currentColor" />
             </button>
           </Link>
 
-          <p className="text-[9px] text-center leading-relaxed text-slate-400 px-4 font-medium">
+          <p className="mt-4 text-[9px] text-center leading-relaxed text-gray-400 font-medium px-4">
             L’analyse fournit une lecture fonctionnelle du potentiel.
             Elle ne constitue ni un diagnostic médical, ni une prescription.
           </p>

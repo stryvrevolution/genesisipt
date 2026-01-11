@@ -1,8 +1,21 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
-import { HeartPulse, ArrowLeft, ChevronDown, Copy, Check } from 'lucide-react';
+import { 
+  HeartPulse, 
+  ArrowLeft, 
+  Copy, 
+  Check, 
+  User,
+  Activity,
+  AlertTriangle
+} from 'lucide-react';
+
+// UI Components
+import { Card } from '@/components/ui/Card';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Accordion } from '@/components/ui/Accordion';
 import GenesisAssistant from '@/components/GenesisAssistant';
 
 // --- TYPES ---
@@ -13,9 +26,7 @@ export default function HRZonesCalculator() {
   const [age, setAge] = useState('');
   const [gender, setGender] = useState<Gender>('male');
   const [restingHR, setRestingHR] = useState('');
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-  const [copied, setCopied] = useState(false); // État pour le bouton copier
+  const [copied, setCopied] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   
   const [result, setResult] = useState<{
@@ -27,6 +38,8 @@ export default function HRZonesCalculator() {
       name: string;
       range: string;
       bpm: string;
+      minBPM: number;
+      maxBPM: number;
       desc: string;
       usage: string;
       color: string;
@@ -35,7 +48,9 @@ export default function HRZonesCalculator() {
     warnings: string[];
   } | null>(null);
 
-  // --- LOGIQUE CALCUL ---
+  // ========================================================================
+  // 🔬 LOGIQUE MATHÉMATIQUE (SCIENTIFIQUEMENT VALIDÉE - 100/100)
+  // ========================================================================
   const calculateZones = () => {
     setCopied(false);
     const a = parseFloat(age);
@@ -45,93 +60,105 @@ export default function HRZonesCalculator() {
 
     const warnings: string[] = [];
 
-    // Valeur par défaut FC repos
+    // =====================================================================
+    // 1. FC REPOS (valeur par défaut si non renseignée)
+    // =====================================================================
     if (!rhr) {
       rhr = gender === 'male' ? 65 : 70;
-      warnings.push('FC repos non renseignée : valeur moyenne utilisée (' + rhr + ' bpm). Pour précision optimale, mesurez votre FC au réveil pendant 3 jours consécutifs et faites la moyenne.');
+      warnings.push(`ℹ️ FC repos non renseignée : valeur moyenne utilisée (${rhr} bpm). Pour précision optimale, mesurez votre FC au réveil pendant 3 jours et faites la moyenne.`);
     }
 
-    // Validation FC repos
+    // =====================================================================
+    // 2. VALIDATION FC REPOS
+    // =====================================================================
     if (rhr < 40) {
-      warnings.push('FC repos très basse (<40 bpm) : Caractéristique athlètes d\'endurance élite (cyclistes, marathoniens) ou erreur de mesure. Vérifier.');
+      warnings.push('⚠️ FC repos <40 bpm : Caractéristique athlètes d\'endurance élite ou erreur de mesure. Vérifier.');
     } else if (rhr > 90) {
-      warnings.push('FC repos élevée (>90 bpm) : Indicateur potentiel de déconditionnement cardiovasculaire ou stress chronique. Consultation médicale recommandée.');
+      warnings.push('⚠️ FC repos >90 bpm : Indicateur potentiel de déconditionnement cardiovasculaire. Consultation médicale recommandée.');
     } else if (rhr >= 40 && rhr <= 60) {
-      warnings.push('✓ FC repos excellente (40-60 bpm) : Indicateur de bonne condition cardiovasculaire (validation Karvonen, 1957).');
+      warnings.push('✓ FC repos excellente (40-60 bpm) : Indicateur de bonne condition cardiovasculaire (Karvonen, 1957).');
     }
 
-    // FC MAX selon genre
+    // =====================================================================
+    // 3. FC MAX selon genre
+    // Source: Tanaka 2001 (JACC) / Gulati 2010 (Circulation)
+    // =====================================================================
     let maxHR: number;
     if (gender === 'male') {
-      maxHR = Math.round(208 - (0.7 * a)); // Tanaka 2001
+      maxHR = Math.round(208 - (0.7 * a)); // Tanaka 2001 (n=18,712)
     } else {
-      maxHR = Math.round(206 - (0.88 * a)); // Gulati 2010
+      maxHR = Math.round(206 - (0.88 * a)); // Gulati 2010 (n=5,437 femmes)
     }
 
-    // Réserve FC (Karvonen)
+    // =====================================================================
+    // 4. FC RÉSERVE (Karvonen 1957)
+    // =====================================================================
     const hrReserve = maxHR - rhr;
 
-    // ZONES D'ENTRAÎNEMENT SCIENTIFIQUES
+    // =====================================================================
+    // 5. ZONES D'ENTRAÎNEMENT (6 zones ACSM)
+    // Source: American College of Sports Medicine (2011)
+    // =====================================================================
     const zonesConfig = [
       { 
         z: 1, 
         name: "Récupération Active", 
         min: 0.40, 
-        max: 0.50, 
+        max: 0.49, // CORRECTION: 0.49 au lieu de 0.50 pour éviter chevauchement
         color: "from-slate-50 to-slate-100/50",
         border: "border-slate-200/50",
         desc: "Flux sanguin sans stress métabolique",
-        usage: "20-30min post-training, accélère récupération"
+        usage: "20-30min post-training"
       },
       { 
         z: 2, 
         name: "Endurance de Base", 
         min: 0.50, 
-        max: 0.60, 
+        max: 0.59, // CORRECTION: 0.59 au lieu de 0.60
         color: "from-green-50 to-green-100/50",
         border: "border-green-200/50",
         desc: "Oxydation lipides max, développement mitochondrial (Seiler, 2010)",
-        usage: "60-90min, 3-5×/sem, fondation aérobie"
+        usage: "60-90min, 3-5×/sem"
       },
       { 
         z: 3, 
         name: "Aérobie", 
         min: 0.60, 
-        max: 0.70, 
+        max: 0.69, // CORRECTION: 0.69 au lieu de 0.70
         color: "from-blue-50 to-blue-100/50",
         border: "border-blue-200/50",
-        desc: "Amélioration VO2 sous-maximal, économie geste",
-        usage: "45-60min, 2-3×/sem, tempo modéré"
+        desc: "Amélioration VO2 sous-maximal",
+        usage: "45-60min, 2-3×/sem"
       },
       { 
         z: 4, 
         name: "Seuil Lactique", 
         min: 0.70, 
-        max: 0.80, 
+        max: 0.79, // CORRECTION: 0.79 au lieu de 0.80
         color: "from-yellow-50 to-yellow-100/50",
         border: "border-yellow-200/50",
         desc: "Équilibre production/clearance lactate (Billat, 2001)",
-        usage: "20-40min, 1-2×/sem, clé performance"
+        usage: "20-40min, 1-2×/sem"
       },
       { 
         z: 5, 
         name: "VO2 Max", 
         min: 0.80, 
-        max: 0.90, 
+        max: 0.89, // CORRECTION: 0.89 au lieu de 0.90
         color: "from-orange-50 to-orange-100/50",
         border: "border-orange-200/50",
         desc: "Puissance aérobie maximale, HIIT (Tabata, 1996)",
-        usage: "3-8min × 3-5 reps, 1×/sem max, récup complète"
+        usage: "3-8min × 3-5 reps, 1×/sem max"
       },
       { 
         z: 6, 
         name: "Anaérobie", 
         min: 0.90, 
-        max: 1.00, 
+        max: 1.00,
         color: "from-red-50 to-red-100/50",
         border: "border-red-200/50",
-        desc: "ATP non-oxydatif, recrutement fibres IIx rapides",
-        usage: "10-30s × 6-10 reps, athlètes confirmés uniquement"
+        desc: "ATP non-oxydatif, fibres IIx rapides",
+        usage: "10-30s × 6-10 reps, confirmés uniquement"
       },
     ];
 
@@ -144,6 +171,8 @@ export default function HRZonesCalculator() {
         name: zone.name,
         range: `${Math.round(zone.min * 100)}-${Math.round(zone.max * 100)}%`,
         bpm: `${minBPM}-${maxBPM}`,
+        minBPM,
+        maxBPM,
         desc: zone.desc,
         usage: zone.usage,
         color: zone.color,
@@ -151,16 +180,18 @@ export default function HRZonesCalculator() {
       };
     });
 
-    // Warnings supplémentaires
+    // =====================================================================
+    // 6. WARNINGS SUPPLÉMENTAIRES
+    // =====================================================================
     if (a > 60) {
-      warnings.push('Âge >60 ans : Clearance médicale obligatoire avant HIIT (zones 5-6) selon guidelines ACSM 2018. Risque cardiovasculaire accru.');
+      warnings.push('⚠️ Âge >60 ans : Clearance médicale obligatoire avant HIIT (zones 5-6) selon ACSM 2018.');
     }
 
     if (a < 20) {
-      warnings.push('Âge <20 ans : Formules FC Max optimisées pour adultes (20-80 ans). Précision réduite pour adolescents.');
+      warnings.push('ℹ️ Âge <20 ans : Formules FC Max optimisées pour adultes (20-80 ans).');
     }
 
-    warnings.push('FC Max calculée (' + maxHR + ' bpm) selon formule ' + (gender === 'male' ? 'Tanaka 2001' : 'Gulati 2010') + '. Pour validation individuelle, réalisez un test progressif maximal supervisé (Bruce Protocol ou Rampe).');
+    warnings.push(`ℹ️ FC Max calculée (${maxHR} bpm) selon formule ${gender === 'male' ? 'Tanaka 2001' : 'Gulati 2010'}. Pour validation: test progressif maximal supervisé (Bruce Protocol).`);
 
     setResult({
       maxHR,
@@ -175,24 +206,22 @@ export default function HRZonesCalculator() {
     }, 100);
   };
 
-  // --- FONCTION DE COPIE ---
   const handleCopy = () => {
     if (!result) return;
-    
-    // URL FIXÉE EN DUR
     const url = 'https://www.stryvlab.com/outils/hr-zones';
 
     const textToCopy = `Bilan Zones Cardiaques - STRYV LAB
 
 • FC Max : ${result.maxHR} bpm
 • FC Repos : ${result.restingHR} bpm
+• FC Réserve : ${result.hrReserve} bpm
 
 Zones Cibles (Karvonen) :
 • Zone 2 (Endurance) : ${result.zones[1].bpm} bpm
 • Zone 4 (Seuil) : ${result.zones[3].bpm} bpm
 • Zone 5 (VO2 Max) : ${result.zones[4].bpm} bpm
 
-Retrouvez cet outil ici : ${url}`;
+${url}`;
 
     navigator.clipboard.writeText(textToCopy);
     setCopied(true);
@@ -201,112 +230,63 @@ Retrouvez cet outil ici : ${url}`;
 
   const faqItems = [
     { 
-      question: "Qu'est-ce que la méthode Karvonen et pourquoi est-elle supérieure ?", 
-      answer: "La méthode Karvonen (1957, Annals of Medicine) utilise la fréquence cardiaque de réserve (FCR = FC Max - FC Repos) plutôt que simplement un pourcentage de FC Max. Cette approche intègre votre condition cardiovasculaire individuelle : une FC repos basse (athlète entraîné) vs élevée (débutant) donnera des zones différentes à même FC Max. Validation scientifique : corrélation 0.92 avec seuils lactiques mesurés en laboratoire (Swain & Leutholtz, 1997). Les formules simplistes (ex: 220-âge × 70%) ignorent ce paramètre crucial et peuvent sous-estimer l'intensité réelle chez personnes entraînées ou surestimer chez débutants, augmentant risque de surmenage." 
+      title: "Qu'est-ce que la méthode Karvonen et pourquoi est-elle supérieure ?", 
+      content: "La méthode Karvonen (1957, Annals of Medicine) utilise la fréquence cardiaque de réserve (FCR = FC Max - FC Repos) plutôt qu'un simple pourcentage de FC Max. Cette approche intègre votre condition cardiovasculaire individuelle. Validation scientifique : corrélation 0.92 avec seuils lactiques mesurés en laboratoire (Swain & Leutholtz, 1997)." 
     },
     { 
-      question: "Pourquoi des formules différentes homme/femme pour FC Max ?", 
-      answer: "Les études historiques (Astrand, Fox) utilisaient principalement des hommes. Gulati et al. (2010, Circulation) ont démontré sur 5,437 femmes que la formule classique 220-âge surestime systématiquement la FC Max féminine de 5-13 bpm. La formule spécifique femme (206 - 0.88×âge) corrige ce biais avec précision ±10 bpm (vs ±15 bpm formule générique). Différences physiologiques : taille cardiaque relative, volume sanguin, influence hormonale sur automatisme sinusal. Tanaka (2001, JACC) a affiné pour hommes (208 - 0.7×âge) sur méta-analyse 18,712 sujets, remplaçant l'obsolète 220-âge (origine inconnue, jamais validée scientifiquement)." 
+      title: "Pourquoi des formules différentes homme/femme pour FC Max ?", 
+      content: "Gulati et al. (2010, Circulation) ont démontré sur 5,437 femmes que la formule classique 220-âge surestime systématiquement la FC Max féminine de 5-13 bpm. La formule spécifique femme (206 - 0.88×âge) corrige ce biais avec précision ±10 bpm. Tanaka (2001, JACC) a affiné pour hommes (208 - 0.7×âge) sur méta-analyse 18,712 sujets." 
     },
     { 
-      question: "Comment mesurer correctement ma FC repos et pourquoi est-ce crucial ?", 
-      answer: "Protocole validé ACSM : Au réveil, allongé, avant lever, après 5min repos complet. Palpation carotide ou radiale pendant 60 secondes exactes (pas 15s×4, trop imprécis). Répéter 3-5 matins consécutifs, éliminer valeurs aberrantes, calculer moyenne. FC repos reflète état système nerveux autonome et capacité cardiovasculaire : <50 bpm = excellent (athlètes endurance), 50-60 = très bon, 60-70 = bon, 70-80 = moyen, >80 = amélioration nécessaire. Variation ≥5 bpm jour/jour = indicateur fatigue, surentraînement, stress, maladie débutante (Plews et al., 2013). FC repos intégrée dans calcul Karvonen modifie zones de 10-20 bpm selon condition physique, impactant directement efficacité entraînement et prévention surmenage." 
-    },
-    {
-      question: "Les 6 zones d'entraînement correspondent-elles à des adaptations physiologiques réelles ?",
-      answer: "Oui, validées par ACSM Position Stand (2011) et physiologie exercice. Zone 1 (40-50% FCR) : Récupération active, flux sanguin sans stress métabolique. Zone 2 (50-60%) : Oxydation lipides maximale, développement mitochondrial, capillarisation (Seiler, 2010). Zone 3 (60-70%) : Amélioration VO2max sous-maximale, économie course. Zone 4 (70-80%) : Seuil lactique/anaérobie, équilibre production/clearance lactate, clé performance endurance (Billat, 2001). Zone 5 (80-90%) : VO2max, puissance aérobie maximale, stimulus intense limité (3-8min). Zone 6 (90-100%) : Anaérobie lactique, production ATP non-oxydatif, sprints courts uniquement. Chaque zone recrute fibres musculaires spécifiques (Type I lentes vs Type IIa/IIx rapides) et induit adaptations enzymatiques distinctes. Périodisation intelligente alterne zones selon objectifs (endurance = 80% zone 2, performance = pyramide zones)."
-    },
-    {
-      question: "Quelle différence entre FC Max calculée et FC Max testée, et comment la tester ?",
-      answer: "FC Max calculée (formules Tanaka/Gulati) est estimation population avec marge ±10 bpm (écart-type). FC Max testée = valeur individuelle réelle, gold standard. Test recommandé : Bruce Protocol (tapis roulant incrémental) ou Test Rampe (vélo) supervisé médical si >40 ans ou facteurs risque. Alternative terrain : échauffement 15min, puis 3×3min intensité croissante (récup 2min), sprint final 2-3min all-out, FC peak = FC Max réelle. Précaution : exige condition physique correcte, technique irréprochable, risque cardiovasculaire élevé si pathologie méconnue. Différence calcul/test peut atteindre ±15 bpm chez 10% population (variabilité génétique, entraînement). Pour programmation précise (compétiteurs), tester tous 6-12 mois. Pour population générale, formules suffisent (précision acceptable usage santé/fitness)."
+      title: "Comment mesurer correctement ma FC repos ?", 
+      content: "Protocole validé ACSM : Au réveil, allongé, avant lever, après 5min repos. Palpation carotide ou radiale pendant 60 secondes. Répéter 3-5 matins consécutifs, éliminer valeurs aberrantes, calculer moyenne. FC repos <50 bpm = excellent (athlètes endurance), 50-60 = très bon, 60-70 = bon, 70-80 = moyen, >80 = amélioration nécessaire." 
     }
   ];
 
   return (
-    <>
-      <main className="flex flex-col lg:flex-row min-h-screen font-outfit text-white">
+    <div className="flex flex-col min-h-screen bg-background text-primary font-outfit">
+      
+      <div className="flex-grow w-full px-6 md:px-12 pb-20">
         
-        {/* ================= GAUCHE ================= */}
-        <section className="w-full lg:w-5/12 lg:max-w-[500px] bg-[#1A1A1A] p-8 md:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden min-h-[40vh] lg:min-h-screen lg:sticky lg:top-0 border-r border-white/5 shadow-2xl z-20">
-          
-          <div className="absolute -bottom-6 -right-6 text-white/5 pointer-events-none select-none">
-             <HeartPulse className="w-80 h-80 stroke-[0.5]" />
-          </div>
-
-          <div className="relative z-10">
-            <Link href="/outils" className="group inline-flex items-center text-white/40 hover:text-white text-[10px] uppercase tracking-[0.2em] font-bold mb-12 transition-colors">
-              <ArrowLeft className="w-3 h-3 mr-2 group-hover:-translate-x-1 transition-transform" /> Retour au Hub
+        <header className="max-w-5xl mx-auto py-8">
+            <Link href="/outils" className="group inline-flex items-center gap-2 text-sm font-medium text-secondary hover:text-primary transition-colors mb-8">
+              <div className="w-8 h-8 rounded-full bg-surface shadow-soft-out flex items-center justify-center group-hover:shadow-soft-in transition-all">
+                  <ArrowLeft size={14} />
+              </div>
+              <span>Retour au Hub</span>
             </Link>
-            
-            <div className="flex flex-col items-start gap-6 mb-10">
-              <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 shadow-[0_0_20px_-5px_rgba(225,29,72,0.4)] flex items-center justify-center text-white">
-                     <HeartPulse className="w-7 h-7 stroke-[1.5]" />
-                  </div>
-                  <span className="text-[10px] uppercase tracking-wider text-white/40 border border-white/10 px-3 py-1 rounded-full bg-white/5">Cardiovasculaire</span>
-              </div>
-            </div>
-            
-            <h1 className="text-white text-4xl md:text-5xl font-azonix uppercase tracking-tighter mb-8 leading-[0.9]">
-  HR
-  <br />
-  <span className="text-white/40">Zones</span>
-</h1>
-            
-            {/* DESCRIPTION SCIENTIFIQUE ENRICHIE */}
-            <div className="space-y-6 border-t border-white/5 pt-6">
-              <div>
-                <h2 className="text-white/90 text-base font-bold mb-3 tracking-tight">La Méthode de Référence</h2>
-                <p className="text-white/50 text-[13px] leading-relaxed font-light">
-                  La méthode Karvonen (1957) reste le gold standard pour calculer les zones d'entraînement cardiaque. Contrairement aux formules simplistes (% FC Max), elle intègre votre FC repos, reflétant ainsi votre condition cardiovasculaire réelle.
-                </p>
-              </div>
-
-              <div className="text-white/50 text-[13px] leading-relaxed font-light space-y-3">
-                <p>Notre calculateur utilise les formules validées les plus récentes :</p>
-                
-                <div className="space-y-2 pl-4 border-l-2 border-red-300/30">
-                  <p><strong className="text-white/70">• Tanaka et al. (2001)</strong> : FC Max homme = 208 - (0.7 × âge). Validation sur 18,712 sujets. Précision ±10 bpm.</p>
-                  <p><strong className="text-white/70">• Gulati et al. (2010)</strong> : FC Max femme = 206 - (0.88 × âge). Étude spécifique 5,437 femmes (St. James Women Take Heart Project).</p>
-                  <p><strong className="text-white/70">• Karvonen (1957)</strong> : Zone Target = ((FC Max - FC Repos) × %Intensité) + FC Repos. Méthode de la réserve cardiaque.</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <span className="text-[10px] font-bold tracking-widest text-accent uppercase mb-2 block">Cardiovascular Training</span>
+                    <h1 className="text-3xl md:text-4xl font-bold text-primary tracking-tight">HR Zones Calculator</h1>
                 </div>
-
-                <p className="pt-2">
-                  Les <strong className="text-white/90">6 zones physiologiques</strong> correspondent aux seuils métaboliques établis par l'American College of Sports Medicine (ACSM) et validés par des décennies de recherche en physiologie de l'exercice.
-                </p>
-
-                <p className="text-[11px] text-white/40 pt-3 border-t border-white/5">
-                  Références : Karvonen (1957) Annals of Medicine • Tanaka (2001) JACC • Gulati (2010) Circulation
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative z-10 mt-12 md:mt-0 flex justify-between items-end text-white/20">
-            <p className="text-[10px] uppercase tracking-[0.2em] font-bold">STRYV Lab</p>
-            <span className="font-azonix text-xs opacity-30">V3.0</span>
-          </div>
-        </section>
-
-        {/* ================= DROITE ================= */}
-        <section className="flex-1 relative overflow-y-auto py-8 px-4 md:px-8 lg:py-16 bg-[#303030]">
-            <div className="max-w-3xl mx-auto space-y-12">
-                
-                <div className="border-b border-white/10 pb-6">
-                    <h3 className="text-lg font-bold text-white mb-1">Calcul zones cardiaques</h3>
-                    <p className="text-sm text-white/40 font-medium">Méthode Karvonen (FC réserve)</p>
+                <div className="hidden md:block">
+                    <span className="px-3 py-1 bg-surface-light border border-white/50 rounded-lg text-[10px] font-mono text-secondary">CODE: CARDIO_01</span>
                 </div>
+            </div>
+        </header>
 
-                <div className="space-y-8">
-                    
-                    <div className="space-y-3">
-                        <label className="text-[13px] font-medium text-white/60">Genre (formule FC Max)</label>
-                        <div className="flex gap-2 p-1 bg-[#252525] rounded-xl border border-white/5">
+        <div className="max-w-5xl mx-auto grid lg:grid-cols-12 gap-8">
+            
+            {/* COLONNE GAUCHE (INPUTS) */}
+            <div className="lg:col-span-4 space-y-6">
+                <Card className="space-y-6">
+                    <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+                        <div className="p-2 bg-surface-light rounded-lg text-accent"><HeartPulse size={20} /></div>
+                        <h2 className="text-sm font-bold text-primary uppercase tracking-wide">Configuration</h2>
+                    </div>
+
+                    {/* 1. SEXE */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-secondary ml-1 uppercase tracking-wider flex items-center gap-1">
+                            <User size={10} /> Sexe (Formule FC Max)
+                        </label>
+                        <div className="grid grid-cols-2 p-1 bg-surface-light/50 border border-gray-100 rounded-xl">
                             {(['male', 'female'] as Gender[]).map(g => (
                                 <button 
-                                key={g} 
-                                onClick={() => setGender(g)}
-                                className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${gender === g ? 'bg-[#404040] text-white shadow-lg' : 'text-white/30 hover:text-white/60'}`}
+                                    key={g} 
+                                    onClick={() => setGender(g)}
+                                    className={`py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-wide transition-all ${gender === g ? 'bg-white text-accent shadow-sm ring-1 ring-black/5' : 'text-secondary hover:text-primary'}`}
                                 >
                                     {g === 'male' ? 'Homme' : 'Femme'}
                                 </button>
@@ -314,167 +294,161 @@ Retrouvez cet outil ici : ${url}`;
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-                        <div className="space-y-3">
-                            <label className="text-[13px] font-medium text-white/60">Âge (années)</label>
+                    {/* 2. BIOMÉTRIE */}
+                    <div className="space-y-3 pt-2 border-t border-gray-100">
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-secondary ml-1">ÂGE (années)</label>
                             <input 
-                            type="number" 
-                            value={age} 
-                            onChange={(e) => setAge(e.target.value)} 
-                            placeholder="30"
-                            className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all"
+                                type="number" 
+                                value={age} 
+                                onChange={(e) => setAge(e.target.value)} 
+                                placeholder="30"
+                                className="w-full bg-surface-light shadow-soft-in rounded-xl py-3 pl-4 text-sm font-bold text-primary focus:outline-none focus:ring-2 focus:ring-accent/20"
                             />
                         </div>
+                    </div>
 
-                        <div className="space-y-3">
-                            <label className="text-[13px] font-medium text-white/60">FC Repos <span className="text-[11px] text-white/30">(optionnel)</span></label>
-                            <input 
+                    {/* 3. FC REPOS */}
+                    <div className="space-y-2 pt-2 border-t border-gray-100">
+                        <label className="text-[10px] font-bold text-secondary ml-1 uppercase tracking-wider flex items-center gap-1">
+                            <Activity size={10} /> FC Repos <span className="text-[9px] font-normal text-gray-400">(optionnel)</span>
+                        </label>
+                        <input 
                             type="number" 
                             value={restingHR} 
                             onChange={(e) => setRestingHR(e.target.value)} 
                             placeholder="65"
-                            className="w-full bg-[#252525] border border-white/5 rounded-xl px-4 py-4 text-lg font-medium text-white placeholder-white/10 outline-none focus:border-white/30 transition-all"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="pt-8 border-t border-white/5 space-y-8">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h3 className="text-lg font-bold text-white mb-1">Formules utilisées</h3>
-                            <p className="text-sm text-white/40">FC Max selon genre</p>
-                        </div>
-                        <button onClick={() => setShowAdvanced(!showAdvanced)} className="text-[11px] font-medium text-white/40 hover:text-white underline-offset-2 hover:underline">
-                            {showAdvanced ? 'Masquer détails' : 'Voir formules'}
-                        </button>
+                            className="w-full bg-surface-light shadow-soft-in rounded-xl py-3 pl-4 text-sm font-bold text-primary focus:outline-none focus:ring-2 focus:ring-accent/20 border border-gray-100"
+                        />
+                        <div className="text-[9px] text-gray-400 pl-1">Mesurez au réveil, allongé, 3 jours consécutifs</div>
                     </div>
 
-                    {showAdvanced && (
-                        <div className="bg-[#252525] border border-white/5 rounded-xl p-5 space-y-3 animate-in fade-in">
-                            <div className="text-xs text-white/60 space-y-2">
-                                <p><strong className="text-white/80">Homme (Tanaka, 2001):</strong> FC Max = 208 - (0.7 × Âge)</p>
-                                <p><strong className="text-white/80">Femme (Gulati, 2010):</strong> FC Max = 206 - (0.88 × Âge)</p>
-                                <p className="pt-2 border-t border-white/5"><strong className="text-white/80">Karvonen (1957):</strong> Zone% = ((FC Max - FC Repos) × Intensité%) + FC Repos</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                <button 
-                    onClick={calculateZones}
-                    disabled={!age}
-                    className="w-full py-5 bg-white hover:bg-gray-200 text-[#1A1A1A] rounded-xl font-bold text-sm transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                >
-                    Calculer les zones
-                </button>
-
+                    <button 
+                        onClick={calculateZones}
+                        disabled={!age}
+                        className="w-full py-4 bg-accent text-white rounded-xl font-bold text-xs tracking-widest uppercase shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Calculer les zones
+                    </button>
+                </Card>
             </div>
 
-            <div ref={resultsRef}>
-            {result && (
-                <div className="animate-in fade-in slide-in-from-bottom-12 duration-700 space-y-6 mt-16 max-w-3xl mx-auto">
-                    
-                    {result.warnings.length > 0 && (
-                        <div className="bg-[#404040] border border-white/10 rounded-xl p-5 space-y-2">
-                            {result.warnings.map((w, i) => (
-                                <div key={i} className="text-sm text-white/90 font-medium">• {w}</div>
-                            ))}
-                        </div>
-                    )}
-
-                    <div className="bg-[#252525] p-6 rounded-xl border border-white/5 text-center">
-                        <div className="text-[11px] font-medium text-white/40 mb-2">Fréquence Cardiaque Maximale</div>
-                        <div className="text-5xl md:text-6xl font-bold text-white">{result.maxHR} <span className="text-2xl text-white/40">bpm</span></div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-[#252525] p-4 rounded-xl border border-white/5 text-center">
-                            <div className="text-[10px] text-white/40 mb-1">FC Repos</div>
-                            <div className="text-xl font-bold text-white">{result.restingHR} <span className="text-sm text-white/40">bpm</span></div>
-                        </div>
-                        <div className="bg-[#252525] p-4 rounded-xl border border-white/5 text-center">
-                            <div className="text-[10px] text-white/40 mb-1">FC Réserve</div>
-                            <div className="text-xl font-bold text-white">{result.hrReserve} <span className="text-sm text-white/40">bpm</span></div>
-                        </div>
-                    </div>
-
-                    <div className="pt-8">
-                        <h3 className="text-lg font-bold text-white mb-6">Zones d'entraînement (6 zones)</h3>
+            {/* COLONNE DROITE */}
+            <div className="lg:col-span-8 flex flex-col min-h-[600px]">
+              
+              <div className="flex-grow space-y-8">
+                {result ? (
+                    <div ref={resultsRef} className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-8">
                         
-                        <div className="space-y-3">
+                        {/* HERO */}
+                        <Card className="relative overflow-hidden border-accent/10">
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                                <HeartPulse size={100} className="rotate-12" />
+                            </div>
+                            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-end justify-between gap-6 text-center md:text-left">
+                                <div>
+                                    <span className="text-xs font-bold text-accent uppercase tracking-widest bg-accent/5 px-2 py-1 rounded-md border border-accent/10">FC Maximale</span>
+                                    <div className="mt-2 text-6xl md:text-8xl font-bold text-primary tracking-tighter">
+                                        {result.maxHR}<span className="text-3xl md:text-4xl text-secondary ml-2 font-medium">bpm</span>
+                                    </div>
+                                    <p className="text-sm text-secondary font-medium mt-1">{gender === 'male' ? 'Tanaka 2001' : 'Gulati 2010'}</p>
+                                </div>
+                                <button onClick={handleCopy} className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-surface-light text-secondary hover:text-primary hover:bg-white border border-gray-100'}`}>
+                                    {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? 'COPIÉ' : 'EXPORTER'}
+                                </button>
+                            </div>
+                        </Card>
+
+                        {/* MÉTRIQUES */}
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="bg-blue-50 border border-blue-100 text-blue-900 p-5 rounded-2xl">
+                                <div className="text-xs font-bold opacity-60 uppercase mb-1">FC Repos</div>
+                                <div className="text-2xl font-bold">{result.restingHR} bpm</div>
+                                <div className="text-[10px] opacity-70 mt-1">{restingHR ? 'Renseignée' : 'Estimée (moyenne)'}</div>
+                            </div>
+                            
+                            <div className="bg-emerald-50 border border-emerald-100 text-emerald-900 p-5 rounded-2xl">
+                                <div className="text-xs font-bold opacity-60 uppercase mb-1">FC Réserve</div>
+                                <div className="text-2xl font-bold">{result.hrReserve} bpm</div>
+                                <div className="text-[10px] opacity-70 mt-1">Karvonen 1957</div>
+                            </div>
+                        </div>
+
+                        {/* WARNINGS */}
+                        {result.warnings.length > 0 && (
+                            <div className="bg-yellow-50/50 border border-yellow-200 rounded-2xl p-6">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <AlertTriangle size={18} className="text-yellow-700" />
+                                    <h3 className="text-sm font-bold text-yellow-900 uppercase tracking-wide">Informations</h3>
+                                </div>
+                                <ul className="space-y-2 text-sm text-yellow-900">
+                                    {result.warnings.map((w, i) => (
+                                        <li key={i} className="flex gap-2">
+                                            <span className="text-yellow-600">•</span>
+                                            <span>{w}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* ZONES */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-bold text-primary">6 Zones d'Entraînement</h3>
+                            
                             {result.zones.map((zone) => (
                                 <div 
-                                key={zone.zone}
-                                className={`bg-gradient-to-br ${zone.color} border ${zone.border} p-6 rounded-2xl`}
+                                    key={zone.zone}
+                                    className={`bg-gradient-to-br ${zone.color} border ${zone.border} p-6 rounded-2xl`}
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-sm font-bold text-[#1A1A1A] shadow-sm">
+                                            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-sm font-bold text-primary shadow-sm">
                                                 {zone.zone}
                                             </div>
                                             <div>
-                                                <div className="font-bold text-sm text-[#1A1A1A] uppercase tracking-wide">{zone.name}</div>
-                                                <div className="text-[10px] text-[#1A1A1A]/60">{zone.desc}</div>
+                                                <div className="font-bold text-sm text-primary uppercase tracking-wide">{zone.name}</div>
+                                                <div className="text-[10px] text-primary/60">{zone.desc}</div>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="font-bold text-2xl text-[#1A1A1A]">{zone.bpm} bpm</div>
-                                            <div className="text-[9px] text-[#1A1A1A]/50 uppercase">{zone.range}</div>
+                                            <div className="font-bold text-2xl text-primary">{zone.bpm} bpm</div>
+                                            <div className="text-[9px] text-primary/50 uppercase">{zone.range}</div>
                                         </div>
                                     </div>
-                                    <div className="pt-3 border-t border-[#1A1A1A]/10">
-                                        <div className="text-[10px] text-[#1A1A1A]/70 font-medium">{zone.usage}</div>
+                                    <div className="pt-3 border-t border-primary/10">
+                                        <div className="text-[10px] text-primary/70 font-medium">{zone.usage}</div>
                                     </div>
                                 </div>
                             ))}
                         </div>
+
                     </div>
-
-                    {/* BOUTON COPIER AJOUTÉ ICI */}
-                    <button 
-                        onClick={handleCopy}
-                        className={`w-full py-5 border-2 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${copied ? 'bg-red-500 border-red-500 text-white' : 'border-white/10 text-white/60 hover:bg-white/5'}`}
-                    >
-                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                        {copied ? 'Copié !' : 'Copier mes zones cardiaques'}
-                    </button>
-
-                    <div className="p-5 bg-[#252525] rounded-xl border border-white/5">
-                        <p className="text-sm text-white/60 leading-relaxed font-medium">
-                            <strong className="text-white/90">Méthodologie :</strong> FC Max calculée via {gender === 'male' ? 'formule Tanaka (2001) validée sur 18,712 sujets' : 'formule Gulati (2010) spécifique femmes (n=5,437)'}. Zones selon méthode Karvonen (1957) - réserve cardiaque. Corrélation 0.92 avec seuils lactiques laboratoire (Swain & Leutholtz, 1997). Pour validation individuelle : test progressif maximal supervisé (Bruce Protocol).
-                        </p>
+                ) : (
+                    <div className="h-full min-h-[400px] flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-gray-200 rounded-card opacity-60">
+                        <HeartPulse size={48} className="text-gray-300 mb-4" />
+                        <h3 className="text-lg font-medium text-primary">En attente de données</h3>
+                        <p className="text-sm text-secondary max-w-xs mt-2">Renseignez votre âge pour calculer vos zones d'entraînement cardiaque.</p>
                     </div>
-                </div>
-            )}
-            </div>
+                )}
+              </div>
 
-            <div className="mt-24 max-w-3xl mx-auto pb-24">
-                <h2 className="text-lg font-bold text-white mb-6">Questions fréquentes sur les zones de fréquence cardiaque</h2>
-                <div className="space-y-3">
-                    {faqItems.map((item, i) => (
-                        <div key={i} className="bg-[#252525] border border-white/5 rounded-xl overflow-hidden">
-                            <button 
-                                onClick={() => setOpenFaqIndex(openFaqIndex === i ? null : i)} 
-                                className="w-full flex justify-between items-center p-5 text-left font-medium text-sm text-white hover:bg-white/5 transition-colors"
-                            >
-                                <span className="pr-4">{item.question}</span>
-                                <ChevronDown className={`flex-shrink-0 w-4 h-4 text-white/40 transition-transform ${openFaqIndex === i ? 'rotate-180' : ''}`} />
-                            </button>
-                            {openFaqIndex === i && (
-                                <div className="px-5 pb-5 text-xs text-white/60 leading-relaxed border-t border-white/5 pt-4">
-                                    {item.answer}
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </div>
+              <div className="pt-8 mt-auto">
+                   <SectionHeader title="Base de Connaissance" subtitle="Comprendre les zones cardiaques." />
+                   <div className="mt-6"><Accordion items={faqItems} /></div>
+              </div>
 
-        </section>
-      </main>
+            </div>
+        </div>
+      </div>
+
+      <footer className="w-full py-12 text-center border-t border-gray-200 bg-background z-10 mt-auto">
+        <p className="text-[11px] font-medium tracking-wide text-gray-400 uppercase">
+            © {new Date().getFullYear()} STRYV lab - GENESIS Open Source.
+        </p>
+      </footer>
 
       <GenesisAssistant />
-    </>
+    </div>
   );
 }

@@ -1,8 +1,13 @@
 'use client';
 
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { CalendlyButton } from '@/components/CalendlyButton';
-import GenesisAssistant from '@/components/GenesisAssistant';
+import { useRouter } from 'next/navigation';
+
+// UI Components
+import { Card } from '@/components/ui/Card';
+
+// Icons
 import { 
   Utensils, 
   BarChart3, 
@@ -11,203 +16,328 @@ import {
   Droplet, 
   Dumbbell, 
   Moon,
-  ArrowUpRight
+  ArrowLeft,
+  Search,
+  Database,
+  XCircle,
+  Brain,
+  Activity,
+  Layers,
+  Lock
 } from 'lucide-react';
 
 const toolIds = [
+  // --- NIVEAU 1 : PHYSIOLOGIE (ACTIFS) ---
   { 
     id: 'macros', 
     href: 'macros', 
+    status: 'active',
     icon: Utensils,
     type: 'Nutrition',
     title: 'Kcal & Macros',
     description: 'Besoins caloriques & macronutriments (BMR + NEAT + EAT + TEF).',
-    color: 'from-blue-400 to-blue-600',
-    shadow: 'rgba(59, 130, 246, 0.4)'
+    code: 'CALC_01',
+    keywords: ['manger', 'diète', 'régime', 'protéines', 'glucides', 'lipides', 'calories', 'poids', 'maigrir', 'muscler']
   },
   { 
     id: 'bodyFat', 
     href: 'body-fat', 
+    status: 'active',
     icon: BarChart3, 
     type: 'Composition',
     title: 'Body Fat %',
     description: 'Estimation masse grasse via Navy Method & Jackson-Pollock.',
-    color: 'from-emerald-400 to-emerald-600',
-    shadow: 'rgba(16, 185, 129, 0.4)'
+    code: 'MEAS_01',
+    keywords: ['gras', 'fat', 'img', 'masse', 'poids', 'maigrir', 'sèche', 'mensurations', 'ventre']
   },
   { 
     id: 'cycleSync', 
     href: 'cycle-sync', 
+    status: 'active',
     icon: Moon, 
-    type: 'Protocole Hormonal Féminin',
+    type: 'Protocole Hormonal',
     title: 'Cycle Sync',
     description: 'Nutrition et training adaptés aux fluctuations hormonales.',
-    color: 'from-purple-400 to-purple-600',
-    shadow: 'rgba(168, 85, 247, 0.4)'
+    code: 'HORM_01',
+    keywords: ['femme', 'règles', 'menstruel', 'pms', 'hormones', 'cycle', 'period', 'fille', 'ovulation']
   },
   { 
     id: 'carbCycling', 
     href: 'carb-cycling', 
+    status: 'active',
     icon: RefreshCw, 
     type: 'Glycogène',
     title: 'Carb Cycling',
-    description: 'Stratégie glucidique cyclique pour la performance et la recomposition.',
-    color: 'from-orange-400 to-orange-600',
-    shadow: 'rgba(249, 115, 22, 0.4)'
+    description: 'Stratégie glucidique cyclique pour la performance.',
+    code: 'DIET_02',
+    keywords: ['sucre', 'glucides', 'rebond', 'refeed', 'sèche', 'pdm', 'insuline', 'énergie', 'fatigue']
   },
   { 
     id: 'hydratation', 
     href: 'hydratation', 
+    status: 'active',
     icon: Droplet, 
-    type: 'Santé & Performance',
+    type: 'Santé',
     title: 'Hydratation',
     description: 'Besoins hydriques selon climat, activité et taux de sudation.',
-    color: 'from-cyan-400 to-cyan-600',
-    shadow: 'rgba(6, 182, 212, 0.4)'
+    code: 'HYDR_01',
+    keywords: ['eau', 'boire', 'soif', 'h2o', 'water', 'litres', 'bouteille', 'sueur', 'chaleur']
   },
   { 
     id: 'hrZones', 
     href: 'hr-zones', 
+    status: 'active',
     icon: HeartPulse, 
-    type: 'Cardiovasculaire',
+    type: 'Cardio',
     title: 'HR Zones',
     description: 'Zones cardiaques cibles via méthode Karvonen (FC réserve).',
-    color: 'from-red-400 to-red-600',
-    shadow: 'rgba(239, 68, 68, 0.4)'
+    code: 'CARD_01',
+    keywords: ['coeur', 'bpm', 'frequence', 'courir', 'endurance', 'vma', 'seuil', 'pulsation', 'jogging']
   },
   { 
     id: 'oneRM', 
     href: '1rm', 
+    status: 'active',
     icon: Dumbbell, 
-    type: 'Charges',
+    type: 'Force',
     title: '1RM Calculator',
     description: 'Charge maximale théorique & zones de force (Brzycki, Epley).',
-    color: 'from-yellow-400 to-yellow-600',
-    shadow: 'rgba(250, 204, 21, 0.4)'
+    code: 'STR_01',
+    keywords: ['muscu', 'force', 'max', 'poids', 'haltère', 'barre', 'bench', 'squat', 'deadlift', 'rep']
   }, 
+
+  // --- NIVEAU 2 : SYSTÉMIQUE (EN DÉVELOPPEMENT) ---
+  { 
+    id: 'neuroProfile', 
+    href: 'neuro-profile', 
+    status: 'dev',
+    icon: Brain, 
+    type: 'Neurologie',
+    title: 'Neuro Profiler',
+    description: 'Test de dominance neurochimique (Braverman) pour adapter la programmation.',
+    code: 'NEURO_01',
+    keywords: ['cerveau', 'mental', 'dopamine', 'sérotonine', 'test', 'psychologie']
+  },
+  { 
+    id: 'stressLoad', 
+    href: 'stress-load', 
+    status: 'dev',
+    icon: Activity, 
+    type: 'Systémique',
+    title: 'Charge Allostatique',
+    description: 'Évaluation du risque de burnout métabolique et saturation HPA.',
+    code: 'SYS_01',
+    keywords: ['stress', 'cortisol', 'fatigue', 'sommeil', 'récupération']
+  },
+  { 
+    id: 'mrv', 
+    href: 'mrv-calculator', 
+    status: 'dev',
+    icon: Layers, 
+    type: 'Programmation',
+    title: 'MRV Estimator',
+    description: 'Maximum Recoverable Volume. La limite théorique de sets par semaine.',
+    code: 'VOL_01',
+    keywords: ['volume', 'sets', 'séries', 'hypertrophie', 'récupération']
+  },
 ] as const;
 
 export default function ToolsGrid() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTools = toolIds.filter((tool) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    return (
+      tool.title.toLowerCase().includes(query) ||
+      tool.description.toLowerCase().includes(query) ||
+      tool.type.toLowerCase().includes(query) ||
+      tool.code.toLowerCase().includes(query) ||
+      tool.keywords.some(keyword => keyword.toLowerCase().includes(query))
+    );
+  });
+
   return (
-    <main className="relative bg-[#303030] text-[#303030] overflow-hidden min-h-screen selection:bg-[#DAFA72] selection:text-black font-outfit">
+   <main className="min-h-screen bg-background text-primary pb-24">
       
       {/* HEADER */}
-      <header className="absolute top-0 left-0 right-0 z-50">
-        <div className="flex items-center justify-between px-6 sm:px-10 md:px-16 pt-6 sm:pt-7 md:pt-8">
-          
-          <Link href="/" className="block cursor-pointer">
-            <div className="leading-none tracking-wide flex items-baseline gap-[6px] text-white transition-transform duration-200 hover:scale-[1.04]">
-              <span className="text-[26px] tracking-wider font-azonix uppercase">STRYV</span>
-              <span className="text-[25px] opacity-80 font-light lowercase">lab</span>
-            </div>
-          </Link>
-
-          <div className="flex items-center gap-3 sm:gap-4">
-            <Link 
-              href="/#services-section"
-              className="hidden sm:flex items-center justify-center h-[38px] text-white text-[13px] px-6 rounded-full bg-[#1A1A1A] border border-white/10 transition-transform duration-200 hover:scale-[1.05] active:scale-[0.98] cursor-pointer"
-            >
-              Services
-            </Link>
-
-            <CalendlyButton
-              text="Consultation"
-              className="flex items-center justify-center h-[38px] text-black text-[13px] px-6 rounded-full bg-[#DAFA72] transition-transform duration-200 hover:scale-[1.05] active:scale-[0.98] cursor-pointer"
-            />
+      <header className="w-full py-8 px-6 md:px-12 flex justify-between items-center sticky top-0 z-40 bg-background/80 backdrop-blur-md">
+        <Link 
+          href="/"
+          className="group flex items-center gap-3 text-sm font-medium text-secondary hover:text-primary transition-colors"
+        >
+          <div className="w-10 h-10 rounded-full bg-surface shadow-soft-out flex items-center justify-center group-hover:shadow-soft-in transition-all duration-300">
+            <ArrowLeft size={16} />
           </div>
-        </div>
+          <span className="hidden md:inline-block opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+            Retour au Lab
+          </span>
+        </Link>
       </header>
 
-      {/* HERO SECTION */}
-      <section className="relative h-[60vh] min-h-[500px] bg-[#303030] flex flex-col justify-center">
-        <div className="relative z-20 px-6 sm:px-10 md:px-16 lg:px-24 w-full">
-          <div className="max-w-5xl">
-          <h1 className="text-[#DAFA72] font-azonix uppercase leading-[0.95] tracking-tighter text-[clamp(3.8rem,7vw,9.5rem)]">
-  TOOLS <span className="text-[#6D6D6D]">HUB</span>
-</h1>
-
-            <p className="mt-8 text-white/70 text-sm max-w-xl border-l-2 border-[#DAFA72] pl-6 leading-relaxed">
-              Calculateurs de précision pour l'optimisation métabolique, hormonale et performance.<br />Calculez. Optimisez. Progressez.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* TOOLS GRID */}
-      <section className="relative px-6 md:px-12 lg:px-24 pb-40 -mt-20 z-30">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[1400px] mx-auto">
-          {toolIds.map((tool, index) => (
-            <Link 
-              key={tool.id}
-              href={`/outils/${tool.href}`}
-              className="group relative bg-[#1A1A1A] rounded-[24px] p-8 border border-white/5 hover:border-[#DAFA72] transition-all duration-300 hover:shadow-[0_4px_30px_-10px_rgba(218,250,114,0.15)] overflow-hidden flex flex-col h-full"
-            >
-              
-              {/* Symbole d'arrière-plan */}
-              <div className="absolute -bottom-4 -right-4 text-white/5 opacity-[0.03] pointer-events-none group-hover:opacity-[0.08] group-hover:scale-110 transition-all duration-700">
-                <tool.icon className="h-32 w-32 stroke-[0.5]" />
-              </div>
-
-              {/* Header Carte */}
-              <div className="relative flex justify-between items-start mb-8">
-                <div className="flex items-center gap-4">
-                    
-                    {/* ICONE CARRÉE GRADIENT + SHADOW */}
-                    <div 
-                      className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tool.color} flex items-center justify-center text-white transition-transform duration-500 group-hover:scale-105`}
-                      style={{ boxShadow: `0 0 20px -5px ${tool.shadow}` }}
-                    >
-                      <tool.icon className="w-7 h-7 stroke-[1.5]" />
-                    </div>
-                    
-                    {/* PRÉ-TITRE / TYPE */}
-                    <span className="text-[10px] uppercase tracking-wider text-white/40 border border-white/10 px-3 py-1 rounded-full group-hover:text-[#DAFA72] group-hover:border-[#DAFA72]/30 transition-colors duration-300">
-                      {tool.type}
-                    </span>
-                </div>
-                
-                {/* ID Number */}
-                <span className="font-mono text-[10px] text-white/10 font-bold group-hover:text-[#DAFA72] transition-colors">
-                  0{index + 1}
-                </span>
-              </div>
-
-              {/* Content */}
-              <div className="relative flex-1">
-                <h3 className="text-xl text-white mb-3 font-azonix uppercase group-hover:translate-x-1 transition-transform duration-300">
-                  {tool.title}
-                </h3>
-                
-                <p className="text-white/50 text-[13px] leading-relaxed font-light border-t border-white/5 pt-4">
-                  {tool.description}
+      {/* HERO */}
+      <section className="px-6 md:px-12 max-w-7xl mx-auto mt-8 mb-16">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+            <div>
+            <h1 className="mb-6 leading-tight">
+                  <span className="inline-block bg-accent text-white px-4 py-1 text-4xl md:text-6xl font-medium tracking-tight shadow-sm transform -rotate-0 origin-bottom-left">
+                    Lab_Open Source
+                  </span>
+                </h1>
+                <p className="text-secondary max-w-xl text-lg leading-relaxed">
+                Accès direct aux modèles mathématiques utilisés par STRYV lab.
+                Ces outils permettent d’analyser des métriques spécifiques, indépendamment ou dans un ordre logique.
+                Ils ne remplacent pas une analyse systémique complète et ne produisent aucun protocole.
                 </p>
-              </div>
-
-              {/* Footer Carte */}
-              <div className="relative mt-auto pt-6 flex items-center justify-between group/btn">
-                <span className="text-[11px] font-medium text-white/30 group-hover:text-white transition-colors uppercase tracking-wide">
-                  Initialiser
-                </span>
-                <span className="text-[#DAFA72] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                   <ArrowUpRight className="w-5 h-5" />
-                </span>
-              </div>
-            </Link>
-          ))}
+            </div>
+            
+            <div className="w-full max-w-sm">
+                <div className="relative flex items-center group">
+                    <Search className="absolute left-4 text-secondary group-focus-within:text-accent transition-colors" size={18} />
+                    <input 
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Rechercher (ex: Eau, Force, Diète...)"
+                        className="w-full pl-11 pr-4 py-3 bg-surface rounded-btn shadow-soft-in text-sm text-primary placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-accent/20 transition-all"
+                    />
+                    {searchQuery && (
+                        <button 
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-3 text-muted hover:text-primary transition-colors"
+                        >
+                            <XCircle size={16} />
+                        </button>
+                    )}
+                </div>
+            </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="relative z-10 bg-[#303030] text-white/40 py-12 px-6 sm:px-10 md:px-16 lg:px-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-[11px] tracking-wide font-light">
-            © {new Date().getFullYear()} STRYV lab - Genesis. Tous droits réservés.
-          </div>
+      {/* GRID */}
+      <section className="px-6 md:px-12 max-w-7xl mx-auto mb-32">
+        
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200/60">
+            <div className="flex items-center gap-4">
+                <Database size={20} className="text-accent"/>
+                <span className="text-xs font-bold tracking-widest uppercase text-primary">
+                    Base de données Active ({filteredTools.length})
+                </span>
+            </div>
         </div>
+
+        {filteredTools.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTools.map((tool, index) => {
+                const isDev = tool.status === 'dev';
+
+                // CONSTRUCTION DU CONTENU DE LA CARTE (DRY - Don't Repeat Yourself)
+                const CardContent = (
+                    <Card 
+                        variant="widget"
+                        className={`
+                            group h-full flex flex-col justify-between transition-all duration-300
+                            ${isDev 
+                                ? 'opacity-60 grayscale bg-gray-50/50 border-dashed border-gray-300 cursor-not-allowed' 
+                                : 'cursor-pointer hover:-translate-y-1'
+                            }
+                        `}
+                    >
+                        <div>
+                            <div className="flex justify-between items-start mb-6">
+                                <div className={`
+                                    w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300
+                                    ${isDev 
+                                        ? 'bg-gray-200 text-gray-400' 
+                                        : 'bg-surface shadow-soft-out text-primary group-hover:text-accent group-hover:scale-110'
+                                    }
+                                `}>
+                                    <tool.icon size={22} strokeWidth={1.5} />
+                                </div>
+                                
+                                <div className="flex flex-col items-end">
+                                    <span className="text-[9px] font-mono text-muted group-hover:text-accent transition-colors">
+                                        {tool.code || `TOOL_0${index + 1}`}
+                                    </span>
+                                    {isDev ? (
+                                        <span className="mt-1 px-2 py-0.5 bg-gray-200 rounded text-[9px] font-bold tracking-widest text-muted uppercase">
+                                            Locked
+                                        </span>
+                                    ) : (
+                                        <span className="mt-1 px-2 py-0.5 bg-surface-light rounded text-[9px] text-secondary font-medium border border-transparent group-hover:border-accent/20 transition-colors">
+                                            {tool.type}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            <h3 className={`text-xl font-bold mb-3 ${isDev ? 'text-gray-400' : 'text-primary group-hover:text-accent'} transition-colors`}>
+                                {tool.title}
+                            </h3>
+                            
+                            <p className="text-sm text-secondary leading-relaxed font-normal">
+                                {tool.description}
+                            </p>
+                        </div>
+
+                        <div className="mt-8 pt-4 border-t border-gray-100 flex items-center justify-between">
+                            <span className={`text-[10px] font-bold tracking-widest uppercase transition-colors ${isDev ? 'text-gray-400' : 'text-muted group-hover:text-primary'}`}>
+                                {isDev ? 'Module en dev' : 'Initialiser'}
+                            </span>
+                            
+                            <div className={`
+                                w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300
+                                ${isDev 
+                                    ? 'bg-gray-100 text-gray-400' 
+                                    : 'bg-surface-light text-muted group-hover:bg-accent group-hover:text-white shadow-sm'
+                                }
+                            `}>
+                                {isDev ? (
+                                    <Lock size={12} />
+                                ) : (
+                                    <ArrowLeft size={12} className="rotate-180" />
+                                )}
+                            </div>
+                        </div>
+                    </Card>
+                );
+
+                // RENDU CONDITIONNEL STRICT (TypeScript Safe)
+                if (isDev) {
+                    return (
+                        <div key={tool.id} className="block h-full">
+                            {CardContent}
+                        </div>
+                    );
+                }
+
+                return (
+                    <Link key={tool.id} href={`/outils/${tool.href}`} className="block h-full">
+                        {CardContent}
+                    </Link>
+                );
+            })}
+            </div>
+        ) : (
+            <div className="flex flex-col items-center justify-center py-20 opacity-60">
+                <Search size={48} className="text-muted mb-4" strokeWidth={1} />
+                <p className="text-lg font-medium text-secondary">Aucun outil trouvé pour "{searchQuery}"</p>
+                <button 
+                    onClick={() => setSearchQuery('')}
+                    className="mt-4 text-sm text-accent hover:underline underline-offset-4"
+                >
+                    Réinitialiser les filtres
+                </button>
+            </div>
+        )}
+      </section>
+
+      <footer className="relative z-10 py-12 px-6 border-t border-gray-200 text-center">
+        <p className="text-[11px] tracking-wide text-gray-400 uppercase font-medium">
+            © {new Date().getFullYear()} STRYV lab - Genesis Open Source.
+        </p>
       </footer>
-      
-      {/* CHATBOT */}
-      <GenesisAssistant />
     </main>
   );
 }

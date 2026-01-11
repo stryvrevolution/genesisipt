@@ -1,31 +1,52 @@
-// app/api/genesis/questions/route.ts (PAS page.tsx, mais route.ts !)
+// app/api/genesis/questions/route.ts
+
+import { NextResponse } from 'next/server';
+import { loadAllQuestions } from '../../../lib/genesis/questions/csv-parser';
+
+// Cache les questions en mémoire
+let cachedQuestions: any[] | null = null;
 
 export async function GET() {
-    const mockQuestions = [
-      {
-        id: 'Q_PROFIL_01',
-        text: 'Quel est votre âge ?',
-        response_type: 'Numérique',
-        min: 18,
-        max: 100,
+  try {
+    // Load questions (from cache if available)
+    if (!cachedQuestions) {
+      cachedQuestions = loadAllQuestions();
+    }
+
+    return NextResponse.json({
+      success: true,
+      questions: cachedQuestions,
+      total: cachedQuestions.length,
+    });
+  } catch (error) {
+    console.error('Error loading questions:', error);
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: 'Failed to load questions',
+        details: error instanceof Error ? error.message : 'Unknown error'
       },
-      {
-        id: 'Q_PROFIL_02',
-        text: 'Quel est votre sexe biologique ?',
-        response_type: 'Choix unique',
-        options: ['Homme', 'Femme'],
-      },
-      {
-        id: 'Q_MET_01',
-        text: 'Comment évaluez-vous votre niveau d\'énergie 1-2h après un repas ?',
-        response_type: 'Échelle 1-10',
-      },
-      {
-        id: 'Q_REC_01',
-        text: 'Sur une échelle de 1 à 10, comment évaluez-vous votre niveau de stress global ?',
-        response_type: 'Échelle 1-10',
-      },
-    ];
-  
-    return Response.json({ questions: mockQuestions });
+      { status: 500 }
+    );
   }
+}
+
+// Optional: Force reload
+export async function POST() {
+  try {
+    cachedQuestions = null;
+    cachedQuestions = loadAllQuestions();
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Questions reloaded',
+      total: cachedQuestions.length,
+    });
+  } catch (error) {
+    console.error('Error reloading questions:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to reload questions' },
+      { status: 500 }
+    );
+  }
+}

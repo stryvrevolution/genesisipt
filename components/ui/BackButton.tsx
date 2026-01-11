@@ -1,34 +1,36 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation';
 
-export function BackButton({ href = '/outils' }: { href?: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3 }}
-      className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10"
-    >
-      <Link
-        href={href}
-        className="group flex items-center gap-2 text-white/70 hover:text-white transition-colors"
-      >
-        <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-white/20 group-hover:border-[#19D4FF]/50 transition-all">
-          <ArrowLeft className="w-4 h-4 text-white" />
-        </div>
-        <span className="text-sm font-sans font-normal opacity-0 group-hover:opacity-100 transition-opacity text-white">
-          Retour
-        </span>
-      </Link>
-    </motion.div>
-  )
+interface BackButtonProps {
+  label?: string;
+  className?: string;
 }
 
+export const BackButton = ({ label = 'Retour', className = '' }: BackButtonProps) => {
+  const router = useRouter();
 
-
-
-
-
+  return (
+    <button
+      onClick={() => router.back()}
+      className={`
+        group inline-flex items-center gap-2 
+        text-[13px] font-medium text-secondary 
+        transition-colors duration-200 
+        hover:text-primary 
+        ${className}
+      `}
+    >
+      {/* Flèche SVG minimaliste (Stroke 1.5px) */}
+      <svg 
+        width="16" height="16" viewBox="0 0 24 24" fill="none" 
+        stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+        className="transition-transform duration-200 group-hover:-translate-x-1"
+      >
+        <path d="M19 12H5" />
+        <path d="M12 19l-7-7 7-7" />
+      </svg>
+      {label}
+    </button>
+  );
+};

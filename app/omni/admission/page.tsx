@@ -1,152 +1,171 @@
+'use client';
+
+import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import { InlineWidget } from "react-calendly";
+import { 
+  ArrowLeft, 
+  ShieldCheck, 
+  Crown, 
+  Activity, 
+  CheckCircle2, 
+  Info,
+  Lock,
+  Brain,
+  MessageCircle,
+  Smartphone
+} from 'lucide-react';
 import FaqOmniSchema from '@/components/seo/FaqOmniSchema';
-import OmniCheckoutButton from '@/app/api/stripe/OmniCheckoutButton';
-
-
-export const metadata = {
-  title: 'OMNI — admission & conditions | STRYV lab',
-  description:
-    'OMNI est un protocole d’optimisation avancée à admission stratégique. Découvrez les conditions d’accès, le processus de validation et le cadre méthodologique.',
-};
 
 export default function OmniAdmissionPage() {
   return (
-    <main className="bg-[#303030] text-white min-h-screen px-6 sm:px-10 md:px-16 lg:px-24 py-24">
-
-      <div className="max-w-4xl mx-auto space-y-16">
-
-        {/* retour */}
+    <main className="min-h-screen bg-background text-primary font-outfit flex flex-col">
+      
+      {/* NAVIGATION HAUTE */}
+      <nav className="max-w-7xl mx-auto px-6 py-8 w-full">
         <Link
           href="/omni"
-          className="inline-flex items-center gap-2 text-white/40 hover:text-white text-[10px] uppercase tracking-[0.2em] font-bold transition-colors"
+          className="inline-flex items-center gap-2 text-secondary hover:text-primary text-[10px] uppercase tracking-widest font-bold transition-all group"
         >
-          <ArrowLeft className="w-3 h-3" />
-          Retour
+          <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
+          Retour au programme
         </Link>
+      </nav>
 
-        {/* header */}
-        <header className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-[#DAFA72]/10 flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6 text-[#DAFA72]" />
+      <div className="flex-grow max-w-7xl mx-auto px-6 pb-24 grid lg:grid-cols-12 gap-16 items-start">
+        
+        {/* === COLONNE GAUCHE : LE CADRE MÉTHODOLOGIQUE === */}
+        <div className="lg:col-span-7 space-y-12">
+          
+          <header className="space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-light border border-gray-100 text-[10px] font-bold tracking-widest text-accent uppercase shadow-sm">
+              <ShieldCheck size={12} />
+              Admission Stratégique
             </div>
-            <span className="text-[10px] uppercase tracking-widest text-white/40 border border-white/10 px-3 py-1 rounded-full bg-white/5">
-              Protocole à admission
-            </span>
+
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]">
+              OMNI Coaching™<br />
+              <span className="text-secondary opacity-30 italic">Admission & Conditions</span>
+            </h1>
+
+            <p className="text-lg text-secondary border-l-2 border-accent pl-6 leading-relaxed">
+              OMNI est un protocole d’optimisation avancée. 
+              Il n’est ni automatique, ni standardisé. Son accès repose sur une admission stratégique.
+            </p>
+          </header>
+
+          <section className="space-y-10 text-secondary leading-relaxed">
+            
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+                <Crown size={20} className="text-amber-500" />
+                Un protocole pour systèmes stables
+              </h2>
+              <p className="text-sm">
+                OMNI est conçu pour des profils capables de soutenir un travail profond, continu et évolutif sur leur potentiel de transformation. 
+                Il ne force jamais un système instable. Cette exigence protège votre physiologie et garantit un cadre de travail durable.
+              </p>
+            </div>
+
+            {/* Grid de Fonctionnalités OMNI */}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-surface rounded-2xl border border-white/60 shadow-soft-out">
+                    <Brain className="text-primary mb-2" size={18} />
+                    <h3 className="text-[10px] font-bold uppercase tracking-wider mb-1">Neuro-Logic</h3>
+                    <p className="text-[10px] leading-snug">Adapté à votre profil neuro-biologique.</p>
+                </div>
+                <div className="p-4 bg-surface rounded-2xl border border-white/60 shadow-soft-out">
+                    <MessageCircle className="text-primary mb-2" size={18} />
+                    <h3 className="text-[10px] font-bold uppercase tracking-wider mb-1">Daily Support</h3>
+                    <p className="text-[10px] leading-snug">Réponse prioritaire 7j/7 par votre coach.</p>
+                </div>
+            </div>
+
+            <div className="bg-surface p-8 rounded-3xl shadow-soft-out border border-white/60 space-y-6">
+              <h3 className="text-xs font-bold text-primary uppercase tracking-widest">Le processus d'admission comprend :</h3>
+              <ul className="space-y-4">
+                {[
+                  "Sécurisation de votre place dans le processus d’admission",
+                  "Kick-off stratégique individuel avec un coach STRYV lab",
+                  "Analyse approfondie de votre situation (IPT™ + entretien)",
+                  "Mobilisation de ressources humaines et méthodologiques dédiées"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm font-medium">
+                    <CheckCircle2 size={16} className="text-accent mt-0.5 shrink-0" strokeWidth={3} />
+                    <span dangerouslySetInnerHTML={{ __html: item }} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="p-6 bg-surface-light rounded-2xl border border-gray-100 flex gap-4 items-start">
+              <Info size={20} className="text-primary shrink-0 mt-1" />
+              <p className="text-[11px] font-medium leading-relaxed italic">
+                Note : Si OMNI n’est pas validé, la valeur engagée est automatiquement réaffectée vers la solution la plus cohérente (G+ ou IPT ciblée).
+              </p>
+            </div>
+          </section>
+        </div>
+
+        {/* === COLONNE DROITE : RÉSERVATION OBLIGATOIRE === */}
+        <div className="lg:col-span-5 sticky top-12">
+          
+          <div className="bg-surface p-6 rounded-[2.5rem] shadow-soft-out border border-white/60 relative overflow-hidden">
+             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-40"></div>
+             
+             <div className="mb-6 text-center">
+                <h2 className="text-sm font-bold text-primary uppercase tracking-widest mb-1">Étape 1 : Appel Stratégique</h2>
+                <p className="text-[10px] text-secondary font-medium uppercase tracking-tight">Le kick-off stratégique est obligatoire</p>
+             </div>
+
+             {/* WIDGET CALENDLY SMART */}
+             <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-inner bg-white min-h-[600px]">
+                <InlineWidget 
+                  url="https://calendly.com/stryvlab/appel-strategique-30min"
+                  styles={{ height: '600px' }}
+                  pageSettings={{
+                    backgroundColor: 'ffffff',
+                    hideEventTypeDetails: true,
+                    hideGdprBanner: true,
+                    primaryColor: '10b981', // Emerald
+                    textColor: '0f172a'    // Slate
+                  }}
+                />
+             </div>
+
+             <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+                <p className="text-[9px] text-gray-400 flex items-center justify-center gap-1.5 font-bold uppercase tracking-widest">
+                    <Lock size={10} /> Planification SSL Sécurisée
+                </p>
+             </div>
           </div>
 
-          <h1 className="font-outfit text-4xl md:text-5xl font-medium leading-[0.95] tracking-[-0.02em]">
-            OMNI<br />
-            <span className="text-white/30">Admission & conditions</span>
-          </h1>
-
-          <p className="text-white/60 text-lg leading-relaxed max-w-3xl border-l border-[#DAFA72]/30 pl-4">
-            OMNI est un protocole d’optimisation avancée.
-            Il n’est ni automatique, ni standardisé.
-            Son accès repose sur une admission stratégique.
-          </p>
-        </header>
-
-        {/* contenu */}
-        <section className="space-y-12 text-white/70 leading-relaxed max-w-3xl">
-
-          <h2 className="text-white text-2xl font-medium">
-            OMNI n’est pas un programme standard
-          </h2>
-
-          <p>
-            OMNI est conçu pour des profils capables de soutenir un travail
-            profond, continu et évolutif sur leur potentiel de transformation.
-            Il ne force jamais un système instable.
-          </p>
-
-          <p>
-            L’accès à OMNI n’est pas automatique.
-            Il repose sur un processus d’admission destiné à garantir
-            la cohérence, la sécurité et l’efficacité du protocole.
-          </p>
-
-          <h2 className="text-white text-2xl font-medium">
-            Pourquoi un processus d’admission est indispensable
-          </h2>
-
-          <p>
-            La majorité des échecs en transformation ne sont pas liés
-            au manque d’effort, mais à un système non prêt.
-          </p>
-
-          <p>
-            OMNI s’active uniquement lorsque les conditions biologiques,
-            comportementales et contextuelles sont réunies.
-            Cette exigence protège votre physiologie et garantit
-            un cadre de travail durable.
-          </p>
-
-          <h2 className="text-white text-2xl font-medium">
-            Ce que déclenche le paiement omni
-          </h2>
-
-          <p>
-            Le paiement OMNI ne correspond pas à une entrée automatique
-            dans le protocole.
-          </p>
-
-          <ul className="space-y-3 pl-4 border-l border-white/10">
-            <li>• Sécurisation de votre place dans le processus d’admission</li>
-            <li>• Kick-off stratégique individuel avec un coach STRYV lab</li>
-            <li>• Analyse approfondie de votre situation (IPT™ + entretien)</li>
-            <li>• Mobilisation de ressources humaines et méthodologiques dédiées</li>
-          </ul>
-
-          <p>
-            Le paiement active l’ingénierie de votre dossier,
-            pas une promesse de transformation.
-          </p>
-
-          <h2 className="text-white text-2xl font-medium">
-            Le kick-off stratégique (obligatoire)
-          </h2>
-
-          <p>
-            Après confirmation du paiement, un appel stratégique
-            doit impérativement être réservé.
-          </p>
-
-          <p>
-            Sans ce rendez-vous, OMNI ne peut pas être activé.
-          </p>
-
-          <h2 className="text-white text-2xl font-medium">
-            En cas de non-admission
-          </h2>
-
-          <p>
-            Si OMNI n’est pas validé,
-            la valeur engagée est automatiquement réaffectée
-            vers la solution la plus cohérente
-            (G+, IPT ciblée ou crédit interne STRYV lab).
-          </p>
-
-        </section>
-
-        {/* CTA STRIPE */}
-        <section className="pt-12 border-t border-white/10 space-y-4 max-w-3xl">
-
-        <OmniCheckoutButton />
-
-
-          <p className="text-[10px] text-white/30 leading-relaxed text-center">
-            Le paiement déclenche une évaluation stratégique,
-            pas une entrée automatique dans le protocole.
-          </p>
-
-        </section>
-
-        {/* FAQ SEO */}
-        <FaqOmniSchema />
+          <div className="mt-6 flex items-center justify-center gap-6 opacity-30 grayscale hover:grayscale-0 transition-all duration-500">
+             <Activity size={24} />
+             <Smartphone size={24} />
+             <ShieldCheck size={24} />
+          </div>
+        </div>
 
       </div>
+
+      {/* FOOTER LÉGAL DÉTACHÉ */}
+      <footer className="border-t border-gray-100 bg-surface-light py-12 mt-auto">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="text-[10px] text-secondary text-center md:text-left">
+            <p className="font-bold text-primary uppercase tracking-[0.2em] mb-1">STRYV LAB</p>
+            <p>Laboratoire d'Ingénierie du Potentiel Humain</p>
+            <p className="mt-1">Admission OMNI™ • Accompagnement 12 Semaines</p>
+          </div>
+          <div className="flex gap-8 text-[10px] font-bold text-secondary uppercase tracking-widest">
+            <Link href="/cgv" className="hover:text-primary transition-colors">CGV</Link>
+            <Link href="/confidentialite" className="hover:text-primary transition-colors">Confidentialité</Link>
+            <Link href="/mentions-legales" className="hover:text-primary transition-colors">Légal</Link>
+          </div>
+        </div>
+      </footer>
+
+      <FaqOmniSchema />
     </main>
   );
 }

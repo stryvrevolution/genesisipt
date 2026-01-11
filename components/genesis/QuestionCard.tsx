@@ -1,3 +1,8 @@
+'use client';
+
+import React from 'react';
+import { Check } from 'lucide-react';
+
 interface QuestionCardProps {
   question: {
     id: string;
@@ -12,19 +17,25 @@ interface QuestionCardProps {
 }
 
 export function QuestionCard({ question, value, onAnswer }: QuestionCardProps) {
-  
+
   const renderInput = () => {
     switch (question.response_type) {
-      
-      // Échelle 1-10
+
+      /* =========================
+         Échelle 1–10
+         ========================= */
       case 'Échelle 1-10':
         return (
-          <div className="space-y-5">
-            <div className="flex justify-between items-center text-xs font-medium text-slate-500">
-              <span>1 - Très faible</span>
-              <span className="font-bold text-3xl text-slate-900 tabular-nums">{value || 5}</span>
-              <span>10 - Très élevé</span>
+          <div className="space-y-8 pt-2">
+
+            <div className="flex justify-between items-end text-xs tracking-widest text-secondary/60 uppercase">
+              <span>Faible</span>
+              <span className="text-5xl font-semibold text-primary tabular-nums leading-none">
+                {value || 5}
+              </span>
+              <span>Élevé</span>
             </div>
+
             <input
               type="range"
               value={value || 5}
@@ -32,111 +43,186 @@ export function QuestionCard({ question, value, onAnswer }: QuestionCardProps) {
               min={1}
               max={10}
               step={1}
-              className="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-slate-900"
+              className="w-full h-2 rounded-full appearance-none cursor-pointer focus:outline-none"
               style={{
-                backgroundImage: `linear-gradient(to right, #0f172a 0%, #0f172a ${((value || 5) - 1) * 11.11}%, #e2e8f0 ${((value || 5) - 1) * 11.11}%, #e2e8f0 100%)`
+                background: `linear-gradient(
+                  to right,
+                  #10b981 0%,
+                  #10b981 ${((value || 5) - 1) * 11.11}%,
+                  #e5e7eb ${((value || 5) - 1) * 11.11}%,
+                  #e5e7eb 100%
+                )`,
               }}
             />
-            <div className="flex justify-between text-[10px] text-slate-400 font-medium tabular-nums">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                <span key={n} className={value === n ? 'text-slate-900 font-bold' : ''}>{n}</span>
+
+            <div className="flex justify-between text-[9px] text-secondary/60 tabular-nums px-0.5">
+              {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                <span
+                  key={n}
+                  className={value === n ? 'text-accent font-medium' : ''}
+                >
+                  {n}
+                </span>
               ))}
             </div>
           </div>
         );
 
-      // Choix unique
+      /* =========================
+         Choix unique
+         ========================= */
       case 'Choix unique':
         return (
-          <div className="space-y-2.5">
-            {question.options?.map((option, idx) => (
-              <div
-                key={idx}
-                className={`group p-4 rounded-xl border transition-all cursor-pointer ${
-                  value === option 
-                    ? 'bg-slate-900 border-slate-900 shadow-lg shadow-slate-900/20' 
-                    : 'bg-white/60 border-slate-200 hover:bg-white hover:border-slate-300'
-                }`}
-                onClick={() => onAnswer(question.id, option)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
-                    value === option 
-                      ? 'border-white' 
-                      : 'border-slate-300 group-hover:border-slate-400'
-                  }`}>
-                    {value === option && (
-                      <div className="w-2 h-2 rounded-full bg-white"></div>
-                    )}
+          <div className="space-y-3">
+            {question.options?.map((option, idx) => {
+              const selected = value === option;
+              return (
+                <div
+                  key={idx}
+                  onClick={() => onAnswer(question.id, option)}
+                  className={`
+                    group flex items-center gap-4 p-5 rounded-xl border cursor-pointer transition-all
+                    ${selected
+                      ? 'bg-accent/10 border-accent text-primary'
+                      : 'bg-surface-light border-gray-100 text-secondary hover:bg-white'}
+                  `}
+                >
+                  <div
+                    className={`
+                      w-5 h-5 rounded-full border flex items-center justify-center transition-all
+                      ${selected ? 'border-accent' : 'border-gray-300'}
+                    `}
+                  >
+                    {selected && <div className="w-2.5 h-2.5 rounded-full bg-accent" />}
                   </div>
-                  <label className={`cursor-pointer flex-1 text-sm font-medium transition-colors ${
-                    value === option 
-                      ? 'text-white' 
-                      : 'text-slate-700'
-                  }`}>
+
+                  <span className="text-sm font-medium leading-snug">
                     {option}
-                  </label>
+                  </span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         );
 
-      // Input numérique
+      /* =========================
+         Choix multiple
+         ========================= */
+      case 'Choix multiple':
+        return (
+          <div className="space-y-3">
+            {question.options?.map((option, idx) => {
+              const selected = Array.isArray(value) && value.includes(option);
+              return (
+                <div
+                  key={idx}
+                  onClick={() => {
+                    const current = Array.isArray(value) ? value : [];
+                    const next = selected
+                      ? current.filter((v: string) => v !== option)
+                      : [...current, option];
+                    onAnswer(question.id, next);
+                  }}
+                  className={`
+                    group flex items-center gap-4 p-5 rounded-xl border cursor-pointer transition-all
+                    ${selected
+                      ? 'bg-primary/10 border-primary text-primary'
+                      : 'bg-surface-light border-gray-100 text-secondary hover:bg-white'}
+                  `}
+                >
+                  <div
+                    className={`
+                      w-5 h-5 rounded-md border flex items-center justify-center transition-all
+                      ${selected ? 'border-primary' : 'border-gray-300'}
+                    `}
+                  >
+                    {selected && <Check className="w-3 h-3 text-primary" strokeWidth={3} />}
+                  </div>
+
+                  <span className="text-sm font-medium leading-snug">
+                    {option}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        );
+
+      /* =========================
+         Numérique
+         ========================= */
       case 'Numérique':
         return (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <input
               type="number"
               value={value || ''}
               onChange={(e) => onAnswer(question.id, e.target.value)}
-              placeholder="Entrez une valeur"
-              className="w-full text-xl font-semibold p-5 text-center bg-white/80 border-2 border-slate-200 rounded-xl focus:border-slate-900 focus:outline-none transition-colors tabular-nums"
+              placeholder="0"
               min={question.min}
               max={question.max}
+              className="
+                w-full text-4xl font-semibold text-center tabular-nums
+                bg-surface-light rounded-2xl p-6
+                shadow-soft-in border border-transparent
+                focus:outline-none focus:ring-2 focus:ring-accent/20
+                placeholder:text-gray-300
+              "
             />
             {question.id.includes('POIDS') && (
-              <p className="text-xs text-slate-500 text-center font-medium">En kilogrammes (kg)</p>
+              <p className="text-[9px] tracking-widest uppercase text-secondary/60 text-center">
+                Kilogrammes
+              </p>
             )}
             {question.id.includes('TAILLE') && (
-              <p className="text-xs text-slate-500 text-center font-medium">En centimètres (cm)</p>
+              <p className="text-[9px] tracking-widest uppercase text-secondary/60 text-center">
+                Centimètres
+              </p>
             )}
           </div>
         );
 
-      // Texte libre
+      /* =========================
+         Texte libre
+         ========================= */
       case 'Texte libre':
         return (
           <textarea
             value={value || ''}
             onChange={(e) => onAnswer(question.id, e.target.value)}
-            placeholder="Votre réponse..."
-            className="w-full p-4 bg-white/80 border-2 border-slate-200 rounded-xl focus:border-slate-900 focus:outline-none min-h-[120px] text-sm text-slate-700 resize-none transition-colors"
+            placeholder="Saisissez votre réponse ici…"
+            className="
+              w-full min-h-[140px] resize-none
+              bg-surface-light rounded-2xl p-5
+              text-sm font-medium text-primary
+              shadow-soft-in border border-transparent
+              focus:outline-none focus:ring-2 focus:ring-accent/20
+              placeholder:text-gray-400
+            "
           />
         );
 
       default:
         return (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-            <p className="text-sm text-red-600 font-medium">
-              Type de question non supporté: {question.response_type}
-            </p>
+          <div className="p-4 rounded-xl bg-red-50 text-red-600 text-sm">
+            Type de question non supporté
           </div>
         );
     }
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl border border-white p-6 md:p-8 rounded-[32px] shadow-xl shadow-slate-200/50">
-      {/* Question text */}
-      <div className="mb-8">
-        <h2 className="text-lg md:text-xl font-semibold leading-relaxed text-slate-900">
+    <div className="bg-surface p-8 md:p-10 rounded-2xl shadow-soft-out">
+      
+      {/* Question */}
+      <div className="mb-10">
+        <p className="text-lg md:text-xl font-medium leading-relaxed text-primary">
           {question.text}
-        </h2>
+        </p>
       </div>
 
-      {/* Input based on type */}
-      <div>
+      {/* Réponse */}
+      <div className="animate-in fade-in duration-500">
         {renderInput()}
       </div>
     </div>

@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { calculateIPTScore } from '@/lib/genesis/scoring-engine';
+import { computeIPTScore } from '@/app/lib/genesis/scoring/scoring-engine';
+import rawMapping from '@/app/lib/genesis/mapping/questions_to_axes.json';
+import type { MappingFile } from '@/app/lib/genesis/scoring/scoring-engine';
+
+const mapping = rawMapping as unknown as MappingFile;
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,7 +17,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { sessionId, responses, email } = body;
 
-    // 1. Mettre à jour submission comme complétée
+    // 1. Marquer la soumission comme complétée
     const { data: submission, error: submissionError } = await supabase
       .from('ipt_submissions')
       .update({
@@ -26,28 +31,21 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (submissionError) throw submissionError;
+    if (submissionError || !submission) {
+      throw submissionError ?? new Error('Submission not found');
+    }
 
-    // 2. Calculer score IPT
-    const scoreData = calculateIPTScore(responses);
+    // 2. Calcul du score GENESIS
+    const scoreResult = computeIPTScore(responses, mapping);
 
-    // 3. Sauvegarder score
+    // 3. Sauvegarde du score réel
     const { data: score, error: scoreError } = await supabase
       .from('ipt_scores')
       .insert({
         submission_id: submission.id,
-        ipt_score: scoreData.iptScore,
-        ipt_category: scoreData.iptCategory,
-        metabolic_score: scoreData.metabolicScore,
-        infrastructure_score: scoreData.infrastructureScore,
-        psychology_score: scoreData.psychologyScore,
-        physiology_score: scoreData.physiologyScore,
-        adherence_score: scoreData.adherenceScore,
-        detected_patterns: scoreData.detectedPatterns,
-        red_flags: scoreData.redFlags,
-        root_causes: scoreData.rootCauses,
-        recommendations: scoreData.recommendations,
-        detailed_scores: scoreData.detailedScores,
+        scoring_version: scoreResult.scoring_version,
+        ipt_global: scoreResult.ipt_global,
+        axes: scoreResult.axes, // JSONB recommandé
       })
       .select()
       .single();
@@ -58,9 +56,9 @@ export async function POST(request: NextRequest) {
       success: true,
       submissionId: submission.id,
       scoreId: score.id,
-      iptScore: score.ipt_score,
-      iptCategory: score.ipt_category,
+      iptGlobal: scoreResult.ipt_global,
     });
+
   } catch (error) {
     console.error('Submit error:', error);
     return NextResponse.json(
